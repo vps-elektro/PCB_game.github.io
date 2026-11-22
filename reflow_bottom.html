@@ -1,0 +1,2734 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>V.P.S. ELEKTRO | Reflow BOTTOM</title>
+
+<style>
+/* ==========================================
+   ZÁKLADNÍ NASTAVENÍ
+========================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    color: #f5fbf6;
+    background: linear-gradient(135deg,#101d18,#244633);
+}
+
+button, input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid #d9f7e0;
+    outline-offset: 2px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   HLAVIČKA
+========================================== */
+
+header {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 8px 12px 5px;
+}
+
+.eyebrow {
+    color: #a4e2b5;
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+h1 {
+    font-size: clamp(19px,2vw,26px);
+    margin: 4px 0;
+}
+
+.intro {
+    margin: 0;
+    color: #c9dece;
+    font-size: 12px;
+}
+
+/* ==========================================
+   HLAVNÍ ROZLOŽENÍ
+========================================== */
+
+.layout {
+    flex: 1;
+    min-height: 0;
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 6px 12px 10px;
+
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 290px;
+    gap: 10px;
+}
+
+.panel {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 12px;
+
+    background: #1b3425;
+    border: 1px solid #587b61;
+    border-radius: 12px;
+}
+
+.panel h2 {
+    font-size: 18px;
+    color: #95dfac;
+    margin: 0 0 7px;
+}
+
+.helper {
+    font-size: 12px;
+    line-height: 1.45;
+    color: #c6daca;
+    margin: 5px 0 10px;
+}
+
+/* ==========================================
+   ÚVODNÍ FOTOGRAFIE PECE
+========================================== */
+
+#machineView {
+    height: 100%;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+#machineView h2,
+#machineView .helper {
+    align-self: stretch;
+}
+
+.oven-image {
+    display: block;
+    max-width: 100%;
+    max-height: 67%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 9px;
+    border: 1px solid #779582;
+}
+
+/* ==========================================
+   PRACOVNÍ OBRAZOVKA
+========================================== */
+
+#profileView:not(.hidden) {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+
+    background: #11271b;
+    border: 1px solid #4c6c55;
+    border-radius: 10px;
+    padding: 7px;
+}
+
+.chart-legend {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 4px 7px;
+
+    font-size: 11px;
+    color: #c6dacb;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-line {
+    width: 25px;
+    height: 0;
+    border-top: 3px dashed #e3ebe5;
+}
+
+.legend-line.user {
+    border-top: 4px solid #58b7ff;
+}
+
+.legend-line.melting {
+    border-top: 3px dashed #ff6868;
+}
+
+.chart-wrap {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#profileChart {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 150px;
+
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ==========================================
+   GRAF – SVG
+========================================== */
+
+.grid-line {
+    stroke: #52725d;
+    stroke-width: 1;
+    opacity: 0.6;
+}
+
+.zone-line {
+    stroke: #49634f;
+    stroke-width: 1;
+    stroke-dasharray: 4 7;
+}
+
+.axis-text,
+.zone-text {
+    fill: #c5d9cb;
+    font: 13px Arial, sans-serif;
+}
+
+.ref-line {
+    fill: none;
+    stroke: #e3ebe5;
+    stroke-width: 4;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-dasharray: 9 7;
+}
+
+.user-line {
+    fill: none;
+    stroke: #58b7ff;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.melting-line {
+    stroke: #ff6868;
+    stroke-width: 2.5;
+    stroke-dasharray: 10 6;
+}
+
+.melting-label {
+    fill: #ffa0a0;
+    font: bold 14px Arial, sans-serif;
+    text-anchor: end;
+}
+
+.handle-hit {
+    fill: transparent;
+    cursor: grab;
+}
+
+.handle {
+    fill: #58b7ff;
+    stroke: white;
+    stroke-width: 3;
+    pointer-events: none;
+}
+
+.handle-value {
+    fill: #c6e8ff;
+    font: bold 14px Arial, sans-serif;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+/* ==========================================
+   HODNOTY ZÓN
+========================================== */
+
+.zone-values {
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: repeat(6,minmax(0,1fr));
+    gap: 5px;
+    margin-top: 7px;
+}
+
+.zone-value {
+    min-width: 0;
+    padding: 7px 3px;
+
+    text-align: center;
+    background: #2d4e38;
+    border: 1px solid #587b61;
+    border-radius: 7px;
+}
+
+.zone-value strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #a2e7b7;
+    font-size: 11px;
+}
+
+.zone-value span {
+    display: block;
+    color: #bfe5ff;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* ==========================================
+   VYPÁLENÁ DPS – HLAVNÍ NÁHLED
+========================================== */
+
+#finishedView:not(.hidden) {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.finished-heading {
+    flex-shrink: 0;
+}
+
+.finished-heading p {
+    margin: 3px 0 10px;
+    color: #d1e5d5;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.finished-workspace {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px;
+
+    background: #11251a;
+    border: 1px solid #5d8165;
+    border-radius: 11px;
+}
+
+/*
+   DPS je otočená na šířku.
+   Obrázek má 897 × 537 px.
+*/
+
+.finished-board {
+    position: relative;
+
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+
+    aspect-ratio: 897 / 537;
+
+    overflow: hidden;
+
+    border-radius: 5px;
+
+    box-shadow:
+        0 12px 30px #0008,
+        0 0 0 2px #91ac95;
+
+    line-height: 0;
+}
+
+.finished-board > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+
+    user-select: none;
+    pointer-events: none;
+}
+
+/*
+   Obě vykreslovací vrstvy musí
+   zabírat CELÝ obrázek DPS.
+
+   Bez toho by procentuální pozice
+   mohly být vypočítány proti
+   nesprávnému rozměru.
+*/
+
+#finishedSolderLayer,
+#finishedComponentsLayer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#finishedSolderLayer {
+    z-index: 5;
+}
+
+#finishedComponentsLayer {
+    z-index: 7;
+}
+
+/* ==========================================
+   LESKLÝ PÁJENÝ SPOJ
+========================================== */
+
+.solder-joint {
+    position: absolute;
+    transform: translate(-50%,-50%);
+
+    border-radius: 30%;
+
+    background: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #f4fafb 12%,
+        #d6e0e3 27%,
+        #8b9da5 48%,
+        #f0f4f5 68%,
+        #697981 100%
+    );
+
+    border: 1px solid #e1ebee;
+
+    box-shadow:
+        inset 2px 2px 3px #ffffff,
+        inset -2px -2px 4px #4b5a62,
+        0 2px 5px #13251b9c;
+}
+
+.solder-joint::after {
+    content: "";
+
+    position: absolute;
+    top: 12%;
+    left: 13%;
+
+    width: 53%;
+    height: 18%;
+
+    background: #ffffff;
+    opacity: 0.95;
+    border-radius: 50%;
+    transform: rotate(-15deg);
+}
+
+/* ==========================================
+   OSazená SOUČÁSTKA
+========================================== */
+
+.soldered-component {
+    position: absolute;
+    transform: translate(-50%,-50%);
+
+    width: 3.1%;
+    height: 7.5%;
+
+    border-radius: 3px;
+
+    background: linear-gradient(
+        90deg,
+        #decba8 0%,
+        #bda47d 27%,
+        #896f50 57%,
+        #dfcda9 100%
+    );
+
+    border-top: 5px solid #dce3e5;
+    border-bottom: 5px solid #abb6bb;
+
+    box-shadow:
+        2px 3px 5px #152419b0,
+        inset 1px 0 2px #fffa;
+}
+
+.soldered-component.resistor {
+    background: #282c30;
+}
+
+.soldered-component.inductor {
+    background: #345b84;
+}
+
+.soldered-component.semiconductor {
+    background: #17191c;
+}
+
+.finished-footer {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding: 9px 2px 0;
+    font-size: 12px;
+    color: #b4dabd;
+}
+
+.board-warning {
+    flex-shrink: 0;
+    margin-top: 7px;
+    padding: 8px;
+    border: 1px solid #ad8654;
+    border-radius: 7px;
+    background: #58432b;
+    color: #ffe1b5;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+/* ==========================================
+   PRAVÝ PANEL
+========================================== */
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    overflow-y: auto;
+}
+
+.info-card,
+.conveyor-card {
+    padding: 10px;
+    border: 1px solid #52745b;
+    border-radius: 9px;
+    background: #294934;
+}
+
+.info-title {
+    margin-bottom: 6px;
+    color: #a0e7b7;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.info-body {
+    color: #d7e6da;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.conveyor-data {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 7px;
+    margin: 8px 0;
+}
+
+.conveyor-data > div {
+    text-align: center;
+    padding: 8px 5px;
+    border-radius: 6px;
+    background: #193322;
+}
+
+.conveyor-data strong {
+    display: block;
+    color: #a3edb7;
+    font-size: 20px;
+}
+
+.conveyor-data span {
+    font-size: 10px;
+    color: #c1d8c7;
+}
+
+.speed-label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.speed-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.speed-input {
+    width: 100%;
+    min-width: 0;
+    padding: 10px;
+
+    border: 2px solid #709979;
+    border-radius: 7px;
+
+    background: #10271a;
+    color: #bfe5ff;
+
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.speed-unit {
+    flex-shrink: 0;
+    font-size: 12px;
+}
+
+.speed-hint {
+    color: #bad5c2;
+    font-size: 11px;
+    line-height: 1.4;
+    margin-top: 7px;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding: 5px 0;
+
+    border-bottom: 1px solid #48654f;
+
+    font-size: 12px;
+}
+
+.status-row strong {
+    color: #9fe4b5;
+}
+
+/* ==========================================
+   TLAČÍTKA
+========================================== */
+
+.primary,
+.secondary {
+    width: 100%;
+    padding: 11px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.primary {
+    border: none;
+    background: #8bdba5;
+    color: #10291b;
+}
+
+.primary:hover {
+    background: #b9f3c8;
+}
+
+.secondary {
+    border: 1px solid #77a983;
+    background: #2b5137;
+    color: #d8f0dc;
+}
+
+.secondary:hover {
+    background: #386946;
+}
+
+.primary:disabled {
+    background: #607c67;
+    color: #c5d4c8;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   VÝSLEDEK
+========================================== */
+
+.result {
+    padding: 10px;
+    border: 1px solid #607b65;
+    border-radius: 8px;
+    background: #294934;
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.result.success {
+    background: #244d34;
+    border-color: #8bdba5;
+}
+
+.result.failure {
+    background: #533b29;
+    border-color: #d5a16e;
+}
+
+.result-title {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.result p {
+    margin: 5px 0;
+}
+
+.small-note {
+    color: #b4cdbb;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+/* ==========================================
+   MENŠÍ OBRAZOVKY NA ŠÍŘKU
+========================================== */
+
+@media (max-width:1100px) and (orientation:landscape) {
+
+    .layout {
+        grid-template-columns: minmax(0,1fr) 250px;
+        gap: 7px;
+        padding: 4px 7px;
+    }
+
+    .panel {
+        padding: 8px;
+    }
+
+    header {
+        padding: 4px;
+    }
+
+    h1 {
+        font-size: 19px;
+    }
+
+    .info-card {
+        display: none;
+    }
+
+    .zone-value {
+        padding: 5px 2px;
+    }
+}
+
+/* ==========================================
+   NÍZKÉ OBRAZOVKY
+========================================== */
+
+@media (max-height:700px) and (orientation:landscape) {
+
+    header {
+        padding: 3px;
+    }
+
+    .eyebrow,
+    .intro,
+    .profile-description,
+    .small-note {
+        display: none;
+    }
+
+    .panel h2 {
+        font-size: 16px;
+    }
+
+    .conveyor-card {
+        padding: 7px;
+    }
+
+    .conveyor-data {
+        margin: 5px 0;
+    }
+
+    .conveyor-data > div {
+        padding: 5px;
+    }
+
+    .conveyor-data strong {
+        font-size: 16px;
+    }
+
+    .speed-input {
+        padding: 7px;
+        font-size: 17px;
+    }
+
+    .primary,
+    .secondary {
+        padding: 8px;
+    }
+}
+
+/* ==========================================
+   TABLET NA VÝŠKU
+========================================== */
+
+@media (orientation:portrait) {
+
+    body {
+        height: auto;
+        min-height: 100dvh;
+        overflow-y: auto;
+    }
+
+    .layout {
+        flex: none;
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .panel {
+        overflow: visible;
+    }
+
+    #profileView:not(.hidden) {
+        min-height: 480px;
+    }
+
+    .chart-wrap {
+        min-height: 270px;
+    }
+
+    #finishedView:not(.hidden) {
+        min-height: 420px;
+    }
+
+    .finished-board {
+        height: auto;
+        width: 100%;
+    }
+
+    .sidebar {
+        overflow: visible;
+    }
+}
+
+@media (max-width:600px) {
+
+    .zone-values {
+        grid-template-columns: repeat(3,1fr);
+    }
+
+    .chart-wrap {
+        min-height: 240px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <p class="eyebrow">
+        V.P.S. ELEKTRO · VÝROBNÍ OPERACE 05
+    </p>
+
+    <h1>Reflow pájení – BOTTOM</h1>
+
+    <p class="intro">
+        Nastavte teplotní profil a rychlost dopravníku.
+    </p>
+</header>
+
+<main class="layout">
+
+    <!-- ==================================
+         LEVÁ ČÁST
+    ================================== -->
+
+    <section class="panel">
+
+        <!-- NÁHLED PECE -->
+
+        <div id="machineView">
+
+            <h2>Reflow pec</h2>
+
+            <img
+                class="oven-image"
+                src="images/pec.jpg"
+                alt="Reflow pec"
+            >
+
+            <p class="helper">
+                Deska BOTTOM je osazena a připravena
+                k přetavení pájecí pasty.
+                Nastavte šest teplotních zón
+                a rychlost dopravníku.
+            </p>
+
+            <button
+                class="primary"
+                id="openProfile"
+                type="button"
+                style="max-width:360px">
+                Vypálit DPS →
+            </button>
+
+        </div>
+
+        <!-- NASTAVENÍ PROFILU -->
+
+        <div id="profileView" class="hidden">
+
+            <h2>Teplotní profil pece</h2>
+
+            <p class="helper profile-description">
+                Přetahujte modré body k přerušované
+                referenční křivce.
+                Červená čára označuje 220 °C.
+            </p>
+
+            <div class="chart-panel">
+
+                <div class="chart-legend">
+
+                    <span class="legend-item">
+                        <span class="legend-line"></span>
+                        Reference
+                    </span>
+
+                    <span class="legend-item">
+                        <span class="legend-line user"></span>
+                        Váš profil
+                    </span>
+
+                    <span class="legend-item">
+                        <span class="legend-line melting"></span>
+                        Prahová teplota 220 °C
+                    </span>
+
+                </div>
+
+                <div class="chart-wrap">
+
+                    <svg
+                        id="profileChart"
+                        viewBox="0 0 760 340"
+                        preserveAspectRatio="xMidYMid meet"
+                        aria-label="Teplotní profil šesti zón">
+                    </svg>
+
+                </div>
+
+            </div>
+
+            <div
+                class="zone-values"
+                id="zoneValues">
+            </div>
+
+        </div>
+
+        <!-- ==================================
+             NÁHLED VYPÁLENÉ DPS
+        ================================== -->
+
+        <div id="finishedView" class="hidden">
+
+            <div class="finished-heading">
+
+                <h2>
+                    DPS BOTTOM – po reflow pájení
+                </h2>
+
+                <p>
+                    DPS prošla pecí.
+                    Nanesená pájecí pasta se přetavila
+                    a vytvořila lesklé pájené spoje.
+                </p>
+
+            </div>
+
+            <div class="finished-workspace">
+
+                <div
+                    class="finished-board"
+                    id="finishedBoard">
+
+                    <img
+                        src="images/blikac_bot.png"
+                        alt="Vodorovná DPS BOTTOM"
+                        draggable="false"
+                    >
+
+                    <!-- VRSTVA LESKLÉHO CÍNU -->
+
+                    <div id="finishedSolderLayer"></div>
+
+                    <!-- VRSTVA SOUČÁSTEK -->
+
+                    <div id="finishedComponentsLayer"></div>
+
+                </div>
+
+            </div>
+
+            <div
+                class="board-warning hidden"
+                id="boardWarning">
+            </div>
+
+            <div class="finished-footer">
+
+                <span>
+                    ✓ Reflow proces dokončen
+                </span>
+
+                <span>
+                    Strana BOTTOM
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ==================================
+         PRAVÝ PANEL
+    ================================== -->
+
+    <aside class="panel sidebar">
+
+        <h2>Řízení reflow pece</h2>
+
+        <div class="info-card" id="profileInfo">
+
+            <div class="info-title">
+                Teplotní profil
+            </div>
+
+            <div class="info-body">
+                Nastavte šest zón.
+                Průměrná odchylka musí být
+                menší než 10 %.
+            </div>
+
+        </div>
+
+        <div class="conveyor-card" id="conveyorCard">
+
+            <div class="info-title">
+                Nastavení dopravníku
+            </div>
+
+            <p class="info-body">
+                Vypočítejte rychlost z délky pece
+                a požadované doby průjezdu.
+            </p>
+
+            <div class="conveyor-data">
+
+                <div>
+                    <strong>4 m</strong>
+                    <span>Délka pece</span>
+                </div>
+
+                <div>
+                    <strong>5 min</strong>
+                    <span>Doba průjezdu</span>
+                </div>
+
+            </div>
+
+            <label
+                class="speed-label"
+                for="conveyorSpeed">
+                Rychlost dopravníku
+            </label>
+
+            <div class="speed-input-row">
+
+                <input
+                    class="speed-input"
+                    id="conveyorSpeed"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="Zadejte"
+                >
+
+                <span class="speed-unit">
+                    m/min
+                </span>
+
+            </div>
+
+            <p class="speed-hint">
+                Použijte desetinnou čárku nebo tečku.
+            </p>
+
+        </div>
+
+        <div class="status-row">
+            <span>Prahová teplota</span>
+            <strong>220 °C</strong>
+        </div>
+
+        <div class="status-row">
+            <span>Limit odchylky</span>
+            <strong>Pod 10 %</strong>
+        </div>
+
+        <div class="status-row">
+            <span>Počet pokusů</span>
+            <strong id="attemptCount">0</strong>
+        </div>
+
+        <button
+            class="primary"
+            id="runButton"
+            type="button"
+            disabled>
+            Spustit reflow →
+        </button>
+
+        <button
+            class="secondary"
+            id="retryButton"
+            type="button">
+            Upravit nastavení
+        </button>
+
+        <div id="resultBox" class="result">
+
+            <div class="result-title">
+                Připraveno
+            </div>
+
+            Nastavte teploty a rychlost dopravníku.
+
+        </div>
+
+        <button
+            class="primary hidden"
+            id="finishButton"
+            type="button">
+            Dokončit operaci →
+        </button>
+
+        <p class="small-note">
+            Výuková simulace. Nastavení topných zón
+            není totožné se změřenou teplotou DPS.
+        </p>
+
+    </aside>
+
+</main>
+
+<script src="choices.js"></script>
+
+<script>
+"use strict";
+
+// ==========================================
+// 1. NASTAVENÍ HRY
+// ==========================================
+
+const STEP_NAME = "reflowBottom";
+
+const COMPLETE_KEY =
+    "vps_semafor_krok_5_dokonceno";
+
+const BACKUP_KEY =
+    "vps_semafor_reflow_bottom_data";
+
+const CHOICES_KEY =
+    "vps_semafor_choices";
+
+
+// ==========================================
+// 2. TEPLOTNÍ PROFIL
+// ==========================================
+
+const REFERENCE = [
+    145,
+    175,
+    205,
+    260,
+    260,
+    190
+];
+
+const INITIAL = [
+    110,
+    130,
+    160,
+    205,
+    220,
+    225
+];
+
+const MELTING_TEMP = 220;
+
+const TEMPERATURE_LIMIT = 10;
+
+const MIN_TEMP = 80;
+const MAX_TEMP = 280;
+
+
+// ==========================================
+// 3. DOPRAVNÍK
+// ==========================================
+
+const OVEN_LENGTH = 4;
+
+const TARGET_TIME = 5;
+
+const TARGET_SPEED =
+    OVEN_LENGTH / TARGET_TIME;
+
+const SPEED_LIMIT = 10;
+
+
+// ==========================================
+// 4. GRAF
+// ==========================================
+
+const GRAPH = {
+    width: 760,
+    height: 340,
+    left: 66,
+    right: 728,
+    top: 27,
+    bottom: 288
+};
+
+const ZONES = 6;
+
+function zoneX(index) {
+
+    return GRAPH.left +
+        index *
+        (GRAPH.right - GRAPH.left) /
+        (ZONES - 1);
+}
+
+function temperatureY(temp) {
+
+    return GRAPH.bottom -
+        (temp - MIN_TEMP) *
+        (GRAPH.bottom - GRAPH.top) /
+        (MAX_TEMP - MIN_TEMP);
+}
+
+function yToTemperature(y) {
+
+    return MAX_TEMP -
+        (y - GRAPH.top) *
+        (MAX_TEMP - MIN_TEMP) /
+        (GRAPH.bottom - GRAPH.top);
+}
+
+function clamp(value, min, max) {
+
+    return Math.max(
+        min,
+        Math.min(max, value)
+    );
+}
+
+
+// ==========================================
+// 5. STAV HRY
+// ==========================================
+
+let temperatures = [...INITIAL];
+
+let speedText = "";
+
+let attempts = [];
+
+let completed = false;
+
+let lastResult = null;
+
+let activePointer = null;
+
+let profileOpened = false;
+
+
+// ==========================================
+// 6. POMOCNÉ ČTENÍ DAT
+// ==========================================
+
+function readLocalJSON(key) {
+
+    try {
+
+        const raw =
+            localStorage.getItem(key);
+
+        return raw
+            ? JSON.parse(raw)
+            : null;
+
+    } catch (error) {
+
+        console.warn(
+            "Chyba čtení:",
+            key,
+            error
+        );
+
+        return null;
+    }
+}
+
+
+function getStepData(name) {
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.getStep === "function"
+        ) {
+
+            return VPSChoices.getStep(name) || {};
+        }
+
+    } catch (error) {
+
+        console.warn(error);
+    }
+
+    return {};
+}
+
+
+// Vrátí první objekt s údaji.
+
+function firstNonEmpty(...objects) {
+
+    for (const obj of objects) {
+
+        if (
+            obj &&
+            typeof obj === "object" &&
+            !Array.isArray(obj) &&
+            Object.keys(obj).length > 0
+        ) {
+
+            return obj;
+        }
+    }
+
+    return {};
+}
+
+
+// ==========================================
+// 7. NAČTENÍ REFlow
+// ==========================================
+
+function loadState() {
+
+    try {
+
+        let saved =
+            getStepData(STEP_NAME);
+
+        if (
+            !saved.rozhodnuti ||
+            !Array.isArray(
+                saved.rozhodnuti.teploty
+            )
+        ) {
+
+            saved =
+                readLocalJSON(BACKUP_KEY) || {};
+        }
+
+        const data =
+            saved.rozhodnuti || saved;
+
+        if (
+            Array.isArray(data.teploty) &&
+            data.teploty.length === ZONES
+        ) {
+
+            temperatures = data.teploty.map(
+                value => clamp(
+                    Math.round(Number(value)),
+                    MIN_TEMP,
+                    MAX_TEMP
+                )
+            );
+        }
+
+        speedText = String(
+            data.rychlostText ??
+            data.rychlost ??
+            ""
+        );
+
+        attempts =
+            Array.isArray(data.pokusy)
+                ? data.pokusy
+                : [];
+
+        lastResult =
+            data.posledniVysledek || null;
+
+        completed =
+            saved.dokonceno === true ||
+            localStorage.getItem(
+                COMPLETE_KEY
+            ) === "true";
+
+    } catch (error) {
+
+        console.warn(
+            "Chyba načítání reflow:",
+            error
+        );
+    }
+}
+
+
+// ==========================================
+// 8. ULOŽENÍ REFLOW
+// ==========================================
+
+function saveState() {
+
+    const data = {
+
+        dokonceno: completed,
+
+        rozhodnuti: {
+
+            teploty: [...temperatures],
+
+            rychlostText: speedText,
+
+            rychlost: parseSpeed(),
+
+            pokusy: [...attempts],
+
+            posledniVysledek: lastResult
+
+        }
+    };
+
+    try {
+
+        if (
+            typeof VPSChoices === "undefined" ||
+            typeof VPSChoices.saveStep !== "function"
+        ) {
+
+            throw new Error(
+                "choices.js není načten."
+            );
+        }
+
+        const result =
+            VPSChoices.saveStep(
+                STEP_NAME,
+                data
+            );
+
+        if (result === false) {
+
+            throw new Error(
+                "Nepodařilo se uložit výrobní kartu."
+            );
+        }
+
+        localStorage.setItem(
+            BACKUP_KEY,
+            JSON.stringify(data)
+        );
+
+        if (completed) {
+
+            localStorage.setItem(
+                COMPLETE_KEY,
+                "true"
+            );
+
+        } else {
+
+            localStorage.removeItem(
+                COMPLETE_KEY
+            );
+        }
+
+        return true;
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Nepodařilo se uložit reflow."
+        );
+
+        return false;
+    }
+}
+
+
+// ==========================================
+// 9. RYCHLOST DOPRAVNÍKU
+// ==========================================
+
+function parseSpeed() {
+
+    const normalized =
+        speedText.trim().replace(",", ".");
+
+    if (!normalized) {
+        return null;
+    }
+
+    const speed = Number(normalized);
+
+    if (
+        !Number.isFinite(speed) ||
+        speed <= 0
+    ) {
+
+        return null;
+    }
+
+    return speed;
+}
+
+
+document.getElementById(
+    "conveyorSpeed"
+).addEventListener("input", event => {
+
+    speedText = event.target.value;
+
+    if (!completed) {
+        saveState();
+    }
+});
+
+
+// ==========================================
+// 10. TVORBA KŘIVEK
+// ==========================================
+
+function createPath(values) {
+
+    return values.map(
+        (value, index) => {
+
+            const x = zoneX(index);
+            const y = temperatureY(value);
+
+            return (
+                (index === 0 ? "M" : "L") +
+                x.toFixed(1) + " " +
+                y.toFixed(1)
+            );
+
+        }
+    ).join(" ");
+}
+
+
+// ==========================================
+// 11. VYKRESLENÍ GRAFU
+// ==========================================
+
+function renderChart() {
+
+    const svg =
+        document.getElementById(
+            "profileChart"
+        );
+
+    let markup = "";
+
+    // Vodorovné čáry.
+
+    for (
+        let temp = 100;
+        temp <= 280;
+        temp += 20
+    ) {
+
+        const y = temperatureY(temp);
+
+        markup += `
+            <line
+                class="grid-line"
+                x1="${GRAPH.left}"
+                y1="${y}"
+                x2="${GRAPH.right}"
+                y2="${y}"
+            />
+
+            <text
+                class="axis-text"
+                x="${GRAPH.left - 13}"
+                y="${y + 5}"
+                text-anchor="end">
+                ${temp}°
+            </text>
+        `;
+    }
+
+    // Svislé osy jednotlivých zón.
+
+    for (let i = 0; i < ZONES; i++) {
+
+        const x = zoneX(i);
+
+        markup += `
+            <line
+                class="zone-line"
+                x1="${x}"
+                y1="${GRAPH.top}"
+                x2="${x}"
+                y2="${GRAPH.bottom}"
+            />
+
+            <text
+                class="zone-text"
+                x="${x}"
+                y="319"
+                text-anchor="middle">
+                Zóna ${i + 1}
+            </text>
+        `;
+    }
+
+    // Prahová teplota.
+
+    const meltingY =
+        temperatureY(MELTING_TEMP);
+
+    markup += `
+        <line
+            class="melting-line"
+            x1="${GRAPH.left}"
+            y1="${meltingY}"
+            x2="${GRAPH.right}"
+            y2="${meltingY}"
+        />
+
+        <text
+            class="melting-label"
+            x="${GRAPH.right - 8}"
+            y="${meltingY - 11}">
+            Prahová teplota 220 °C
+        </text>
+    `;
+
+    // Referenční profil.
+
+    markup += `
+        <path
+            class="ref-line"
+            d="${createPath(REFERENCE)}"
+        />
+    `;
+
+    // Nastavení dítěte.
+
+    markup += `
+        <path
+            class="user-line"
+            d="${createPath(temperatures)}"
+        />
+    `;
+
+    // Dotykové body.
+
+    temperatures.forEach(
+        (temp, index) => {
+
+            const x = zoneX(index);
+            const y = temperatureY(temp);
+
+            const labelY =
+                y < 55 ? y + 37 : y - 23;
+
+            markup += `
+                <g>
+                    <circle
+                        class="handle-hit"
+                        data-handle="${index}"
+                        cx="${x}"
+                        cy="${y}"
+                        r="29"
+                    />
+
+                    <circle
+                        class="handle"
+                        cx="${x}"
+                        cy="${y}"
+                        r="10"
+                    />
+
+                    <text
+                        class="handle-value"
+                        x="${x}"
+                        y="${labelY}">
+                        ${temp} °C
+                    </text>
+                </g>
+            `;
+        }
+    );
+
+    svg.innerHTML = markup;
+
+    renderZoneValues();
+}
+
+
+// ==========================================
+// 12. HODNOTY ZÓN
+// ==========================================
+
+function renderZoneValues() {
+
+    const container =
+        document.getElementById(
+            "zoneValues"
+        );
+
+    container.replaceChildren();
+
+    temperatures.forEach(
+        (temp, index) => {
+
+            const card =
+                document.createElement("div");
+
+            card.className = "zone-value";
+
+            const title =
+                document.createElement("strong");
+
+            title.textContent =
+                "Zóna " + (index + 1);
+
+            const value =
+                document.createElement("span");
+
+            value.textContent =
+                temp + " °C";
+
+            card.appendChild(title);
+            card.appendChild(value);
+
+            container.appendChild(card);
+        }
+    );
+}
+
+
+// ==========================================
+// 13. OVLÁDÁNÍ DOTYKEM
+// ==========================================
+
+const chart =
+    document.getElementById(
+        "profileChart"
+    );
+
+
+chart.addEventListener(
+    "pointerdown",
+    event => {
+
+        if (completed) {
+            return;
+        }
+
+        const handle =
+            event.target.closest(
+                "[data-handle]"
+            );
+
+        if (
+            !handle ||
+            !event.isPrimary ||
+            event.button > 0
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+
+        activePointer = {
+
+            pointerId: event.pointerId,
+
+            index: Number(
+                handle.dataset.handle
+            )
+
+        };
+
+        chart.setPointerCapture(
+            event.pointerId
+        );
+
+        updateDraggedTemperature(event);
+    }
+);
+
+
+chart.addEventListener(
+    "pointermove",
+    event => {
+
+        if (
+            !activePointer ||
+            event.pointerId !==
+            activePointer.pointerId
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+
+        updateDraggedTemperature(event);
+    }
+);
+
+
+chart.addEventListener(
+    "pointerup",
+    event => {
+
+        if (
+            !activePointer ||
+            event.pointerId !==
+            activePointer.pointerId
+        ) {
+            return;
+        }
+
+        updateDraggedTemperature(event);
+
+        activePointer = null;
+
+        if (
+            chart.hasPointerCapture(
+                event.pointerId
+            )
+        ) {
+
+            chart.releasePointerCapture(
+                event.pointerId
+            );
+        }
+
+        saveState();
+    }
+);
+
+
+chart.addEventListener(
+    "pointercancel",
+    () => {
+
+        activePointer = null;
+        saveState();
+    }
+);
+
+
+// ==========================================
+// 14. PŘEVOD PRSTU NA TEPLOTU
+// ==========================================
+
+function updateDraggedTemperature(event) {
+
+    if (!activePointer) {
+        return;
+    }
+
+    const point =
+        chart.createSVGPoint();
+
+    point.x = event.clientX;
+    point.y = event.clientY;
+
+    const matrix =
+        chart.getScreenCTM();
+
+    if (!matrix) {
+        return;
+    }
+
+    const svgPoint =
+        point.matrixTransform(
+            matrix.inverse()
+        );
+
+    const temp = Math.round(
+        clamp(
+            yToTemperature(svgPoint.y),
+            MIN_TEMP,
+            MAX_TEMP
+        )
+    );
+
+    temperatures[
+        activePointer.index
+    ] = temp;
+
+    renderChart();
+}
+
+
+// ==========================================
+// 15. ODCHYLKA TEPLOT
+// ==========================================
+
+function calculateTemperatureDeviation() {
+
+    const deviations =
+        temperatures.map(
+            (temp, index) => {
+
+                const reference =
+                    REFERENCE[index];
+
+                return (
+                    Math.abs(temp - reference) /
+                    reference * 100
+                );
+            }
+        );
+
+    const average =
+        deviations.reduce(
+            (a, b) => a + b,
+            0
+        ) / deviations.length;
+
+    return {
+        deviations,
+        average
+    };
+}
+
+
+// ==========================================
+// 16. ODCHYLKA RYCHLOSTI
+// ==========================================
+
+function calculateSpeedDeviation(speed) {
+
+    return (
+        Math.abs(speed - TARGET_SPEED) /
+        TARGET_SPEED * 100
+    );
+}
+
+
+// ==========================================
+// 17. SPUŠTĚNÍ REFLOW
+// ==========================================
+
+function runReflow() {
+
+    if (completed || !profileOpened) {
+        return;
+    }
+
+    const speed = parseSpeed();
+
+    if (speed === null) {
+
+        alert(
+            "Zadejte platnou rychlost " +
+            "dopravníku v m/min."
+        );
+
+        document.getElementById(
+            "conveyorSpeed"
+        ).focus();
+
+        return;
+    }
+
+    const tempResult =
+        calculateTemperatureDeviation();
+
+    const speedDeviation =
+        calculateSpeedDeviation(speed);
+
+    const tempPassed =
+        tempResult.average <
+        TEMPERATURE_LIMIT;
+
+    const speedPassed =
+        speedDeviation < SPEED_LIMIT;
+
+    const passed =
+        tempPassed && speedPassed;
+
+    const actualTime =
+        OVEN_LENGTH / speed;
+
+    const attempt = {
+
+        cislo: attempts.length + 1,
+
+        teploty: [...temperatures],
+
+        odchylkyZon: [
+            ...tempResult.deviations
+        ],
+
+        prumernaOdchylkaTeplot:
+            tempResult.average,
+
+        rychlost: speed,
+
+        dobaPrůjezdu: actualTime,
+
+        odchylkaRychlosti:
+            speedDeviation,
+
+        teplotniProfilVyhovuje:
+            tempPassed,
+
+        rychlostVyhovuje:
+            speedPassed,
+
+        uspesny: passed,
+
+        cas: new Date().toISOString()
+
+    };
+
+    const previousResult = lastResult;
+
+    attempts.push(attempt);
+
+    lastResult = attempt;
+
+    completed = passed;
+
+    if (!saveState()) {
+
+        attempts.pop();
+
+        lastResult = previousResult;
+
+        completed = false;
+
+        return;
+    }
+
+    renderResult();
+    updateSidebar();
+
+    if (passed) {
+
+        showFinishedBoard();
+    }
+}
+
+
+// ==========================================
+// 18. VÝSLEDEK POKUSU
+// ==========================================
+
+function renderResult() {
+
+    const box =
+        document.getElementById(
+            "resultBox"
+        );
+
+    box.className = "result";
+
+    if (!lastResult) {
+
+        box.innerHTML = `
+            <div class="result-title">
+                Připraveno k nastavení
+            </div>
+
+            Nastavte teploty a rychlost dopravníku.
+        `;
+
+        return;
+    }
+
+    const tempDeviation = Number(
+        lastResult.prumernaOdchylkaTeplot
+    ).toFixed(2);
+
+    const speedDeviation = Number(
+        lastResult.odchylkaRychlosti
+    ).toFixed(2);
+
+    if (lastResult.uspesny) {
+
+        box.classList.add("success");
+
+        box.innerHTML = `
+            <div class="result-title">
+                ✓ Reflow úspěšné
+            </div>
+
+            <p>
+                Odchylka teplot:
+                <strong>${tempDeviation} %</strong>
+            </p>
+
+            <p>
+                Odchylka rychlosti:
+                <strong>${speedDeviation} %</strong>
+            </p>
+
+            <p>
+                DPS úspěšně prošla pecí.
+            </p>
+        `;
+
+    } else {
+
+        box.classList.add("failure");
+
+        const tStatus =
+            lastResult.teplotniProfilVyhovuje
+                ? "Vyhovuje"
+                : "Nevyhovuje";
+
+        const sStatus =
+            lastResult.rychlostVyhovuje
+                ? "Vyhovuje"
+                : "Nevyhovuje";
+
+        box.innerHTML = `
+            <div class="result-title">
+                Reflow neúspěšné
+            </div>
+
+            <p>
+                Teploty:
+                <strong>
+                    ${tempDeviation} % – ${tStatus}
+                </strong>
+            </p>
+
+            <p>
+                Rychlost:
+                <strong>
+                    ${speedDeviation} % – ${sStatus}
+                </strong>
+            </p>
+
+            <p>
+                Upravte nastavení a opakujte pokus.
+            </p>
+        `;
+    }
+}
+
+
+// ==========================================
+// 19. STAV PRAVÉHO PANELU
+// ==========================================
+
+function updateSidebar() {
+
+    document.getElementById(
+        "attemptCount"
+    ).textContent = attempts.length;
+
+    document.getElementById(
+        "runButton"
+    ).disabled = !profileOpened || completed;
+
+    document.getElementById(
+        "retryButton"
+    ).disabled = completed;
+
+    document.getElementById(
+        "conveyorSpeed"
+    ).disabled = completed;
+
+    document.getElementById(
+        "finishButton"
+    ).classList.toggle(
+        "hidden",
+        !completed
+    );
+
+    [
+        "conveyorCard",
+        "profileInfo",
+        "runButton",
+        "retryButton"
+    ].forEach(id => {
+
+        document.getElementById(
+            id
+        ).classList.toggle(
+            "hidden",
+            completed
+        );
+    });
+}
+
+
+// ==========================================
+// 20. OTEVŘENÍ PROFILU
+// ==========================================
+
+function openProfile() {
+
+    profileOpened = true;
+
+    document.getElementById(
+        "machineView"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "finishedView"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "profileView"
+    ).classList.remove("hidden");
+
+    renderChart();
+    updateSidebar();
+}
+
+
+// ==========================================
+// 21. OPAKOVÁNÍ POKUSU
+// ==========================================
+
+function retryProfile() {
+
+    if (completed) {
+        return;
+    }
+
+    if (!profileOpened) {
+        openProfile();
+    }
+
+    renderChart();
+}
+
+
+// ==========================================
+// 22. SOUŘADNICE DPS BOTTOM
+// ==========================================
+
+const BOARD_WIDTH = 897;
+const BOARD_HEIGHT = 537;
+
+const SOLDER_PADS = [
+
+    {
+        id: "C4_L",
+        x: 517,
+        y: 81,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C4_R",
+        x: 517,
+        y: 134,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C3_L",
+        x: 386,
+        y: 404,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C3_R",
+        x: 386,
+        y: 458,
+        w: 34,
+        h: 20
+    }
+
+];
+
+const COMPONENT_POSITIONS = {
+
+    C4: {
+        x: 517,
+        y: 107.5
+    },
+
+    C3: {
+        x: 386,
+        y: 431
+    }
+
+};
+
+
+function asPercent(value, maximum) {
+
+    return (
+        value / maximum * 100
+    ) + "%";
+}
+
+
+// ==========================================
+// 23. NAČTENÍ PÁJECÍ PASTY
+// ==========================================
+
+function getPasteData() {
+
+    const step =
+        getStepData("pastaBottom");
+
+    const backup =
+        readLocalJSON(
+            "vps_semafor_pasta_bottom_rozhodnuti"
+        );
+
+    const central =
+        readLocalJSON(CHOICES_KEY);
+
+    const centralPaste =
+        central?.pastaBottom?.rozhodnuti;
+
+    const data = firstNonEmpty(
+        step.rozhodnuti,
+        backup,
+        centralPaste
+    );
+
+    console.log(
+        "REFLOW – pasta:",
+        data
+    );
+
+    return data;
+}
+
+
+// ==========================================
+// 24. NAČTENÍ OSÁZENÍ BOTTOM
+// ==========================================
+
+function getPlacedComponents() {
+
+    const step =
+        getStepData("osazeniBottom");
+
+    const backup =
+        readLocalJSON(
+            "vps_semafor_osazeni_bottom_data"
+        );
+
+    const central =
+        readLocalJSON(CHOICES_KEY);
+
+    const data = firstNonEmpty(
+        step.soucastky,
+        backup?.soucastky,
+        central?.osazeniBottom?.soucastky
+    );
+
+    console.log(
+        "REFLOW – součástky:",
+        data
+    );
+
+    return data;
+}
+
+
+// ==========================================
+// 25. VYKRESLENÍ VYPÁLENÉ DPS
+// ==========================================
+
+function renderFinishedBoard() {
+
+    const solderLayer =
+        document.getElementById(
+            "finishedSolderLayer"
+        );
+
+    const componentsLayer =
+        document.getElementById(
+            "finishedComponentsLayer"
+        );
+
+    solderLayer.replaceChildren();
+    componentsLayer.replaceChildren();
+
+    const paste =
+        getPasteData();
+
+    const components =
+        getPlacedComponents();
+
+    // --------------------------------------
+    // LESKLÉ PÁJENÉ SPOJE
+    // --------------------------------------
+
+    SOLDER_PADS.forEach(pad => {
+
+        if (!paste[pad.id]) {
+            return;
+        }
+
+        const solder =
+            document.createElement("div");
+
+        solder.className =
+            "solder-joint";
+
+        solder.style.left =
+            asPercent(
+                pad.x,
+                BOARD_WIDTH
+            );
+
+        solder.style.top =
+            asPercent(
+                pad.y,
+                BOARD_HEIGHT
+            );
+
+        solder.style.width =
+            asPercent(
+                pad.w,
+                BOARD_WIDTH
+            );
+
+        solder.style.height =
+            asPercent(
+                pad.h,
+                BOARD_HEIGHT
+            );
+
+        solder.title =
+            "Přetavená pájka: " +
+            pad.id;
+
+        solderLayer.appendChild(solder);
+    });
+
+
+    // --------------------------------------
+    // SKUTEČNĚ OSazené SOUČÁSTKY
+    // --------------------------------------
+
+    ["C3", "C4"].forEach(position => {
+
+        const placed =
+            components[position];
+
+        if (!placed) {
+            return;
+        }
+
+        const material =
+            typeof placed === "string"
+                ? placed
+                : (
+                    placed.material ||
+                    placed.code ||
+                    ""
+                );
+
+        if (!material) {
+            return;
+        }
+
+        const coords =
+            COMPONENT_POSITIONS[position];
+
+        const element =
+            document.createElement("div");
+
+        let type = "semiconductor";
+
+        if (material.startsWith("MC")) {
+
+            type = "capacitor";
+
+        } else if (
+            material.startsWith("MR")
+        ) {
+
+            type = "resistor";
+
+        } else if (
+            material.startsWith("MT")
+        ) {
+
+            type = "inductor";
+        }
+
+        element.className =
+            "soldered-component " + type;
+
+        element.style.left =
+            asPercent(
+                coords.x,
+                BOARD_WIDTH
+            );
+
+        element.style.top =
+            asPercent(
+                coords.y,
+                BOARD_HEIGHT
+            );
+
+        element.title =
+            position + ": " + material;
+
+        componentsLayer.appendChild(element);
+    });
+
+
+    // --------------------------------------
+    // UPOZORNĚNÍ NA CHYBĚJÍCÍ DATA
+    // --------------------------------------
+
+    const solderCount =
+        solderLayer.children.length;
+
+    const componentCount =
+        componentsLayer.children.length;
+
+    console.log(
+        "REFLOW – počet pájených plošek:",
+        solderCount
+    );
+
+    console.log(
+        "REFLOW – počet součástek:",
+        componentCount
+    );
+
+    const warning =
+        document.getElementById(
+            "boardWarning"
+        );
+
+    const messages = [];
+
+    if (solderCount < 4) {
+
+        messages.push(
+            "V předchozí operaci jsou uloženy " +
+            "pouze " + solderCount +
+            " ze 4 nanesených plošek."
+        );
+    }
+
+    if (componentCount < 2) {
+
+        messages.push(
+            "V předchozí operaci jsou uloženy " +
+            "pouze " + componentCount +
+            " ze 2 osazených součástek."
+        );
+    }
+
+    if (messages.length > 0) {
+
+        warning.textContent =
+            messages.join(" ");
+
+        warning.classList.remove("hidden");
+
+    } else {
+
+        warning.classList.add("hidden");
+    }
+}
+
+
+// ==========================================
+// 26. ZOBRAZENÍ HOTOVÉ DPS
+// ==========================================
+
+function showFinishedBoard() {
+
+    if (!completed) {
+        return;
+    }
+
+    document.getElementById(
+        "machineView"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "profileView"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "finishedView"
+    ).classList.remove("hidden");
+
+    renderFinishedBoard();
+
+    updateSidebar();
+}
+
+
+// ==========================================
+// 27. DOKONČENÍ OPERACE
+// ==========================================
+
+function finishOperation() {
+
+    if (!completed) {
+
+        alert(
+            "Nejprve musíte úspěšně " +
+            "dokončit reflow."
+        );
+
+        return;
+    }
+
+    if (!saveState()) {
+        return;
+    }
+
+    window.location.href =
+        "tp.html";
+}
+
+
+// ==========================================
+// 28. TLAČÍTKA
+// ==========================================
+
+document.getElementById(
+    "openProfile"
+).addEventListener(
+    "click",
+    openProfile
+);
+
+
+document.getElementById(
+    "runButton"
+).addEventListener(
+    "click",
+    runReflow
+);
+
+
+document.getElementById(
+    "retryButton"
+).addEventListener(
+    "click",
+    retryProfile
+);
+
+
+document.getElementById(
+    "finishButton"
+).addEventListener(
+    "click",
+    finishOperation
+);
+
+
+// ==========================================
+// 29. SPUŠTĚNÍ HRY
+// ==========================================
+
+loadState();
+
+document.getElementById(
+    "conveyorSpeed"
+).value = speedText;
+
+renderChart();
+renderResult();
+updateSidebar();
+
+// Pokud už hráč reflow dokončil,
+// zobrazíme rovnou vypálenou DPS.
+
+if (completed) {
+
+    showFinishedBoard();
+}
+
+</script>
+
+</body>
+</html>

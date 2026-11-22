@@ -1,0 +1,1491 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>V.P.S. ELEKTRO | Pájecí pasta TOP</title>
+
+<style>
+/* ==========================================
+   ZÁKLADNÍ NASTAVENÍ
+========================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    height: 100dvh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    color: #f5fbf6;
+
+    background: linear-gradient(
+        135deg,
+        #101d18,
+        #244633
+    );
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+}
+
+button:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 2px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   HLAVIČKA
+========================================== */
+
+header {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 10px 15px 6px;
+}
+
+.eyebrow {
+    color: #9cdbaf;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+h1 {
+    margin: 5px 0;
+    font-size: clamp(20px, 2.3vw, 27px);
+}
+
+.intro {
+    margin: 0;
+    color: #cbded0;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* ==========================================
+   ROZLOŽENÍ
+========================================== */
+
+.layout {
+    flex: 1;
+    min-height: 0;
+
+    width: 100%;
+    max-width: 1600px;
+
+    margin: 0 auto;
+    padding: 7px 13px 12px;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 285px;
+    gap: 12px;
+
+    align-items: stretch;
+}
+
+.panel {
+    min-width: 0;
+    min-height: 0;
+
+    padding: 13px;
+
+    background: #1b3425;
+    border: 1px solid #587b61;
+    border-radius: 13px;
+
+    overflow: hidden;
+}
+
+.panel h2 {
+    color: #95dfac;
+    font-size: 19px;
+    margin: 0 0 8px;
+}
+
+.helper {
+    color: #c5d9ca;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 5px 0 10px;
+}
+
+/* ==========================================
+   NÁHLED PRACOVIŠTĚ
+========================================== */
+
+#machineView {
+    height: 100%;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+}
+
+#machineView h2,
+#machineView .helper {
+    align-self: stretch;
+}
+
+.machine-image {
+    display: block;
+    max-width: 100%;
+    max-height: 67%;
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+    border: 1px solid #779582;
+    border-radius: 10px;
+}
+
+/* ==========================================
+   PRACOVNÍ PLOCHA TOP
+========================================== */
+
+#boardView:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+#boardView > h2,
+#boardView > .helper {
+    flex-shrink: 0;
+}
+
+/* OBRÁZEK DPS */
+
+.board-workspace {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 9px;
+
+    background: #10251a;
+
+    border: 1px solid #587b61;
+    border-radius: 11px;
+
+    overflow: hidden;
+}
+
+/*
+   Originální obrázek TOP:
+   897 × 537 px.
+
+   Je již vodorovný, neotáčíme jej.
+*/
+
+.board-stage {
+    position: relative;
+
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+
+    aspect-ratio: 897 / 537;
+
+    overflow: hidden;
+    flex-shrink: 0;
+
+    border-radius: 5px;
+
+    background: #748f79;
+
+    box-shadow:
+        0 10px 26px #0006,
+        0 0 0 2px #89a88e;
+
+    line-height: 0;
+}
+
+.board-stage > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    object-fit: fill;
+
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+}
+
+/* VRSTVA KLIKACÍCH PLOŠEK */
+
+#padsLayer {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+}
+
+/* ==========================================
+   SMT PLOŠKY
+========================================== */
+
+.pad {
+    position: absolute;
+    z-index: 3;
+
+    transform: translate(-50%, -50%);
+
+    padding: 0;
+
+    border: 1px dashed rgba(255,255,255,0.85);
+    border-radius: 3px;
+
+    background: rgba(255,255,255,0.08);
+
+    box-shadow: 0 0 0 3px #153a2229;
+
+    touch-action: manipulation;
+
+    transition:
+        background 0.12s,
+        border-color 0.12s;
+}
+
+.pad:hover,
+.pad:focus-visible {
+    background: rgba(255,255,255,0.23);
+    border: 2px solid #fff3bc;
+}
+
+/* NANESENÁ PASTA */
+
+.pad.pasted {
+    border: 1px solid #a8b2af;
+
+    background: linear-gradient(
+        130deg,
+        #e0e4e2,
+        #abb4b1 48%,
+        #828d89
+    );
+
+    box-shadow:
+        inset 1px 1px 3px #f7faf7,
+        inset -2px -2px 4px #586360,
+        0 1px 3px #17241a82;
+}
+
+.pad.pasted::after {
+    content: "";
+
+    position: absolute;
+    left: 20%;
+    top: 15%;
+
+    width: 55%;
+    height: 20%;
+
+    border-radius: 50%;
+    transform: rotate(-20deg);
+
+    background: rgba(255,255,255,0.45);
+}
+
+/* ==========================================
+   SPODNÍ LIŠTA
+========================================== */
+
+.board-bottom {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+    gap: 10px;
+
+    padding-top: 11px;
+}
+
+.legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 12px;
+    color: #c8dfce;
+}
+
+.legend-sample {
+    display: inline-block;
+    width: 24px;
+    height: 17px;
+
+    border: 1px solid #b9c4c1;
+    border-radius: 3px;
+
+    background: linear-gradient(
+        125deg,
+        #e3e8e5,
+        #86928e
+    );
+}
+
+/* ==========================================
+   PRAVÝ PANEL
+========================================== */
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    margin-bottom: 3px;
+}
+
+.recipe-card {
+    padding: 10px;
+
+    border: 1px solid #5d8266;
+    border-radius: 8px;
+
+    background: #294934;
+}
+
+.recipe-card.done {
+    border-color: #8cdda4;
+}
+
+.recipe-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+}
+
+.recipe-card h3 {
+    color: #a4eab8;
+    font-size: 16px;
+    margin: 0;
+}
+
+.recipe-value {
+    margin-top: 5px;
+    color: #e2ede5;
+    font-size: 12px;
+}
+
+.recipe-count {
+    color: #c8dfce;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.progress-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+
+    font-size: 13px;
+
+    margin-top: 8px;
+}
+
+.progress-title strong {
+    color: #a2e8b6;
+}
+
+.progress-track {
+    height: 12px;
+
+    margin: 4px 0 5px;
+
+    border-radius: 20px;
+    background: #344d3a;
+
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0;
+
+    background: #8bdba5;
+    transition: width 0.2s;
+}
+
+.status-box {
+    padding: 9px;
+
+    border: 1px solid #4f7458;
+    border-radius: 8px;
+
+    background: #243d2c;
+
+    color: #cde0d1;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* ==========================================
+   TLAČÍTKA
+========================================== */
+
+.primary,
+.secondary {
+    border-radius: 8px;
+
+    padding: 11px 15px;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.primary {
+    border: none;
+
+    background: #8bdba5;
+    color: #10291b;
+}
+
+.primary:hover {
+    background: #b9f3c8;
+}
+
+.primary:disabled {
+    background: #637f69;
+    color: #c9d6cc;
+
+    cursor: not-allowed;
+}
+
+.secondary {
+    border: 1px solid #77a983;
+
+    background: #2b5137;
+    color: #e0f1e4;
+}
+
+.secondary:hover {
+    background: #386946;
+}
+
+.wide {
+    width: 100%;
+}
+
+.small-note {
+    color: #b4cdbb;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+/* ==========================================
+   KOMPAKTNÍ ZOBRAZENÍ
+========================================== */
+
+@media (max-width: 1100px) and
+       (orientation: landscape) {
+
+    .layout {
+        grid-template-columns:
+            minmax(0,1fr) 250px;
+
+        gap: 7px;
+        padding: 5px 8px;
+    }
+
+    header {
+        padding: 5px;
+    }
+
+    .panel {
+        padding: 8px;
+    }
+
+    .sidebar {
+        gap: 5px;
+    }
+
+    .recipe-card {
+        padding: 7px;
+    }
+}
+
+@media (max-height: 740px) and
+       (orientation: landscape) {
+
+    header {
+        padding: 4px;
+    }
+
+    h1 {
+        font-size: 19px;
+    }
+
+    .intro {
+        display: none;
+    }
+
+    .panel h2 {
+        font-size: 16px;
+    }
+
+    .helper {
+        font-size: 11px;
+        margin: 3px 0 7px;
+    }
+
+    .recipe-card {
+        padding: 6px;
+    }
+
+    .recipe-card h3 {
+        font-size: 14px;
+    }
+
+    .small-note {
+        display: none;
+    }
+
+    .board-bottom {
+        padding-top: 5px;
+    }
+}
+
+/* TABLETY NA VÝŠKU */
+
+@media (orientation: portrait) {
+
+    body {
+        height: auto;
+        min-height: 100dvh;
+        overflow-y: auto;
+    }
+
+    .layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        flex: none;
+        height: auto;
+    }
+
+    .panel {
+        overflow: visible;
+    }
+
+    #boardView:not(.hidden) {
+        min-height: 430px;
+    }
+
+    .board-workspace {
+        min-height: 320px;
+    }
+
+    .board-stage {
+        width: 100%;
+        height: auto;
+        max-height: 100%;
+    }
+
+    .sidebar {
+        overflow: visible;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .board-workspace {
+        min-height: 250px;
+    }
+
+    .board-stage {
+        width: 100%;
+        height: auto;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <p class="eyebrow">
+        V.P.S. ELEKTRO · VÝROBNÍ OPERACE 06
+    </p>
+
+    <h1>Nanášení pájecí pasty – TOP</h1>
+
+    <p class="intro">
+        Naneste pájecí pastu na SMT plošky
+        rezistorů R1, R2, R3 a R4.
+    </p>
+
+</header>
+
+<main class="layout">
+
+    <!-- LEVÁ PRACOVNÍ PLOCHA -->
+
+    <section class="panel">
+
+        <!-- NÁHLED PRACOVIŠTĚ -->
+
+        <div id="machineView">
+
+            <h2>Pracoviště nanášení pasty</h2>
+
+            <img
+                src="images/pasta.jpg"
+                class="machine-image"
+                alt="Pracoviště nanášení pájecí pasty"
+            >
+
+            <p class="helper">
+                Strana BOTTOM byla zpracována.
+                Nyní připravíme stranu TOP
+                pro osazování SMT rezistorů.
+            </p>
+
+            <button
+                class="primary"
+                id="openBoard"
+                type="button"
+                style="width:100%;max-width:380px">
+                Přejít k nanášení pasty →
+            </button>
+
+        </div>
+
+        <!-- PRACOVNÍ PLOCHA TOP -->
+
+        <div id="boardView" class="hidden">
+
+            <h2>DPS – strana TOP</h2>
+
+            <p class="helper">
+                Klepněte na obě SMT plošky každého
+                rezistoru. Po nanesení pasty se
+                ploška zbarví do stříbřitě šedé.
+                Opětovným klepnutím můžete pastu odebrat.
+            </p>
+
+            <!-- DPS -->
+
+            <div class="board-workspace">
+
+                <div
+                    class="board-stage"
+                    id="boardStage">
+
+                    <img
+                        src="images/blikac_top.png"
+                        alt="DPS semaforu – strana TOP"
+                        draggable="false"
+                    >
+
+                    <div id="padsLayer"></div>
+
+                </div>
+
+            </div>
+
+            <!-- SPODNÍ LIŠTA -->
+
+            <div class="board-bottom">
+
+                <div class="legend">
+                    <span class="legend-sample"></span>
+                    Nanesená pájecí pasta
+                </div>
+
+                <button
+                    class="secondary"
+                    id="backMachine"
+                    type="button">
+                    ← Zpět na pracoviště
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- PRAVÝ PANEL -->
+
+    <aside class="panel sidebar">
+
+        <h2>Průběh operace</h2>
+
+        <p class="helper">
+            Nanášejte pouze na obdélníkové
+            SMT plošky rezistorů.
+            Kruhové THT otvory neoznačujte.
+        </p>
+
+        <!-- R1 -->
+
+        <div class="recipe-card" id="cardR1">
+
+            <div class="recipe-top">
+                <h3>R1</h3>
+                <span
+                    class="recipe-count"
+                    id="countR1">
+                    0 / 2
+                </span>
+            </div>
+
+            <div class="recipe-value">
+                MR09 – 10 kΩ
+            </div>
+
+        </div>
+
+        <!-- R2 -->
+
+        <div class="recipe-card" id="cardR2">
+
+            <div class="recipe-top">
+                <h3>R2</h3>
+                <span
+                    class="recipe-count"
+                    id="countR2">
+                    0 / 2
+                </span>
+            </div>
+
+            <div class="recipe-value">
+                MR03 – 100 kΩ
+            </div>
+
+        </div>
+
+        <!-- R3 -->
+
+        <div class="recipe-card" id="cardR3">
+
+            <div class="recipe-top">
+                <h3>R3</h3>
+                <span
+                    class="recipe-count"
+                    id="countR3">
+                    0 / 2
+                </span>
+            </div>
+
+            <div class="recipe-value">
+                MR09 – 10 kΩ
+            </div>
+
+        </div>
+
+        <!-- R4 -->
+
+        <div class="recipe-card" id="cardR4">
+
+            <div class="recipe-top">
+                <h3>R4</h3>
+                <span
+                    class="recipe-count"
+                    id="countR4">
+                    0 / 2
+                </span>
+            </div>
+
+            <div class="recipe-value">
+                MR03 – 100 kΩ
+            </div>
+
+        </div>
+
+        <!-- CELKOVÝ STAV -->
+
+        <div class="progress-title">
+
+            <span>Nanesené plošky</span>
+
+            <strong id="totalCount">
+                0 / 8
+            </strong>
+
+        </div>
+
+        <div class="progress-track">
+
+            <div
+                class="progress-fill"
+                id="progressFill">
+            </div>
+
+        </div>
+
+        <div
+            class="status-box"
+            id="statusMessage">
+            Zbývá nanést pastu na 8 plošek.
+        </div>
+
+        <!-- DOKONČENÍ -->
+
+        <button
+            class="primary wide"
+            id="finishButton"
+            type="button">
+            Dokončit nanášení pasty TOP →
+        </button>
+
+        <p class="small-note">
+            Každá označená ploška se ukládá
+            do výrobní karty hry.
+            Dalším krokem bude osazení SMT
+            rezistorů na stranu TOP.
+        </p>
+
+    </aside>
+
+</main>
+
+<script src="choices.js"></script>
+
+<script>
+"use strict";
+
+// ==========================================
+// 1. KLÍČE VÝROBNÍ KARTY
+// ==========================================
+
+const STEP_NAME = "pastaTop";
+
+const COMPLETE_KEY =
+    "vps_semafor_krok_6_dokonceno";
+
+const BACKUP_KEY =
+    "vps_semafor_pasta_top_rozhodnuti";
+
+
+// ==========================================
+// 2. ROZMĚRY DPS TOP
+// ==========================================
+
+// Originální obrázek blikac_top.png
+// má rozměry 897 × 537 px.
+
+const BOARD = {
+    width: 897,
+    height: 537
+};
+
+
+// ==========================================
+// 3. SKUTEČNÉ POLOHY SMT PLOŠEK
+// ==========================================
+
+// Souřadnice vycházejí z dodaného
+// obrázku strany TOP.
+//
+// R4 a R3 jsou vlevo nahoře.
+// R2 a R1 jsou vpravo dole.
+
+const PADS = [
+
+    // ======================================
+    // R4 – 100 kΩ
+    // ======================================
+
+    {
+        id: "R4_L",
+        component: "R4",
+        x: 270,
+        y: 61,
+        w: 21,
+        h: 32
+    },
+
+    {
+        id: "R4_R",
+        component: "R4",
+        x: 323,
+        y: 61,
+        w: 21,
+        h: 32
+    },
+
+    // ======================================
+    // R3 – 10 kΩ
+    // ======================================
+
+    {
+        id: "R3_L",
+        component: "R3",
+        x: 270,
+        y: 118,
+        w: 21,
+        h: 32
+    },
+
+    {
+        id: "R3_R",
+        component: "R3",
+        x: 323,
+        y: 118,
+        w: 21,
+        h: 32
+    },
+
+    // ======================================
+    // R2 – 100 kΩ
+    // ======================================
+
+    {
+        id: "R2_L",
+        component: "R2",
+        x: 640,
+        y: 436,
+        w: 21,
+        h: 32
+    },
+
+    {
+        id: "R2_R",
+        component: "R2",
+        x: 692,
+        y: 436,
+        w: 21,
+        h: 32
+    },
+
+    // ======================================
+    // R1 – 10 kΩ
+    // ======================================
+
+    {
+        id: "R1_L",
+        component: "R1",
+        x: 640,
+        y: 501,
+        w: 21,
+        h: 32
+    },
+
+    {
+        id: "R1_R",
+        component: "R1",
+        x: 692,
+        y: 501,
+        w: 21,
+        h: 32
+    }
+
+];
+
+
+// ==========================================
+// 4. STAV NANESENÍ PASTY
+// ==========================================
+
+// Příklad:
+// {
+//     R1_L: true,
+//     R1_R: true,
+//     R2_L: false
+// }
+
+let pasted = {};
+
+let completed = false;
+
+
+// ==========================================
+// 5. POMOCNÁ FUNKCE
+// ==========================================
+
+function percent(value, maximum) {
+
+    return (
+        value / maximum * 100
+    ) + "%";
+}
+
+
+// ==========================================
+// 6. NAČTENÍ ULOŽENÝCH DAT
+// ==========================================
+
+function loadState() {
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.getStep === "function"
+        ) {
+
+            const step =
+                VPSChoices.getStep(STEP_NAME);
+
+            if (
+                step &&
+                step.rozhodnuti &&
+                typeof step.rozhodnuti === "object" &&
+                Object.keys(
+                    step.rozhodnuti
+                ).length > 0
+            ) {
+
+                pasted = {
+                    ...step.rozhodnuti
+                };
+
+                completed =
+                    step.dokonceno === true ||
+                    localStorage.getItem(
+                        COMPLETE_KEY
+                    ) === "true";
+
+                return;
+            }
+        }
+
+        // Záloha z localStorage.
+
+        const backup =
+            localStorage.getItem(BACKUP_KEY);
+
+        if (backup) {
+
+            const data =
+                JSON.parse(backup);
+
+            if (
+                data &&
+                typeof data === "object"
+            ) {
+
+                pasted = {
+                    ...data
+                };
+            }
+        }
+
+        completed =
+            localStorage.getItem(
+                COMPLETE_KEY
+            ) === "true";
+
+    } catch (error) {
+
+        console.warn(
+            "Chyba načítání pasty TOP:",
+            error
+        );
+
+        pasted = {};
+    }
+}
+
+
+// ==========================================
+// 7. ULOŽENÍ DO CHOICES.JS
+// ==========================================
+
+function saveState(done = false) {
+
+    try {
+
+        if (
+            typeof VPSChoices === "undefined" ||
+            typeof VPSChoices.saveStep !== "function"
+        ) {
+
+            throw new Error(
+                "Soubor choices.js není dostupný."
+            );
+        }
+
+        const saved =
+            VPSChoices.saveStep(
+                STEP_NAME,
+                {
+                    dokonceno: done,
+
+                    rozhodnuti: {
+                        ...pasted
+                    }
+                }
+            );
+
+        if (saved === false) {
+
+            throw new Error(
+                "Nepodařilo se uložit výrobní kartu."
+            );
+        }
+
+        localStorage.setItem(
+            BACKUP_KEY,
+            JSON.stringify(pasted)
+        );
+
+        if (done) {
+
+            localStorage.setItem(
+                COMPLETE_KEY,
+                "true"
+            );
+
+        } else {
+
+            localStorage.removeItem(
+                COMPLETE_KEY
+            );
+        }
+
+        completed = done;
+
+        return true;
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Nepodařilo se uložit " +
+            "nanesení pájecí pasty TOP."
+        );
+
+        return false;
+    }
+}
+
+
+// ==========================================
+// 8. VYKRESLENÍ SMT PLOŠEK
+// ==========================================
+
+function renderPads() {
+
+    const layer =
+        document.getElementById(
+            "padsLayer"
+        );
+
+    layer.replaceChildren();
+
+    PADS.forEach(pad => {
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.className =
+            "pad" +
+            (
+                pasted[pad.id]
+                    ? " pasted"
+                    : ""
+            );
+
+        // Souřadnice převádíme na procenta,
+        // aby plošky zůstaly na správném místě
+        // i při zmenšení obrázku.
+
+        button.style.left =
+            percent(pad.x, BOARD.width);
+
+        button.style.top =
+            percent(pad.y, BOARD.height);
+
+        button.style.width =
+            percent(pad.w, BOARD.width);
+
+        button.style.height =
+            percent(pad.h, BOARD.height);
+
+        button.title =
+            pad.component + " – " +
+            (
+                pasted[pad.id]
+                    ? "Odebrat pastu"
+                    : "Nanést pastu"
+            );
+
+        button.setAttribute(
+            "aria-label",
+            button.title
+        );
+
+        button.setAttribute(
+            "aria-pressed",
+            String(
+                Boolean(pasted[pad.id])
+            )
+        );
+
+        // ==================================
+        // NANESENÍ NEBO ODEBRÁNÍ PASTY
+        // ==================================
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const oldValue =
+                    Boolean(pasted[pad.id]);
+
+                const wasCompleted =
+                    completed;
+
+                pasted[pad.id] =
+                    !oldValue;
+
+                if (!saveState(false)) {
+
+                    pasted[pad.id] =
+                        oldValue;
+
+                    completed =
+                        wasCompleted;
+                }
+
+                renderPads();
+                updateStatus();
+            }
+        );
+
+        layer.appendChild(button);
+    });
+}
+
+
+// ==========================================
+// 9. AKTUALIZACE PRŮBĚHU
+// ==========================================
+
+function updateStatus() {
+
+    const total =
+        PADS.filter(
+            pad => pasted[pad.id]
+        ).length;
+
+    document.getElementById(
+        "totalCount"
+    ).textContent =
+        total + " / 8";
+
+    document.getElementById(
+        "progressFill"
+    ).style.width =
+        (total / PADS.length * 100) + "%";
+
+    // Počty po jednotlivých rezistorech.
+
+    ["R1", "R2", "R3", "R4"].forEach(
+        component => {
+
+            const count =
+                PADS.filter(
+                    pad =>
+                        pad.component === component &&
+                        pasted[pad.id]
+                ).length;
+
+            document.getElementById(
+                "count" + component
+            ).textContent =
+                count + " / 2";
+
+            document.getElementById(
+                "card" + component
+            ).classList.toggle(
+                "done",
+                count === 2
+            );
+        }
+    );
+
+    const remaining =
+        PADS.length - total;
+
+    const message =
+        document.getElementById(
+            "statusMessage"
+        );
+
+    if (remaining === 0) {
+
+        message.textContent =
+            "Všech 8 SMT plošek má " +
+            "nanesenou pájecí pastu. " +
+            "Operaci můžete dokončit.";
+
+    } else {
+
+        message.textContent =
+            "Zbývá nanést pastu na " +
+            remaining +
+            " SMT plošek.";
+    }
+
+    document.getElementById(
+        "finishButton"
+    ).disabled =
+        remaining > 0;
+}
+
+
+// ==========================================
+// 10. PŘEPÍNÁNÍ PRACOVIŠTĚ
+// ==========================================
+
+function showBoard(show) {
+
+    document.getElementById(
+        "machineView"
+    ).classList.toggle(
+        "hidden",
+        show
+    );
+
+    document.getElementById(
+        "boardView"
+    ).classList.toggle(
+        "hidden",
+        !show
+    );
+}
+
+
+// ==========================================
+// 11. OTEVŘENÍ DPS
+// ==========================================
+
+document.getElementById(
+    "openBoard"
+).addEventListener(
+    "click",
+    () => {
+
+        showBoard(true);
+    }
+);
+
+
+// ==========================================
+// 12. NÁVRAT NA PRACOVIŠTĚ
+// ==========================================
+
+document.getElementById(
+    "backMachine"
+).addEventListener(
+    "click",
+    () => {
+
+        showBoard(false);
+    }
+);
+
+
+// ==========================================
+// 13. DOKONČENÍ OPERACE
+// ==========================================
+
+document.getElementById(
+    "finishButton"
+).addEventListener(
+    "click",
+    () => {
+
+        const total =
+            PADS.filter(
+                pad => pasted[pad.id]
+            ).length;
+
+        if (total !== 8) {
+
+            alert(
+                "Nejprve naneste pájecí pastu " +
+                "na všech osm SMT plošek."
+            );
+
+            showBoard(true);
+
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                "Dokončit nanášení pájecí " +
+                "pasty na stranu TOP?\n\n" +
+                "Nanesené plošky se uloží " +
+                "do výrobní karty."
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        if (!saveState(true)) {
+            return;
+        }
+
+        // Další krok technologického postupu
+        // se odemkne přes dokončovací klíč.
+
+        window.location.href =
+            "tp.html";
+    }
+);
+
+
+// ==========================================
+// 14. SPUŠTĚNÍ OPERACE
+// ==========================================
+
+loadState();
+
+renderPads();
+
+updateStatus();
+
+</script>
+
+</body>
+</html>

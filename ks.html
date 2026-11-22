@@ -1,0 +1,643 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>V.P.S. ELEKTRO | Kusovník semaforu</title>
+
+<style>
+
+/* =====================================
+   ZÁKLADNÍ VZHLED
+===================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    color: #eef8f0;
+
+    background: linear-gradient(
+        135deg,
+        #101d18,
+        #244633
+    );
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* =====================================
+   HLAVIČKA
+===================================== */
+
+header {
+    text-align: center;
+    padding: 28px 15px;
+}
+
+.header-label {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #8bdba5;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: clamp(25px, 4vw, 38px);
+    margin-bottom: 10px;
+}
+
+.header-description {
+    font-size: 15px;
+    color: #c9dece;
+    line-height: 1.6;
+}
+
+/* =====================================
+   HLAVNÍ KARTA
+===================================== */
+
+main {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 0 18px 40px;
+}
+
+.bom-card {
+    background: #1b3425;
+    border: 1px solid #668b6d;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 15px 40px #0005;
+}
+
+.bom-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.bom-heading h2 {
+    color: #9be8b2;
+    font-size: 23px;
+}
+
+.bom-heading p {
+    color: #c7dcca;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+/* =====================================
+   TABULKA KUSOVNÍKU
+===================================== */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 9px;
+    border: 1px solid #5e8267;
+}
+
+table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    background: #213b2a;
+}
+
+thead {
+    background: #365b41;
+}
+
+th {
+    color: #c8f7d4;
+    text-align: left;
+    font-size: 14px;
+    padding: 15px 13px;
+    border-bottom: 2px solid #78ac85;
+}
+
+td {
+    padding: 13px;
+    font-size: 14px;
+    border-bottom: 1px solid #47644e;
+    color: #edf7ef;
+}
+
+/* =====================================
+   JEDNOTNÁ BARVA VŠECH ŘÁDKŮ
+===================================== */
+
+tbody tr,
+tbody tr:nth-child(even),
+tbody tr:hover {
+    background: #213b2a;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.material-code {
+    font-weight: bold;
+    color: #a3efb9;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+.location {
+    display: inline-block;
+    background: #355840;
+    color: #e6f8e9;
+    border: 1px solid #78a886;
+    border-radius: 5px;
+    padding: 5px 9px;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
+}
+
+.quantity {
+    font-size: 16px;
+    font-weight: bold;
+    color: #e4f8e7;
+    text-align: center;
+}
+
+th:last-child,
+td:last-child {
+    text-align: center;
+}
+
+/* =====================================
+   SOUHRN
+===================================== */
+
+.summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    margin-top: 22px;
+    padding: 18px 20px;
+
+    background: #274632;
+    border: 1px solid #618d6e;
+    border-radius: 10px;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.summary-item span {
+    color: #bdd5c3;
+    font-size: 13px;
+}
+
+.summary-item strong {
+    color: #a5efb9;
+    font-size: 26px;
+}
+
+/* =====================================
+   INFORMAČNÍ TEXT
+===================================== */
+
+.note {
+    margin-top: 17px;
+    color: #c7dbca;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* =====================================
+   TLAČÍTKO ZPĚT DO SKLADU
+===================================== */
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.action-button {
+    padding: 12px 19px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.primary-button {
+    background: #8bdba5;
+    border: 2px solid #8bdba5;
+    color: #10291b;
+}
+
+.primary-button:hover {
+    background: #b9f3c9;
+}
+
+/* =====================================
+   PATIČKA
+===================================== */
+
+footer {
+    text-align: center;
+    padding: 15px;
+    color: #a1bba8;
+    font-size: 12px;
+}
+
+/* =====================================
+   RESPONZIVNÍ ZOBRAZENÍ
+===================================== */
+
+@media (max-width: 700px) {
+
+    .bom-card {
+        padding: 14px;
+    }
+
+    th, td {
+        padding: 11px 9px;
+        font-size: 12px;
+    }
+
+    .actions {
+        justify-content: stretch;
+    }
+
+    .action-button {
+        flex: 1;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =====================================
+     HLAVIČKA
+===================================== -->
+
+<header>
+
+    <p class="header-label">
+        V.P.S. ELEKTRO | VÝROBNÍ DOKUMENTACE
+    </p>
+
+    <h1>Kusovník elektronických součástek</h1>
+
+    <p class="header-description">
+        Výuková DPS – Semafor
+        <br>
+        Seznam materiálu potřebného
+        pro osazení jedné desky plošných spojů.
+    </p>
+
+</header>
+
+<main>
+
+    <section class="bom-card">
+
+        <div class="bom-heading">
+
+            <div>
+
+                <h2>Materiálový kusovník</h2>
+
+                <p>
+                    Vyhledejte ve skladu všechny
+                    uvedené materiálové položky.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- ==========================
+             KUSOVNÍK
+        =========================== -->
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Materiál</th>
+                        <th>Hodnota / Typ</th>
+                        <th>Sklad</th>
+                        <th>Pozice na DPS</th>
+                        <th>Ks</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="bomBody">
+
+                    <!-- SMT REZISTORY -->
+
+                    <tr>
+                        <td class="material-code">MR03</td>
+                        <td>Rezistor SMT 100 kΩ, 1206</td>
+                        <td><span class="location">A1</span></td>
+                        <td>R2, R4</td>
+                        <td class="quantity">2</td>
+                    </tr>
+
+                    <tr>
+                        <td class="material-code">MR09</td>
+                        <td>Rezistor SMT 10 kΩ, 1206</td>
+                        <td><span class="location">A1</span></td>
+                        <td>R1, R3</td>
+                        <td class="quantity">2</td>
+                    </tr>
+
+                    <!-- SMT KONDENZÁTORY -->
+
+                    <tr>
+                        <td class="material-code">MC01</td>
+                        <td>Kondenzátor keramický SMT 100 nF</td>
+                        <td><span class="location">A2</span></td>
+                        <td>C3, C4</td>
+                        <td class="quantity">2</td>
+                    </tr>
+
+                    <!-- THT KONDENZÁTORY -->
+
+                    <tr>
+                        <td class="material-code">MC11</td>
+                        <td>Kondenzátor elektrolytický 22 µF</td>
+                        <td><span class="location">C2</span></td>
+                        <td>C2</td>
+                        <td class="quantity">1</td>
+                    </tr>
+
+                    <tr>
+                        <td class="material-code">MC14</td>
+                        <td>Kondenzátor elektrolytický 47 µF</td>
+                        <td><span class="location">C2</span></td>
+                        <td>C1</td>
+                        <td class="quantity">1</td>
+                    </tr>
+
+                    <!-- THT REZISTORY -->
+
+                    <tr>
+                        <td class="material-code">MR12</td>
+                        <td>Rezistor THT 10 kΩ</td>
+                        <td><span class="location">C2</span></td>
+                        <td>R6</td>
+                        <td class="quantity">1</td>
+                    </tr>
+
+                    <tr>
+                        <td class="material-code">MR13</td>
+                        <td>Rezistor THT 470 Ω</td>
+                        <td><span class="location">C2</span></td>
+                        <td>R5, R7, R8</td>
+                        <td class="quantity">3</td>
+                    </tr>
+
+                    <!-- INTEGROVANÉ OBVODY -->
+
+                    <tr>
+                        <td class="material-code">MP25</td>
+                        <td>Integrovaný obvod NE555</td>
+                        <td><span class="location">B3</span></td>
+                        <td>U1, U2</td>
+                        <td class="quantity">2</td>
+                    </tr>
+
+                    <!-- LED -->
+
+                    <tr>
+                        <td class="material-code">MP31</td>
+                        <td>LED zelená</td>
+                        <td><span class="location">C1</span></td>
+                        <td>D3</td>
+                        <td class="quantity">1</td>
+                    </tr>
+
+                    <tr>
+                        <td class="material-code">MP34</td>
+                        <td>LED červená</td>
+                        <td><span class="location">C1</span></td>
+                        <td>D1</td>
+                        <td class="quantity">1</td>
+                    </tr>
+
+                    <tr>
+                        <td class="material-code">MP35</td>
+                        <td>LED žlutá</td>
+                        <td><span class="location">C1</span></td>
+                        <td>D2</td>
+                        <td class="quantity">1</td>
+                    </tr>
+
+                    <!-- PŘEPÍNAČ MS01 -->
+
+                    <tr>
+                        <td class="material-code">MS01</td>
+                        <td>Přepínač / Jumper</td>
+                        <td><span class="location">C3</span></td>
+                        <td>SW1</td>
+                        <td class="quantity">1</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- ==========================
+             SOUHRN
+        =========================== -->
+
+        <div class="summary">
+
+            <div class="summary-item">
+
+                <span>Materiálové položky</span>
+
+                <strong id="materialCount">
+                    12
+                </strong>
+
+            </div>
+
+            <div class="summary-item">
+
+                <span>Celkový počet součástek</span>
+
+                <strong id="componentCount">
+                    18
+                </strong>
+
+            </div>
+
+        </div>
+
+        <p class="note">
+
+            <strong>Poznámka:</strong>
+
+            Kusovník uvádí materiálová čísla,
+            jejich hodnoty, skladové pozice
+            a osazovací pozice na DPS.
+
+            Jedno materiálové číslo stačí
+            ve skladové hře vybrat pouze jednou.
+
+        </p>
+
+        <!-- ==========================
+             ZPĚT DO SKLADU
+        =========================== -->
+
+        <div class="actions">
+
+            <button
+                class="action-button primary-button"
+                type="button"
+                onclick="closeBOM()">
+
+                ← Zpět do skladu
+
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+
+    V.P.S. ELEKTRO s.r.o. |
+    Výuková výrobní dokumentace
+
+</footer>
+
+<script>
+"use strict";
+
+// ======================================
+// 1. AUTOMATICKÝ SOUČET KUSOVNÍKU
+// ======================================
+
+function updateBOMSummary() {
+
+    const rows = document.querySelectorAll(
+        "#bomBody tr"
+    );
+
+    let materialCount = 0;
+    let componentCount = 0;
+
+    rows.forEach(row => {
+
+        materialCount++;
+
+        const quantityCell =
+            row.querySelector(".quantity");
+
+        if (quantityCell) {
+
+            componentCount +=
+                Number(
+                    quantityCell.textContent
+                ) || 0;
+
+        }
+
+    });
+
+    document.getElementById(
+        "materialCount"
+    ).textContent = materialCount;
+
+    document.getElementById(
+        "componentCount"
+    ).textContent = componentCount;
+
+}
+
+
+// ======================================
+// 2. NÁVRAT DO SKLADU
+// ======================================
+
+function closeBOM() {
+
+    // Pokud byl kusovník otevřen
+    // ze skladu v nové kartě.
+
+    if (
+        window.opener &&
+        !window.opener.closed
+    ) {
+
+        window.close();
+
+        // Náhradní návrat v případě,
+        // že prohlížeč zavření nepovolí.
+
+        setTimeout(() => {
+
+            if (!window.closed) {
+
+                window.location.href =
+                    "sklad.html";
+
+            }
+
+        }, 100);
+
+    } else {
+
+        window.location.href =
+            "sklad.html";
+
+    }
+
+}
+
+
+// ======================================
+// 3. SPUŠTĚNÍ
+// ======================================
+
+updateBOMSummary();
+
+</script>
+
+</body>
+</html>

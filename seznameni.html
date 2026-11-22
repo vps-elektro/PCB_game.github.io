@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>V.P.S. ELEKTRO | Seznámení s výrobou</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            font-family: "Trebuchet MS", Arial, sans-serif;
+            background: linear-gradient(135deg, #101d18, #244633);
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 55px 45px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .label {
+            color: #a8d8b7;
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: clamp(26px, 4vw, 36px);
+            margin-bottom: 25px;
+        }
+
+        .divider {
+            width: 90px;
+            height: 3px;
+            margin: 0 auto 35px;
+            background: #8bdba5;
+            border-radius: 5px;
+        }
+
+        .description {
+            max-width: 670px;
+            margin: 0 auto;
+            color: #dce9df;
+            font-size: 19px;
+            line-height: 1.8;
+        }
+
+        .highlight {
+            color: #8bdba5;
+            font-weight: bold;
+        }
+
+        .option {
+            max-width: 420px;
+            margin: 45px auto 0;
+            padding: 35px 25px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(139, 219, 165, 0.4);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .option:hover {
+            background: rgba(139, 219, 165, 0.13);
+            border-color: #8bdba5;
+            transform: translateY(-5px);
+        }
+
+        .option-icon {
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        .option h2 {
+            font-size: 23px;
+            margin-bottom: 12px;
+            color: #8bdba5;
+        }
+
+        .option p {
+            color: #c5d8ca;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 45px;
+            padding: 12px 28px;
+            background: transparent;
+            border: 1px solid #8bdba5;
+            border-radius: 7px;
+            color: #8bdba5;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background: rgba(139, 219, 165, 0.12);
+        }
+
+        @media (max-width: 650px) {
+            .container {
+                padding: 40px 22px;
+            }
+
+            .description {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <p class="label">Seznámení s výrobou</p>
+
+        <h1>Naším úkolem je vyrobit semafor</h1>
+
+        <div class="divider"></div>
+
+        <p class="description">
+            Budeme osazovat desku plošných spojů,
+            která plní funkci
+            <span class="highlight">semaforu</span>.
+            <br><br>
+            Abychom desku správně osadili,
+            budete se nejprve muset seznámit
+            s <span class="highlight">
+            technologickým postupem</span>.
+        </p>
+
+        <div class="option" onclick="openProcedure()">
+            <div class="option-icon">📋</div>
+
+            <h2>Technologický postup</h2>
+
+            <p>
+                Seznamte se s jednotlivými kroky
+                výroby a správným pořadím
+                výrobních operací.
+            </p>
+        </div>
+
+        <button class="back-button" onclick="goBack()">
+            ← Zpět
+        </button>
+
+    </main>
+
+    <script>
+        function openProcedure() {
+            window.location.href = "tp.html";
+        }
+
+        function goBack() {
+            window.location.href = "uvod.html";
+        }
+    </script>
+
+</body>
+</html>

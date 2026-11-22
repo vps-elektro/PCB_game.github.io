@@ -1,0 +1,3944 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V.P.S. ELEKTRO | Provozně-funkční zkouška</title>
+
+<style>
+* { box-sizing:border-box; }
+
+html,body {
+    margin:0;
+    min-height:100%;
+}
+
+body {
+    font-family:"Trebuchet MS",Arial,sans-serif;
+    background:linear-gradient(135deg,#101d18,#244633);
+    color:#f0f8f1;
+}
+
+button,input { font:inherit; }
+button { cursor:pointer; }
+button:disabled { opacity:.45;cursor:not-allowed; }
+.hidden { display:none!important; }
+
+header {
+    text-align:center;
+    padding:13px 12px 6px;
+}
+
+header small {
+    color:#a4edb8;
+    letter-spacing:2px;
+    font-size:11px;
+}
+
+h1 {
+    font-size:clamp(20px,2.5vw,29px);
+    margin:6px 0;
+}
+
+header p {
+    color:#c8dfce;
+    font-size:12px;
+    margin:5px 0;
+}
+
+main {
+    max-width:1550px;
+    margin:auto;
+    padding:8px 12px 20px;
+}
+
+.panel {
+    background:#1b3426;
+    border:1px solid #587c63;
+    border-radius:12px;
+    padding:13px;
+    min-width:0;
+}
+
+h2 { margin:0 0 9px;font-size:19px; }
+h3 { margin:5px 0 10px;font-size:15px; }
+
+.primary,.secondary {
+    border-radius:8px;
+    padding:11px 14px;
+    font-weight:bold;
+}
+
+.primary {
+    border:0;
+    background:#98e5ac;
+    color:#10291b;
+}
+
+.secondary {
+    border:1px solid #77a887;
+    background:#31563d;
+    color:#eff9f1;
+}
+
+.primary:hover:not(:disabled) {
+    background:#b9f4cb;
+}
+
+.secondary:hover:not(:disabled) {
+    background:#416e4f;
+}
+
+.muted {
+    color:#c4d8ca;
+    font-size:12px;
+    line-height:1.5;
+}
+
+.info {
+    background:#254332;
+    border:1px solid #53785f;
+    border-radius:8px;
+    padding:10px;
+    font-size:12px;
+    line-height:1.55;
+}
+
+.info.warning {
+    border-color:#bf8b45;
+    background:#493922;
+}
+
+.info.success {
+    border-color:#71c58b;
+    background:#234a31;
+}
+
+.info.error {
+    border-color:#b86a69;
+    background:#472b2b;
+}
+
+.flex {
+    display:flex;
+    gap:9px;
+    flex-wrap:wrap;
+}
+
+.wide { width:100%; }
+
+/* ==========================================
+   1. ÚVOD
+========================================== */
+
+#intro {
+    max-width:950px;
+    margin:auto;
+}
+
+#intro .content {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    align-items:center;
+}
+
+.intro-preview {
+    background:#10241a;
+    border-radius:8px;
+    padding:12px;
+}
+
+.intro-preview img {
+    width:100%;
+    display:block;
+    border-radius:5px;
+}
+
+#intro ul {
+    padding-left:20px;
+    line-height:1.8;
+    font-size:13px;
+}
+
+/* ==========================================
+   2. TESTOVACÍ PRACOVIŠTĚ
+========================================== */
+
+.test-layout {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 325px;
+    gap:12px;
+}
+
+.test-left { min-width:0; }
+
+#board {
+    position:relative;
+    width:100%;
+    aspect-ratio:897/537;
+    background:#789378;
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 5px 18px #0009;
+    touch-action:manipulation;
+}
+
+#board > img {
+    display:block;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    user-select:none;
+    -webkit-user-drag:none;
+}
+
+#componentsLayer,
+#terminalsLayer {
+    position:absolute;
+    inset:0;
+}
+
+#componentsLayer {
+    z-index:2;
+    pointer-events:none;
+}
+
+#terminalsLayer {
+    z-index:5;
+    pointer-events:none;
+}
+
+/* ==========================================
+   3. PŘIPOJOVACÍ ZDÍŘKY NA DPS
+========================================== */
+
+.terminal {
+    position:absolute;
+    transform:translate(-50%,-50%);
+    width:8%;
+    aspect-ratio:1/1;
+    border:2px solid #fff;
+    border-radius:50%;
+    box-shadow:0 0 0 3px #10281b88;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    pointer-events:auto;
+    touch-action:none;
+    z-index:6;
+}
+
+.terminal.plus {
+    background:radial-gradient(circle,#f39797,#c32929);
+    color:white;
+}
+
+.terminal.minus {
+    background:radial-gradient(circle,#7b8992,#1d242a);
+    color:white;
+}
+
+.terminal.connected {
+    box-shadow:
+        0 0 0 3px #a6f4b8,
+        0 0 14px #a6f4b8;
+}
+
+.terminal span {
+    font-size:clamp(12px,2vw,24px);
+    font-weight:bold;
+}
+
+.terminal-label {
+    position:absolute;
+    top:105%;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:10px!important;
+    white-space:nowrap;
+    padding:4px;
+    border-radius:3px;
+    background:#142a1e;
+}
+
+/* ==========================================
+   4. PŘÍVODNÍ SONDY
+========================================== */
+
+.probes {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin:12px 0;
+}
+
+.probe {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px 8px;
+    border-radius:9px;
+    background:#10251b;
+    border:2px solid #54715b;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    cursor:grab;
+    min-height:70px;
+}
+
+.probe.active {
+    border-color:#ffe18a;
+    background:#514427;
+}
+
+.probe.connected {
+    border-color:#87dba1;
+}
+
+.probe-tip {
+    width:18px;
+    height:38px;
+    border-radius:8px 8px 3px 3px;
+    transform:rotate(30deg);
+    border:2px solid #dbe2e4;
+    position:relative;
+    flex-shrink:0;
+}
+
+.probe-tip::after {
+    content:"";
+    position:absolute;
+    width:5px;
+    height:16px;
+    left:5px;
+    top:-17px;
+    background:linear-gradient(90deg,#65757d,#fff,#66777e);
+    clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+
+.probe-tip.red {
+    background:linear-gradient(90deg,#9e1515,#f44949,#a61818);
+}
+
+.probe-tip.black {
+    background:linear-gradient(90deg,#070707,#444,#0c0c0c);
+}
+
+.probe span {
+    font-size:12px;
+    line-height:1.4;
+}
+
+.probe-ghost {
+    position:fixed;
+    z-index:1000;
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    padding:10px;
+    border-radius:8px;
+    background:#192c21;
+    border:2px solid #f3e2a0;
+    box-shadow:0 6px 18px #000a;
+}
+
+/* ==========================================
+   5. LABORATORNÍ ZDROJ
+========================================== */
+
+.supply {
+    background:linear-gradient(145deg,#343c40,#181e22);
+    border:3px solid #6a7479;
+    border-radius:11px;
+    padding:13px;
+    box-shadow:inset 0 2px 6px #0009;
+}
+
+.supply-name {
+    color:#d6dedf;
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:1px;
+    margin-bottom:9px;
+}
+
+.display-row {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.digital {
+    padding:10px 6px;
+    border:2px solid #060e0a;
+    border-radius:5px;
+    background:#081810;
+    text-align:center;
+}
+
+.digital small {
+    display:block;
+    font-size:10px;
+    color:#85a78d;
+}
+
+.digital strong {
+    display:block;
+    font-family:Consolas,monospace;
+    font-size:clamp(21px,2.1vw,31px);
+    color:#79ff9a;
+    text-shadow:0 0 8px #36cf61a0;
+}
+
+.control {
+    margin:14px 0 10px;
+}
+
+.control label {
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    font-size:12px;
+    color:#e1e9e2;
+    margin-bottom:7px;
+}
+
+.control input[type=range] {
+    display:block;
+    width:100%;
+    accent-color:#8bdda5;
+}
+
+.supply-bottom {
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-top:12px;
+}
+
+.led-indicator {
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:#482c2c;
+    flex-shrink:0;
+}
+
+.led-indicator.on {
+    background:#89f5a4;
+    box-shadow:0 0 12px #89f5a4;
+}
+
+/* ==========================================
+   6. SEMAFOR
+========================================== */
+
+.traffic {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    background:#10191b;
+    border:3px solid #4d5d60;
+    padding:13px;
+    margin:12px auto;
+    border-radius:12px;
+    width:max-content;
+    max-width:100%;
+}
+
+.traffic-light {
+    width:clamp(45px,5vw,72px);
+    aspect-ratio:1;
+    border-radius:50%;
+    border:4px solid #283237;
+    box-shadow:inset 1px 4px 10px #000e;
+    opacity:.26;
+    transition:opacity .12s,box-shadow .12s;
+}
+
+.traffic-light.red {background:#fb3030}
+.traffic-light.yellow {background:#ffcb21}
+.traffic-light.green {background:#25d45f}
+
+.traffic-light.lit {
+    opacity:1;
+}
+
+.traffic-light.red.lit {
+    box-shadow:0 0 20px #ff3636,0 0 40px #f33;
+}
+
+.traffic-light.yellow.lit {
+    box-shadow:0 0 20px #ffd32e,0 0 40px #ffcd29;
+}
+
+.traffic-light.green.lit {
+    box-shadow:0 0 20px #2ee66c,0 0 40px #2ee66c;
+}
+
+.actions {
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+    flex-wrap:wrap;
+}
+
+/* ==========================================
+   7. KONTROLA DVOU DPS
+========================================== */
+
+#inspection {
+    margin-top:12px;
+}
+
+.inspect-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.inspect-board {
+    position:relative;
+    aspect-ratio:897/537;
+    overflow:hidden;
+    background:#759176;
+    border-radius:7px;
+}
+
+.inspect-board > img {
+    display:block;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+
+.inspect-parts {
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+}
+
+.inspect-clicks {
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+}
+
+.inspect-click {
+    position:absolute;
+    transform:translate(-50%,-50%);
+    border:1px dashed #e3f4df70;
+    background:#fff1;
+    padding:0;
+    border-radius:5px;
+    pointer-events:auto;
+    touch-action:manipulation;
+}
+
+.inspect-click.selected {
+    outline:3px solid #f4d57a;
+    border-color:#fff;
+}
+
+.inspect-click label {
+    position:absolute;
+    top:-17px;
+    left:50%;
+    transform:translateX(-50%);
+    color:white;
+    background:#15311eec;
+    padding:3px 5px;
+    border-radius:3px;
+    font-size:10px;
+    font-weight:bold;
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+.component-img {
+    position:absolute;
+    transform:
+        translate(-50%,-50%)
+        rotate(var(--rotation,0deg));
+    object-fit:contain;
+    pointer-events:none;
+    max-width:none;
+    max-height:none;
+    filter:drop-shadow(1px 2px 2px #0009);
+}
+
+.component-fallback {
+    position:absolute;
+    transform:translate(-50%,-50%);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:10px;
+    font-weight:bold;
+    color:#fff;
+    background:#222a2c;
+    border:2px solid #c8d0d2;
+    border-radius:3px;
+    pointer-events:none;
+}
+
+.smt-small {
+    position:absolute;
+    transform:translate(-50%,-50%);
+    width:5.5%;
+    height:4%;
+    background:linear-gradient(90deg,#b7c8cb 0 15%,#24282b 17% 83%,#bccbd0 85%);
+    border-radius:3px;
+    box-shadow:1px 2px 3px #0008;
+    pointer-events:none;
+}
+
+.solder-small {
+    position:absolute;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    pointer-events:none;
+    border:1px solid #f6d741;
+}
+
+.solder-small.good {
+    background:radial-gradient(circle at 30% 20%,#fff,#a4b8c0,#647983);
+    border-color:#eef6f7;
+}
+
+.solder-small.ball {
+    background:radial-gradient(circle at 30% 20%,#fff,#8b9ba0,#374348);
+    border:3px solid #e5bf36;
+}
+
+.solder-small.burnt {
+    background:radial-gradient(circle,#84705a,#29201d);
+    border-color:#66452d;
+}
+
+.solder-small.missing {
+    background:transparent;
+    border-color:#eac72f;
+}
+
+.inspect-result {
+    padding:12px;
+    background:#243e2d;
+    border:1px solid #5c8367;
+    border-radius:8px;
+    margin:12px 0;
+    min-height:65px;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.result-ok {
+    color:#a6efb9;
+}
+
+.result-bad {
+    color:#ffb5a9;
+}
+
+.result-pending {
+    color:#ffdf8b;
+}
+
+/* ==========================================
+   8. KONEC HRY
+========================================== */
+
+#successScreen {
+    max-width:780px;
+    margin:auto;
+    text-align:center;
+    padding:26px;
+}
+
+#successScreen h2 {
+    color:#aaf0bd;
+    font-size:29px;
+}
+
+#successScreen .trophy {
+    font-size:65px;
+}
+
+/* ==========================================
+   9. MOBIL A TABLET
+========================================== */
+
+@media(max-width:1000px) {
+    .test-layout {
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:720px) {
+    #intro .content,
+    .inspect-grid {
+        grid-template-columns:1fr;
+    }
+
+    main {padding:5px}
+    .panel {padding:9px}
+
+    .inspect-board {
+        width:100%;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <small>
+        V.P.S. ELEKTRO · VÝROBNÍ OPERACE 11
+    </small>
+
+    <h1>Provozně-funkční zkouška semaforu</h1>
+
+    <p>
+        Nastav laboratorní zdroj,
+        připoj napájecí sondy
+        a ověř funkčnost vyrobené DPS.
+    </p>
+</header>
+
+<main>
+
+    <!-- ==================================
+         ÚVOD
+    =================================== -->
+
+    <section class="panel" id="intro">
+
+        <h2>Pracoviště funkčního testování</h2>
+
+        <div class="content">
+
+            <div class="intro-preview">
+                <img
+                    src="images/blikac_top.png"
+                    alt="DPS semaforu">
+            </div>
+
+            <div>
+
+                <p class="muted">
+                    Tvoje DPS prošla výrobou.
+                    Nyní je potřeba ověřit,
+                    zda opravdu funguje.
+                </p>
+
+                <ul>
+                    <li>Nastav napájecí napětí 9 V.</li>
+                    <li>Nastav proudové omezení 50 mA.</li>
+                    <li>Připoj červenou sondu na +.</li>
+                    <li>Připoj černou sondu na −.</li>
+                    <li>Zapni zdroj a proveď zkoušku.</li>
+                </ul>
+
+                <p class="muted">
+                    Pokud semafor nebude fungovat,
+                    provedeš optickou kontrolu
+                    osazení a pájených spojů.
+                </p>
+
+                <button class="primary"
+                        id="startBtn"
+                        type="button">
+                    Zahájit funkční zkoušku →
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ==================================
+         TESTOVÁNÍ
+    =================================== -->
+
+    <section id="test" class="hidden">
+
+        <div class="test-layout">
+
+            <!-- LEVÁ STRANA -->
+
+            <section class="panel test-left">
+
+                <h2>DPS – strana TOP</h2>
+
+                <p class="muted">
+                    Připoj sondy ke správným pólům.
+                    Sondu můžeš přetáhnout prstem
+                    nebo ji vybrat a klepnout na zdířku.
+                </p>
+
+                <div id="board">
+
+                    <img
+                        src="images/blikac_top.png"
+                        draggable="false"
+                        alt="TOP strana semaforu">
+
+                    <div id="componentsLayer"></div>
+
+                    <div id="terminalsLayer">
+
+                        <button
+                            id="terminalPlus"
+                            class="terminal plus"
+                            type="button">
+                            <span>+</span>
+                            <span class="terminal-label">PLUS</span>
+                        </button>
+
+                        <button
+                            id="terminalMinus"
+                            class="terminal minus"
+                            type="button">
+                            <span>−</span>
+                            <span class="terminal-label">MINUS</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <h3>Napájecí a měřicí sondy</h3>
+
+                <div class="probes">
+
+                    <button
+                        id="probeRed"
+                        class="probe"
+                        type="button">
+
+                        <i class="probe-tip red"></i>
+
+                        <span>
+                            Červená sonda<br>
+                            <b>Napájení +</b>
+                        </span>
+
+                    </button>
+
+                    <button
+                        id="probeBlack"
+                        class="probe"
+                        type="button">
+
+                        <i class="probe-tip black"></i>
+
+                        <span>
+                            Černá sonda<br>
+                            <b>Osciloskop / −</b>
+                        </span>
+
+                    </button>
+
+                </div>
+
+                <div class="traffic">
+
+                    <div
+                        id="lightRed"
+                        class="traffic-light red">
+                    </div>
+
+                    <div
+                        id="lightYellow"
+                        class="traffic-light yellow">
+                    </div>
+
+                    <div
+                        id="lightGreen"
+                        class="traffic-light green">
+                    </div>
+
+                </div>
+
+                <div class="info" id="testMessage">
+                    Nastav zdroj a připoj sondy.
+                </div>
+
+                <div class="actions">
+
+                    <button
+                        class="primary"
+                        id="runTestBtn"
+                        type="button">
+                        Spustit funkční zkoušku
+                    </button>
+
+                    <button
+                        class="secondary"
+                        id="inspectionBtn"
+                        type="button"
+                        disabled>
+                        Optická kontrola
+                    </button>
+
+                    <button
+                        class="secondary"
+                        id="disconnectBtn"
+                        type="button">
+                        Odpojit sondy
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- LABORATORNÍ ZDROJ -->
+
+            <aside class="panel">
+
+                <h2>Laboratorní zdroj</h2>
+
+                <div class="supply">
+
+                    <div class="supply-name">
+                        DC LABORATORY POWER SUPPLY
+                    </div>
+
+                    <div class="display-row">
+
+                        <div class="digital">
+                            <small>VOLTAGE</small>
+                            <strong id="voltageDisplay">
+                                0.0 V
+                            </strong>
+                        </div>
+
+                        <div class="digital">
+                            <small>CURRENT LIMIT</small>
+                            <strong id="currentDisplay">
+                                0 mA
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="control">
+
+                        <label>
+                            <span>Napájecí napětí</span>
+                            <b id="voltageLabel">0.0 V</b>
+                        </label>
+
+                        <input
+                            id="voltageInput"
+                            type="range"
+                            min="0"
+                            max="15"
+                            step="0.5"
+                            value="0">
+
+                    </div>
+
+                    <div class="control">
+
+                        <label>
+                            <span>Proudové omezení</span>
+                            <b id="currentLabel">0 mA</b>
+                        </label>
+
+                        <input
+                            id="currentInput"
+                            type="range"
+                            min="0"
+                            max="150"
+                            step="5"
+                            value="0">
+
+                    </div>
+
+                    <div class="supply-bottom">
+
+                        <button
+                            id="outputBtn"
+                            class="secondary"
+                            type="button">
+                            OUTPUT OFF
+                        </button>
+
+                        <span
+                            id="outputIndicator"
+                            class="led-indicator">
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="info" style="margin-top:12px">
+                    <b>Požadované nastavení:</b>
+                    <br>
+                    Napětí: 9,0 V
+                    <br>
+                    Proudové omezení: 50 mA
+                </div>
+
+                <div class="info" style="margin-top:10px">
+                    <b>Pokyny:</b>
+                    <br>
+                    Nejdříve nastav zdroj.
+                    Připoj sondy ke správným pólům
+                    a potom zapni výstup.
+                </div>
+
+                <button
+                    class="secondary wide"
+                    id="backBtn"
+                    type="button"
+                    style="margin-top:12px">
+                    ← Zpět na technologický postup
+                </button>
+
+            </aside>
+
+        </div>
+
+        <!-- ==================================
+             OPTICKÁ KONTROLA
+        =================================== -->
+
+        <section
+            id="inspection"
+            class="panel hidden">
+
+            <h2>Optická kontrola DPS</h2>
+
+            <p class="muted">
+                Porovnej správně osazenou
+                referenční DPS s deskou,
+                kterou jsi vyrobil.
+                Klikni na součástku
+                nebo pájený spoj.
+            </p>
+
+            <div class="actions">
+
+                <button
+                    id="inspectTopBtn"
+                    class="primary"
+                    type="button">
+                    TOP – osazení
+                </button>
+
+                <button
+                    id="inspectBottomBtn"
+                    class="secondary"
+                    type="button">
+                    BOTTOM – pájení
+                </button>
+
+            </div>
+
+            <div class="inspect-grid"
+                 style="margin-top:12px">
+
+                <div>
+
+                    <h3>Referenční DPS – správná</h3>
+
+                    <div
+                        class="inspect-board"
+                        id="referenceBoard">
+
+                        <img
+                            id="referenceImage"
+                            src="images/blikac_top.png"
+                            alt="Referenční DPS">
+
+                        <div
+                            class="inspect-parts"
+                            id="referenceParts">
+                        </div>
+
+                        <div
+                            class="inspect-clicks"
+                            id="referenceClicks">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <h3>DPS žáka – skutečné osazení</h3>
+
+                    <div
+                        class="inspect-board"
+                        id="studentBoard">
+
+                        <img
+                            id="studentImage"
+                            src="images/blikac_top.png"
+                            alt="DPS žáka">
+
+                        <div
+                            class="inspect-parts"
+                            id="studentParts">
+                        </div>
+
+                        <div
+                            class="inspect-clicks"
+                            id="studentClicks">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div
+                class="inspect-result"
+                id="inspectionResult">
+
+                Klikni na pozici součástky,
+                kterou chceš zkontrolovat.
+
+            </div>
+
+            <div class="actions">
+
+                <button
+                    class="secondary"
+                    id="closeInspectionBtn"
+                    type="button">
+                    ← Zpět na funkční zkoušku
+                </button>
+
+                <button
+                    class="secondary"
+                    id="returnToProductionBtn"
+                    type="button">
+                    Vrátit se k opravě DPS
+                </button>
+
+            </div>
+
+        </section>
+
+    </section>
+
+    <!-- ==================================
+         ÚSPĚŠNÉ DOKONČENÍ
+    =================================== -->
+
+    <section
+        class="panel hidden"
+        id="successScreen">
+
+        <div class="trophy">🏆</div>
+
+        <h2>
+            Gratulujeme!
+        </h2>
+
+        <p>
+            Úspěšně jste vyrobili
+            a otestovali funkční semafor.
+        </p>
+
+        <p class="muted">
+            Deska prošla provozně-funkční
+            zkouškou a semafor správně bliká.
+        </p>
+
+        <div class="traffic">
+
+            <div
+                id="successRed"
+                class="traffic-light red">
+            </div>
+
+            <div
+                id="successYellow"
+                class="traffic-light yellow">
+            </div>
+
+            <div
+                id="successGreen"
+                class="traffic-light green">
+            </div>
+
+        </div>
+
+        <button
+            id="finishGameBtn"
+            class="primary"
+            type="button">
+            Dokončit celou hru →
+        </button>
+
+    </section>
+
+</main>
+
+<script src="choices.js"></script>
+
+<script>
+"use strict";
+
+// ==========================================
+// 1. ZÁKLADNÍ NASTAVENÍ
+// ==========================================
+
+const STEP_NAME = "zkouska";
+
+const BACKUP_KEY =
+    "vps_semafor_zkouska_data";
+
+const COMPLETE_KEY =
+    "vps_semafor_krok_11_dokonceno";
+
+const BOARD_W = 897;
+const BOARD_H = 537;
+
+const REQUIRED_VOLTAGE = 9;
+const REQUIRED_CURRENT = 50;
+
+const $ = id =>
+    document.getElementById(id);
+
+function pct(value,max) {
+    return value / max * 100 + "%";
+}
+
+function copy(value) {
+    return JSON.parse(JSON.stringify(value));
+}
+
+
+// ==========================================
+// 2. REFERENČNÍ POLARITA
+// ==========================================
+
+/*
+   DŮLEŽITÉ!
+
+   Správnou polaritu musíme ověřit
+   podle skutečného zapojení DPS.
+
+   0 = výchozí natočení v THT kroku.
+   180 = otočení po kliknutí.
+
+   null = dosud neověřená hodnota.
+
+   Dokud zůstane některá hodnota null,
+   automatická funkční zkouška
+   NESMÍ označit DPS za funkční.
+
+   Rezistory se zde nekontrolují
+   podle natočení.
+*/
+
+const CORRECT_ORIENTATION = {
+    C1: 0,
+    C2: 180,
+
+    U1: 180,
+    U2: 0,
+
+    D1: 0,
+    D2: 0,
+    D3: 0
+};
+
+
+// ==========================================
+// 3. PŘIPOJOVACÍ ZDÍŘKY
+// ==========================================
+
+/*
+   Uprav podle skutečné polohy
+   + a − na obrázku blikac_top.png.
+
+   Souřadnice odpovídají obrázku
+   897 × 537 px.
+*/
+
+const TERMINALS = {
+
+    plus:{
+        x:882,
+        y:78
+    },
+
+    minus:{
+        x:882,
+        y:434
+    }
+
+};
+
+
+// ==========================================
+// 4. THT SOUČÁSTKY NA TOP
+// ==========================================
+
+/*
+   Souřadnice převzaté z osazení THT.
+*/
+
+const THT_TARGETS = [
+
+    {
+        id:"C1",x:305,y:463,w:91,h:91,
+        material:"MC14"
+    },
+
+    {
+        id:"C2",x:620,y:70,w:90,h:91,
+        material:"MC11"
+    },
+
+    {
+        id:"U1",x:450,y:430,w:200,h:220,
+        material:"MP25"
+    },
+
+    {
+        id:"U2",x:455,y:105,w:200,h:220,
+        material:"MP25"
+    },
+
+    {
+        id:"D1",x:180,y:268,w:109,h:108,
+        material:"MP34"
+    },
+
+    {
+        id:"D2",x:449,y:268,w:110,h:109,
+        material:"MP35"
+    },
+
+    {
+        id:"D3",x:718,y:268,w:111,h:109,
+        material:"MP31"
+    },
+
+    {
+        id:"R5",x:66,y:267,w:54,h:121,
+        material:"MR13"
+    },
+
+    {
+        id:"R6",x:770,y:177,w:125,h:65,
+        material:"MR12"
+    },
+
+    {
+        id:"R7",x:309,y:262,w:54,h:118,
+        material:"MR13"
+    },
+
+    {
+        id:"R8",x:603,y:267,w:55,h:122,
+        material:"MR13"
+    },
+
+    {
+        id:"SW1",x:822,y:453,w:71,h:153,
+        material:"MS01"
+    }
+
+];
+
+
+// ==========================================
+// 5. OBRÁZKY A VELIKOSTI THT
+// ==========================================
+
+const MATERIALS = {
+
+    MC14:{
+        image:"images/cap_47uf.png",
+        kind:"capacitor"
+    },
+
+    MC11:{
+        image:"images/cap_22uf.png",
+        kind:"capacitor"
+    },
+
+    MP25:{
+        image:"images/ne555.png",
+        kind:"ic"
+    },
+
+    MP34:{
+        image:"images/led_red.png",
+        kind:"led"
+    },
+
+    MP35:{
+        image:"images/led_yellow.png",
+        kind:"led"
+    },
+
+    MP31:{
+        image:"images/led_green.png",
+        kind:"led"
+    },
+
+    MR12:{
+        image:"images/resistor_10k.png",
+        kind:"resistor"
+    },
+
+    MR13:{
+        image:"images/resistor_470r.png",
+        kind:"resistor"
+    },
+
+    MS01:{
+        image:"images/prepinac.png",
+        kind:"jumper"
+    }
+
+};
+
+const IMAGE_SIZES = {
+
+    capacitor:{
+        w:90,h:90,base:0
+    },
+
+    led:{
+        w:150,h:150,base:90
+    },
+
+    ic:{
+        w:200,h:170,base:0
+    },
+
+    resistorHorizontal:{
+        w:240,h:90,base:0
+    },
+
+    resistorVertical:{
+        w:240,h:90,base:90
+    },
+
+    jumper:{
+        w:70,h:150,base:0
+    }
+
+};
+
+
+// ==========================================
+// 6. SMT REZISTORY
+// ==========================================
+
+const SMT_POSITIONS = {
+
+    R1:{
+        x:666,y:501,
+        required:"MR09"
+    },
+
+    R2:{
+        x:666,y:436,
+        required:"MR03"
+    },
+
+    R3:{
+        x:296.5,y:118,
+        required:"MR09"
+    },
+
+    R4:{
+        x:296.5,y:61,
+        required:"MR03"
+    }
+
+};
+
+
+// ==========================================
+// 7. SMT KONDENZÁTORY BOTTOM
+// ==========================================
+
+const SMT_BOTTOM = [
+
+    {
+        id:"C3",
+        x:386,
+        y:431
+    },
+
+    {
+        id:"C4",
+        x:517,
+        y:108
+    }
+
+];
+
+
+// ==========================================
+// 8. THT PÁJECÍ BODY
+// ==========================================
+
+/*
+   Stejná identifikace bodů,
+   jakou používá pajeni_top.html.
+
+   Souřadnice musí souhlasit
+   s poslední verzí pájecí hry.
+*/
+
+const SOLDER_GROUPS = {
+
+    U2:[
+        [381,38],[426,38],[471,38],[517,38],
+        [381,176],[426,176],[471,176],[517,176]
+    ],
+
+    U1:[
+        [386,363],[432,363],[477,363],[523,363],
+        [386,500],[432,500],[477,500],[523,500]
+    ],
+
+    C2:[
+        [282,74],[327,74]
+    ],
+
+    C1:[
+        [597,466],[642,466]
+    ],
+
+    D1:[
+        [180,246],[180,291]
+    ],
+
+    D2:[
+        [449,246],[449,291]
+    ],
+
+    D3:[
+        [718,246],[718,291]
+    ],
+
+    R5:[
+        [66,179],[66,361]
+    ],
+
+    R7:[
+        [309,176],[309,363]
+    ],
+
+    R8:[
+        [604,176],[604,361]
+    ],
+
+    R6:[
+        [678,361],[861,361]
+    ],
+
+    SW1:[
+        [821,38],[821,84],[821,128]
+    ],
+
+    BT1:[
+        [875,152],[875,513]
+    ]
+
+};
+
+const SOLDER_POINTS =
+    Object.entries(SOLDER_GROUPS)
+    .flatMap(([group,positions]) => {
+
+        return positions.map(
+            ([x,y],index) => ({
+
+                id:group+"_"+(index+1),
+                group,
+                x,
+                y
+            })
+        );
+    });
+
+
+// ==========================================
+// 9. STAV ZKOUŠKY
+// ==========================================
+
+let voltage = 0;
+let currentLimit = 0;
+
+let outputOn = false;
+
+let connections = {
+    red:null,
+    black:null
+};
+
+let selectedProbe = null;
+
+let draggingProbe = null;
+
+let testFailed = false;
+let testPassed = false;
+
+let inspectionSide = "top";
+let selectedInspection = null;
+
+let blinkInterval = null;
+let blinkIndex = 0;
+
+let testResult = null;
+
+
+// ==========================================
+// 10. ČTENÍ VÝROBNÍ KARTY
+// ==========================================
+
+function readJSON(key) {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(key) ||
+            "null"
+        );
+
+    } catch(error) {
+
+        console.warn(error);
+        return null;
+    }
+}
+
+function getStep(name) {
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.getStep === "function"
+        ) {
+
+            return VPSChoices.getStep(name) || {};
+        }
+
+    } catch(error) {
+
+        console.warn(error);
+    }
+
+    return {};
+}
+
+function getSavedStep(name,backupKey) {
+
+    const central = getStep(name);
+
+    if (Object.keys(central).length) {
+        return central;
+    }
+
+    return readJSON(backupKey) || {};
+}
+
+function getMaterialCode(item) {
+
+    if (typeof item === "string") {
+        return item;
+    }
+
+    return item?.material ||
+           item?.code ||
+           "";
+}
+
+
+// ==========================================
+// 11. NAČTENÍ OSAZENÍ
+// ==========================================
+
+function getStudentTHT() {
+
+    return getSavedStep(
+        "osazeniTopTHT",
+        "vps_semafor_osazeni_top_tht_data"
+    ).soucastky || {};
+}
+
+function getStudentSMT() {
+
+    return getSavedStep(
+        "osazeniTopSMD",
+        "vps_semafor_osazeni_top_smd_data"
+    ).soucastky || {};
+}
+
+function getStudentSolder() {
+
+    return getSavedStep(
+        "pajeniTop",
+        "vps_semafor_pajeni_top_data"
+    ).spoje || {};
+}
+
+
+// ==========================================
+// 12. KONTROLA VÝROBNÍCH KROKŮ
+// ==========================================
+
+const REQUIRED_STEPS = [
+
+    {number:1,name:"sklad"},
+    {number:2,name:"podavace"},
+    {number:3,name:"pastaBottom"},
+    {number:4,name:"osazeniBottom"},
+    {number:5,name:"reflowBottom"},
+    {number:6,name:"pastaTop"},
+    {number:7,name:"osazeniTopSMD"},
+    {number:8,name:"reflowTop"},
+    {number:9,name:"osazeniTopTHT"},
+    {number:10,name:"pajeniTop"}
+
+];
+
+/*
+   Pro kompatibilitu se staršími kroky
+   používáme hlavně původní klíče
+   v localStorage.
+
+   Předpokládáme, že každý krok
+   nastaví příslušný příznak
+   dokončení.
+*/
+
+const LEGACY_COMPLETION_KEYS = {
+
+    1:"vps_semafor_sklad_dokonceno",
+
+    2:"vps_semafor_krok_2_dokonceno",
+    3:"vps_semafor_krok_3_dokonceno",
+    4:"vps_semafor_krok_4_dokonceno",
+    5:"vps_semafor_krok_5_dokonceno",
+    6:"vps_semafor_krok_6_dokonceno",
+    7:"vps_semafor_krok_7_dokonceno",
+    8:"vps_semafor_krok_8_dokonceno",
+    9:"vps_semafor_krok_9_dokonceno",
+    10:"vps_semafor_krok_10_dokonceno"
+
+};
+
+function isStepCompleted(step) {
+
+    const legacyKey =
+        LEGACY_COMPLETION_KEYS[
+            step.number
+        ];
+
+    if (
+        localStorage.getItem(legacyKey) ===
+        "true"
+    ) {
+        return true;
+    }
+
+    return getStep(
+        step.name
+    ).dokonceno === true;
+}
+
+
+// ==========================================
+// 13. KONTROLA OSAZENÍ A PÁJENÍ
+// ==========================================
+
+function evaluateProduction() {
+
+    const issues = [];
+    const pending = [];
+
+    // --------------------------------------
+    // DOKONČENÍ OPERACÍ
+    // --------------------------------------
+
+    REQUIRED_STEPS.forEach(step => {
+
+        if (!isStepCompleted(step)) {
+
+            issues.push(
+                "STEP_NOT_COMPLETED_" +
+                step.number
+            );
+        }
+    });
+
+    // --------------------------------------
+    // THT MATERIÁLY
+    // --------------------------------------
+
+    const tht = getStudentTHT();
+
+    THT_TARGETS.forEach(target => {
+
+        const item = tht[target.id];
+
+        const actual =
+            getMaterialCode(item);
+
+        if (actual !== target.material) {
+
+            issues.push(
+                "WRONG_THT_" + target.id
+            );
+        }
+
+        // Polaritu kontrolujeme pouze
+        // u LED, IC a elektrolytů.
+
+        if (
+            !Object.prototype.hasOwnProperty.call(
+                CORRECT_ORIENTATION,
+                target.id
+            )
+        ) {
+            return;
+        }
+
+        const expected =
+            CORRECT_ORIENTATION[
+                target.id
+            ];
+
+        if (
+            expected !== 0 &&
+            expected !== 180
+        ) {
+
+            pending.push(
+                "ORIENTATION_NOT_VERIFIED_" +
+                target.id
+            );
+
+            return;
+        }
+
+        const actualRotation =
+            Number(item?.rotation) === 180
+                ? 180
+                : 0;
+
+        if (
+            actual === target.material &&
+            actualRotation !== expected
+        ) {
+
+            issues.push(
+                "WRONG_ORIENTATION_" +
+                target.id
+            );
+        }
+    });
+
+    // --------------------------------------
+    // SMT REZISTORY
+    // --------------------------------------
+
+    const smt = getStudentSMT();
+
+    Object.entries(SMT_POSITIONS).forEach(
+        ([id,position]) => {
+
+            const actual =
+                getMaterialCode(
+                    smt[id]
+                );
+
+            if (
+                actual !== position.required
+            ) {
+
+                issues.push(
+                    "WRONG_SMT_" + id
+                );
+            }
+        }
+    );
+
+    // --------------------------------------
+    // THT PÁJENÍ
+    // --------------------------------------
+
+    const joints = getStudentSolder();
+
+    SOLDER_POINTS.forEach(point => {
+
+        const result =
+            joints[point.id]?.result;
+
+        if (result !== "good") {
+
+            issues.push(
+                "BAD_SOLDER_" +
+                point.id
+            );
+        }
+    });
+
+    // --------------------------------------
+    // CELKOVÝ STAV
+    // --------------------------------------
+
+    let status;
+
+    if (issues.length) {
+
+        status = "failed";
+
+    } else if (pending.length) {
+
+        status = "pending";
+
+    } else {
+
+        status = "passed";
+    }
+
+    return {
+
+        passed:status === "passed",
+
+        status,
+
+        issues,
+
+        pending,
+
+        checkedAt:
+            new Date().toISOString()
+
+    };
+}
+
+
+// ==========================================
+// 14. ZDROJ – NASTAVENÍ
+// ==========================================
+
+function updateSupply() {
+
+    voltage =
+        Number($("voltageInput").value);
+
+    currentLimit =
+        Number($("currentInput").value);
+
+    $("voltageDisplay").textContent =
+        voltage.toFixed(1) + " V";
+
+    $("voltageLabel").textContent =
+        voltage.toFixed(1) + " V";
+
+    $("currentDisplay").textContent =
+        currentLimit + " mA";
+
+    $("currentLabel").textContent =
+        currentLimit + " mA";
+
+    stopBlinking();
+
+    testPassed = false;
+
+    if (outputOn) {
+
+        showTestMessage(
+            "Nastavení zdroje bylo změněno. " +
+            "Spusť funkční zkoušku znovu.",
+            "warning"
+        );
+    }
+}
+
+$("voltageInput").addEventListener(
+    "input",
+    updateSupply
+);
+
+$("currentInput").addEventListener(
+    "input",
+    updateSupply
+);
+
+$("outputBtn").addEventListener(
+    "click",
+    () => {
+
+        outputOn = !outputOn;
+
+        $("outputBtn").textContent =
+            outputOn
+                ? "OUTPUT ON"
+                : "OUTPUT OFF";
+
+        $("outputIndicator").classList.toggle(
+            "on",
+            outputOn
+        );
+
+        if (!outputOn) {
+
+            stopBlinking();
+
+            testPassed = false;
+
+            showTestMessage(
+                "Výstup zdroje je vypnutý.",
+                ""
+            );
+
+        } else {
+
+            showTestMessage(
+                "Výstup zdroje je zapnutý. " +
+                "Nyní spusť funkční zkoušku.",
+                ""
+            );
+        }
+    }
+);
+
+
+// ==========================================
+// 15. UMÍSTĚNÍ ZDÍŘEK NA DPS
+// ==========================================
+
+function renderTerminals() {
+
+    const plus = $("terminalPlus");
+    const minus = $("terminalMinus");
+
+    plus.style.left =
+        pct(TERMINALS.plus.x,BOARD_W);
+
+    plus.style.top =
+        pct(TERMINALS.plus.y,BOARD_H);
+
+    minus.style.left =
+        pct(TERMINALS.minus.x,BOARD_W);
+
+    minus.style.top =
+        pct(TERMINALS.minus.y,BOARD_H);
+
+    plus.classList.toggle(
+        "connected",
+        Object.values(connections)
+            .includes("plus")
+    );
+
+    minus.classList.toggle(
+        "connected",
+        Object.values(connections)
+            .includes("minus")
+    );
+
+    ["red","black"].forEach(color => {
+
+        const button = $(
+            color === "red"
+                ? "probeRed"
+                : "probeBlack"
+        );
+
+        button.classList.toggle(
+            "connected",
+            Boolean(connections[color])
+        );
+
+        button.classList.toggle(
+            "active",
+            selectedProbe === color
+        );
+
+        const text =
+            button.querySelector("span");
+
+        const name =
+            color === "red"
+                ? "Červená sonda"
+                : "Černá sonda";
+
+        text.textContent =
+            name +
+            " – " +
+            (
+                connections[color]
+                    ? connections[color] === "plus"
+                        ? "připojena na +"
+                        : "připojena na −"
+                    : "nepřipojena"
+            );
+    });
+}
+
+
+// ==========================================
+// 16. PŘIPOJOVÁNÍ SOND
+// ==========================================
+
+function attachProbe(color,terminal) {
+
+    if (
+        !["red","black"].includes(color) ||
+        !["plus","minus"].includes(terminal)
+    ) {
+        return;
+    }
+
+    // Jedna zdířka nesmí obsahovat
+    // dvě současně připojené sondy.
+
+    const other =
+        color === "red"
+            ? "black"
+            : "red";
+
+    if (
+        connections[other] === terminal
+    ) {
+
+        connections[other] = null;
+    }
+
+    connections[color] = terminal;
+
+    selectedProbe = null;
+
+    renderTerminals();
+
+    stopBlinking();
+    testPassed = false;
+
+    showTestMessage(
+        "Sonda byla připojena. " +
+        "Po dokončení zapojení spusť zkoušku.",
+        ""
+    );
+}
+
+function handleTerminalClick(terminal) {
+
+    if (!selectedProbe) {
+        return;
+    }
+
+    attachProbe(
+        selectedProbe,
+        terminal
+    );
+}
+
+$("terminalPlus").addEventListener(
+    "click",
+    () => handleTerminalClick("plus")
+);
+
+$("terminalMinus").addEventListener(
+    "click",
+    () => handleTerminalClick("minus")
+);
+
+
+// ==========================================
+// 17. PŘETAHOVÁNÍ SOND PRSTEM
+// ==========================================
+
+function beginProbeDrag(event,color) {
+
+    if (
+        draggingProbe ||
+        !event.isPrimary ||
+        event.button > 0
+    ) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const source =
+        color === "red"
+            ? $("probeRed")
+            : $("probeBlack");
+
+    draggingProbe = {
+
+        color,
+        pointerId:event.pointerId,
+        startX:event.clientX,
+        startY:event.clientY,
+        moved:false,
+        ghost:null
+    };
+
+    selectedProbe = color;
+
+    renderTerminals();
+
+    try {
+
+        source.setPointerCapture(
+            event.pointerId
+        );
+
+    } catch(error) {
+
+        console.warn(error);
+    }
+}
+
+function moveProbeDrag(event) {
+
+    if (
+        !draggingProbe ||
+        draggingProbe.pointerId !==
+        event.pointerId
+    ) {
+        return;
+    }
+
+    const d = draggingProbe;
+
+    const distance =
+        Math.hypot(
+            event.clientX - d.startX,
+            event.clientY - d.startY
+        );
+
+    if (
+        !d.moved &&
+        distance > 7
+    ) {
+
+        d.moved = true;
+
+        d.ghost =
+            document.createElement("div");
+
+        d.ghost.className =
+            "probe-ghost";
+
+        d.ghost.textContent =
+            d.color === "red"
+                ? "🔴 Červená sonda"
+                : "⚫ Černá sonda";
+
+        document.body.appendChild(
+            d.ghost
+        );
+    }
+
+    if (!d.moved) {
+        return;
+    }
+
+    event.preventDefault();
+
+    d.ghost.style.left =
+        event.clientX + "px";
+
+    d.ghost.style.top =
+        event.clientY + "px";
+}
+
+function endProbeDrag(event) {
+
+    if (
+        !draggingProbe ||
+        draggingProbe.pointerId !==
+        event.pointerId
+    ) {
+        return;
+    }
+
+    const d = draggingProbe;
+
+    const wasMoved = d.moved;
+
+    // Najdeme cílovou zdířku pod prstem.
+
+    const targetElement =
+        document.elementFromPoint(
+            event.clientX,
+            event.clientY
+        );
+
+    const terminal =
+        targetElement?.closest(
+            ".terminal"
+        );
+
+    d.ghost?.remove();
+
+    draggingProbe = null;
+
+    if (
+        wasMoved &&
+        terminal
+    ) {
+
+        const terminalName =
+            terminal.id === "terminalPlus"
+                ? "plus"
+                : "minus";
+
+        attachProbe(
+            d.color,
+            terminalName
+        );
+
+    } else if (
+        !wasMoved
+    ) {
+
+        // Krátké klepnutí pouze vybere sondu.
+
+        selectedProbe =
+            selectedProbe === d.color
+                ? null
+                : d.color;
+
+        renderTerminals();
+
+    } else {
+
+        selectedProbe = d.color;
+
+        renderTerminals();
+    }
+}
+
+function cancelProbeDrag(event) {
+
+    if (
+        !draggingProbe ||
+        draggingProbe.pointerId !==
+        event.pointerId
+    ) {
+        return;
+    }
+
+    draggingProbe.ghost?.remove();
+    draggingProbe = null;
+}
+
+$("probeRed").addEventListener(
+    "pointerdown",
+    event => beginProbeDrag(
+        event,
+        "red"
+    )
+);
+
+$("probeBlack").addEventListener(
+    "pointerdown",
+    event => beginProbeDrag(
+        event,
+        "black"
+    )
+);
+
+window.addEventListener(
+    "pointermove",
+    moveProbeDrag
+);
+
+window.addEventListener(
+    "pointerup",
+    endProbeDrag
+);
+
+window.addEventListener(
+    "pointercancel",
+    cancelProbeDrag
+);
+
+
+// ==========================================
+// 18. ODPOJENÍ SOND
+// ==========================================
+
+$("disconnectBtn").addEventListener(
+    "click",
+    () => {
+
+        connections.red = null;
+        connections.black = null;
+
+        selectedProbe = null;
+
+        renderTerminals();
+
+        stopBlinking();
+
+        testPassed = false;
+
+        showTestMessage(
+            "Sondy byly odpojeny.",
+            ""
+        );
+    }
+);
+
+
+// ==========================================
+// 19. ZOBRAZENÍ STAVU ZKOUŠKY
+// ==========================================
+
+function showTestMessage(text,type="") {
+
+    const message = $("testMessage");
+
+    message.textContent = text;
+
+    message.className =
+        "info" +
+        (
+            type
+                ? " " + type
+                : ""
+        );
+}
+
+
+// ==========================================
+// 20. ANIMACE SEMAFORU
+// ==========================================
+
+function setLights(prefix,index) {
+
+    const red =
+        $(prefix+"Red");
+
+    const yellow =
+        $(prefix+"Yellow");
+
+    const green =
+        $(prefix+"Green");
+
+    [red,yellow,green].forEach(
+        element => {
+
+            element.classList.remove(
+                "lit"
+            );
+        }
+    );
+
+    if (index === 0) {
+        red.classList.add("lit");
+    }
+
+    if (index === 1) {
+        yellow.classList.add("lit");
+    }
+
+    if (index === 2) {
+        green.classList.add("lit");
+    }
+}
+
+function stopBlinking() {
+
+    if (blinkInterval !== null) {
+
+        clearInterval(blinkInterval);
+
+        blinkInterval = null;
+    }
+
+    ["light","success"].forEach(prefix => {
+
+        ["Red","Yellow","Green"].forEach(
+            color => {
+
+                const element =
+                    $(prefix+color);
+
+                element.classList.remove(
+                    "lit"
+                );
+            }
+        );
+    });
+}
+
+function startBlinking(prefix="light") {
+
+    stopBlinking();
+
+    blinkIndex = 0;
+
+    setLights(prefix,blinkIndex);
+
+    blinkInterval = setInterval(
+        () => {
+
+            blinkIndex =
+                (blinkIndex+1)%3;
+
+            setLights(
+                prefix,
+                blinkIndex
+            );
+
+        },
+        650
+    );
+}
+
+
+// ==========================================
+// 21. ULOŽENÍ VÝSLEDKU ZKOUŠKY
+// ==========================================
+
+function saveTestState(passed,result) {
+
+    const data = {
+
+        dokonceno:passed,
+
+        napeti:voltage,
+
+        proudoveOmezeni:
+            currentLimit,
+
+        vystupZapnut:
+            outputOn,
+
+        sondy:
+            copy(connections),
+
+        kontrola:
+            result,
+
+        uspesnaZkouska:
+            passed
+    };
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.saveStep === "function"
+        ) {
+
+            const saved =
+                VPSChoices.saveStep(
+                    STEP_NAME,
+                    data
+                );
+
+            if (saved === false) {
+
+                throw new Error(
+                    "Uložení do výrobní karty selhalo."
+                );
+            }
+        }
+
+        localStorage.setItem(
+            BACKUP_KEY,
+            JSON.stringify(data)
+        );
+
+        if (passed) {
+
+            localStorage.setItem(
+                COMPLETE_KEY,
+                "true"
+            );
+
+        } else {
+
+            localStorage.removeItem(
+                COMPLETE_KEY
+            );
+        }
+
+        return true;
+
+    } catch(error) {
+
+        console.error(error);
+
+        alert(
+            "Nepodařilo se uložit funkční zkoušku."
+        );
+
+        return false;
+    }
+}
+
+
+// ==========================================
+// 22. SPUŠTĚNÍ FUNKČNÍ ZKOUŠKY
+// ==========================================
+
+function runFunctionalTest() {
+
+    stopBlinking();
+
+    testPassed = false;
+
+    // Nejprve ověříme elektrické
+    // nastavení a zapojení sond.
+
+    const setupIssues = [];
+
+    if (voltage !== REQUIRED_VOLTAGE) {
+
+        setupIssues.push(
+            "WRONG_VOLTAGE"
+        );
+    }
+
+    if (
+        currentLimit !==
+        REQUIRED_CURRENT
+    ) {
+
+        setupIssues.push(
+            "WRONG_CURRENT_LIMIT"
+        );
+    }
+
+    if (
+        connections.red !== "plus"
+    ) {
+
+        setupIssues.push(
+            "RED_PROBE_WRONG"
+        );
+    }
+
+    if (
+        connections.black !== "minus"
+    ) {
+
+        setupIssues.push(
+            "BLACK_PROBE_WRONG"
+        );
+    }
+
+    if (!outputOn) {
+
+        setupIssues.push(
+            "POWER_OUTPUT_OFF"
+        );
+    }
+
+    // Potom vyhodnotíme výrobní kartu.
+
+    const production =
+        evaluateProduction();
+
+    const allIssues = [
+        ...setupIssues,
+        ...production.issues
+    ];
+
+    let status;
+
+    if (allIssues.length) {
+
+        status = "failed";
+
+    } else if (
+        production.pending.length
+    ) {
+
+        status = "pending";
+
+    } else {
+
+        status = "passed";
+    }
+
+    testResult = {
+
+        passed:
+            status === "passed",
+
+        status,
+
+        setupIssues,
+
+        productionIssues:
+            production.issues,
+
+        pending:
+            production.pending,
+
+        checkedAt:
+            new Date().toISOString()
+    };
+
+    testPassed =
+        testResult.passed;
+
+    if (
+        !saveTestState(
+            testPassed,
+            testResult
+        )
+    ) {
+        return;
+    }
+
+    // --------------------------------------
+    // ÚSPĚŠNÁ ZKOUŠKA
+    // --------------------------------------
+
+    if (testPassed) {
+
+        testFailed = false;
+
+        $("inspectionBtn").disabled =
+            true;
+
+        showTestMessage(
+            "Funkční zkouška vyhověla! " +
+            "Semafor správně bliká.",
+            "success"
+        );
+
+        startBlinking("light");
+
+        // Po úspěšné zkoušce zobrazíme
+        // závěrečnou obrazovku.
+
+        $("test").classList.add(
+            "hidden"
+        );
+
+        $("successScreen").classList.remove(
+            "hidden"
+        );
+
+        startBlinking("success");
+
+        return;
+    }
+
+    // --------------------------------------
+    // NEÚSPĚŠNÁ ZKOUŠKA
+    // --------------------------------------
+
+    testFailed = true;
+
+    $("inspectionBtn").disabled =
+        false;
+
+    if (setupIssues.length) {
+
+        showTestMessage(
+            "Semafor nebliká. " +
+            "Zkontroluj nastavení zdroje " +
+            "a připojení sond. " +
+            "Můžeš také provést optickou kontrolu.",
+            "error"
+        );
+
+    } else if (
+        production.status === "pending"
+    ) {
+
+        showTestMessage(
+            "Funkčnost zatím nelze potvrdit. " +
+            "Nejsou ověřené referenční " +
+            "orientace některých součástek. " +
+            "Je dostupná optická kontrola.",
+            "warning"
+        );
+
+    } else {
+
+        showTestMessage(
+            "Semafor nebliká. " +
+            "Napájení je nastaveno, " +
+            "ale výrobní karta obsahuje " +
+            "závadu. Proveď optickou kontrolu.",
+            "error"
+        );
+    }
+}
+
+$("runTestBtn").addEventListener(
+    "click",
+    runFunctionalTest
+);
+
+
+// ==========================================
+// 23. VYKRESLENÍ SKUTEČNÉ TOP DPS
+// ==========================================
+
+function getImageSize(material,id) {
+
+    if (!material) {
+        return null;
+    }
+
+    if (material.kind === "capacitor") {
+        return IMAGE_SIZES.capacitor;
+    }
+
+    if (material.kind === "led") {
+        return IMAGE_SIZES.led;
+    }
+
+    if (material.kind === "ic") {
+        return IMAGE_SIZES.ic;
+    }
+
+    if (material.kind === "jumper") {
+        return IMAGE_SIZES.jumper;
+    }
+
+    if (
+        ["R5","R7","R8"].includes(id)
+    ) {
+        return IMAGE_SIZES.resistorVertical;
+    }
+
+    return IMAGE_SIZES.resistorHorizontal;
+}
+
+function createTHTImage(target,actual) {
+
+    const code =
+        getMaterialCode(actual);
+
+    if (!code) {
+        return null;
+    }
+
+    const material =
+        MATERIALS[code];
+
+    const size =
+        getImageSize(
+            material,
+            target.id
+        );
+
+    let element;
+
+    if (material?.image) {
+
+        element =
+            document.createElement("img");
+
+        element.src =
+            material.image;
+
+        element.alt =
+            code;
+
+        element.className =
+            "component-img";
+
+        element.draggable = false;
+
+    } else {
+
+        element =
+            document.createElement("div");
+
+        element.className =
+            "component-fallback";
+
+        element.textContent =
+            code;
+    }
+
+    element.style.left =
+        pct(target.x,BOARD_W);
+
+    element.style.top =
+        pct(target.y,BOARD_H);
+
+    if (size) {
+
+        element.style.width =
+            pct(size.w,BOARD_W);
+
+        element.style.height =
+            pct(size.h,BOARD_H);
+
+        const rotation =
+            Number(actual?.rotation) === 180
+                ? 180
+                : 0;
+
+        element.style.setProperty(
+            "--rotation",
+            (
+                size.base +
+                rotation
+            ) + "deg"
+        );
+
+    } else {
+
+        element.style.width =
+            pct(80,BOARD_W);
+
+        element.style.height =
+            pct(45,BOARD_H);
+    }
+
+    return element;
+}
+
+
+// ==========================================
+// 24. VYKRESLENÍ TOP SOUČÁSTEK
+// ==========================================
+
+function renderInspectionTop(
+    layer,
+    reference
+) {
+
+    const tht = getStudentTHT();
+    const smt = getStudentSMT();
+
+    // SMT R1–R4.
+
+    Object.entries(SMT_POSITIONS).forEach(
+        ([id,position]) => {
+
+            const actual =
+                reference
+                    ? position.required
+                    : getMaterialCode(
+                        smt[id]
+                    );
+
+            if (!actual) {
+                return;
+            }
+
+            const element =
+                document.createElement("span");
+
+            element.className =
+                "smt-small";
+
+            element.style.left =
+                pct(position.x,BOARD_W);
+
+            element.style.top =
+                pct(position.y,BOARD_H);
+
+            layer.appendChild(element);
+        }
+    );
+
+    // THT součástky.
+
+    THT_TARGETS.forEach(target => {
+
+        const item =
+            reference
+                ? {
+                    material:target.material,
+                    rotation:
+                        CORRECT_ORIENTATION[
+                            target.id
+                        ] ?? 0
+                }
+                : tht[target.id];
+
+        const image =
+            createTHTImage(
+                target,
+                item
+            );
+
+        if (image) {
+            layer.appendChild(image);
+        }
+    });
+}
+
+
+// ==========================================
+// 25. VYKRESLENÍ BOTTOM PÁJENÍ
+// ==========================================
+
+function renderInspectionBottom(
+    layer,
+    reference
+) {
+
+    const joints =
+        getStudentSolder();
+
+    // SMT C3 a C4 jako dokončené
+    // součástky.
+
+    SMT_BOTTOM.forEach(cap => {
+
+        const body =
+            document.createElement("span");
+
+        body.className =
+            "component-fallback";
+
+        body.style.left =
+            pct(cap.x,BOARD_W);
+
+        body.style.top =
+            pct(cap.y,BOARD_H);
+
+        body.style.width =
+            pct(27,BOARD_W);
+
+        body.style.height =
+            pct(52,BOARD_H);
+
+        body.style.background =
+            "#c6ad85";
+
+        body.textContent = "";
+
+        layer.appendChild(body);
+    });
+
+    // THT pájecí spoje.
+
+    SOLDER_POINTS.forEach(point => {
+
+        const result =
+            reference
+                ? "good"
+                : (
+                    joints[point.id]?.result ||
+                    "missing"
+                );
+
+        const element =
+            document.createElement("span");
+
+        element.className =
+            "solder-small " + result;
+
+        element.style.left =
+            pct(point.x,BOARD_W);
+
+        element.style.top =
+            pct(point.y,BOARD_H);
+
+        element.style.width =
+            pct(24,BOARD_W);
+
+        element.style.height =
+            pct(24,BOARD_H);
+
+        layer.appendChild(element);
+    });
+}
+
+
+// ==========================================
+// 26. KLIKACÍ POZICE PŘI KONTROLE
+// ==========================================
+
+function createInspectionClick(
+    id,x,y,w,h,
+    container
+) {
+
+    const button =
+        document.createElement("button");
+
+    button.type = "button";
+
+    button.className =
+        "inspect-click";
+
+    if (
+        selectedInspection === id
+    ) {
+        button.classList.add(
+            "selected"
+        );
+    }
+
+    button.style.left =
+        pct(x,BOARD_W);
+
+    button.style.top =
+        pct(y,BOARD_H);
+
+    button.style.width =
+        pct(w,BOARD_W);
+
+    button.style.height =
+        pct(h,BOARD_H);
+
+    const label =
+        document.createElement("label");
+
+    label.textContent =
+        id;
+
+    button.appendChild(label);
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            selectedInspection = id;
+
+            inspectItem(id);
+
+            renderInspection();
+        }
+    );
+
+    container.appendChild(button);
+}
+
+
+// ==========================================
+// 27. KONTROLA KONKRÉTNÍ SOUČÁSTKY
+// ==========================================
+
+function inspectItem(id) {
+
+    const result =
+        $("inspectionResult");
+
+    result.className =
+        "inspect-result";
+
+    // --------------------------------------
+    // TOP – THT
+    // --------------------------------------
+
+    if (
+        inspectionSide === "top" &&
+        THT_TARGETS.some(
+            t => t.id === id
+        )
+    ) {
+
+        const target =
+            THT_TARGETS.find(
+                t => t.id === id
+            );
+
+        const actual =
+            getStudentTHT()[id];
+
+        const actualCode =
+            getMaterialCode(actual);
+
+        if (
+            actualCode !==
+            target.material
+        ) {
+
+            result.innerHTML =
+                "<b class='result-bad'>" +
+                id +
+                " – NESHODA</b>";
+
+            result.append(
+                document.createTextNode(
+                    " Nesprávný materiál. " +
+                    "Požadováno: " +
+                    target.material +
+                    ". Osazeno: " +
+                    (
+                        actualCode ||
+                        "nic"
+                    ) + "."
+                )
+            );
+
+            return;
+        }
+
+        if (
+            Object.prototype.hasOwnProperty.call(
+                CORRECT_ORIENTATION,
+                id
+            )
+        ) {
+
+            const expected =
+                CORRECT_ORIENTATION[id];
+
+            if (
+                expected !== 0 &&
+                expected !== 180
+            ) {
+
+                result.innerHTML =
+                    "<b class='result-pending'>" +
+                    id +
+                    " – NELZE OVĚŘIT POLARITU</b>";
+
+                result.append(
+                    document.createTextNode(
+                        " Materiál souhlasí, " +
+                        "ale správná referenční " +
+                        "orientace zatím nebyla nastavena."
+                    )
+                );
+
+                return;
+            }
+
+            const rotation =
+                Number(actual?.rotation) === 180
+                    ? 180
+                    : 0;
+
+            if (
+                rotation !== expected
+            ) {
+
+                result.innerHTML =
+                    "<b class='result-bad'>" +
+                    id +
+                    " – NESHODA</b>";
+
+                result.append(
+                    document.createTextNode(
+                        " Součástka je nesprávně otočena."
+                    )
+                );
+
+                return;
+            }
+        }
+
+        result.innerHTML =
+            "<b class='result-ok'>" +
+            id +
+            " – SHODA</b>";
+
+        result.append(
+            document.createTextNode(
+                " Materiál a případně " +
+                "polarita jsou správné."
+            )
+        );
+
+        return;
+    }
+
+    // --------------------------------------
+    // TOP – SMT
+    // --------------------------------------
+
+    if (
+        inspectionSide === "top" &&
+        SMT_POSITIONS[id]
+    ) {
+
+        const expected =
+            SMT_POSITIONS[id].required;
+
+        const actual =
+            getMaterialCode(
+                getStudentSMT()[id]
+            );
+
+        const correct =
+            actual === expected;
+
+        result.innerHTML =
+            correct
+                ? "<b class='result-ok'>" +
+                  id +
+                  " – SHODA</b>"
+                : "<b class='result-bad'>" +
+                  id +
+                  " – NESHODA</b>";
+
+        result.append(
+            document.createTextNode(
+                " Požadováno: " +
+                expected +
+                ". Osazeno: " +
+                (
+                    actual ||
+                    "nic"
+                ) + "."
+            )
+        );
+
+        return;
+    }
+
+    // --------------------------------------
+    // BOTTOM – THT PÁJENÍ
+    // --------------------------------------
+
+    if (
+        inspectionSide === "bottom"
+    ) {
+
+        const actual =
+            getStudentSolder()[id];
+
+        const solderResult =
+            actual?.result;
+
+        const correct =
+            solderResult === "good";
+
+        result.innerHTML =
+            correct
+                ? "<b class='result-ok'>" +
+                  id +
+                  " – SHODA</b>"
+                : "<b class='result-bad'>" +
+                  id +
+                  " – NESHODA</b>";
+
+        let description;
+
+        if (
+            solderResult === "good"
+        ) {
+
+            description =
+                "Správný pájený spoj.";
+
+        } else if (
+            solderResult === "ball"
+        ) {
+
+            description =
+                "Kulička cínu – nedostatečné pájení.";
+
+        } else if (
+            solderResult === "burnt"
+        ) {
+
+            description =
+                "Přehřátý pájený spoj.";
+
+        } else {
+
+            description =
+                "Spoj nebyl zapájen.";
+        }
+
+        result.append(
+            document.createTextNode(
+                " " + description
+            )
+        );
+
+        return;
+    }
+}
+
+
+// ==========================================
+// 28. VYKRESLENÍ OPTICKÉ KONTROLY
+// ==========================================
+
+function renderInspection() {
+
+    const top =
+        inspectionSide === "top";
+
+    const image =
+        top
+            ? "images/blikac_top.png"
+            : "images/blikac_bot_90.png";
+
+    $("referenceImage").src =
+        image;
+
+    $("studentImage").src =
+        image;
+
+    const refParts =
+        $("referenceParts");
+
+    const studentParts =
+        $("studentParts");
+
+    const refClicks =
+        $("referenceClicks");
+
+    const studentClicks =
+        $("studentClicks");
+
+    refParts.replaceChildren();
+    studentParts.replaceChildren();
+
+    refClicks.replaceChildren();
+    studentClicks.replaceChildren();
+
+    if (top) {
+
+        renderInspectionTop(
+            refParts,
+            true
+        );
+
+        renderInspectionTop(
+            studentParts,
+            false
+        );
+
+        // Klikací THT pozice.
+
+        THT_TARGETS.forEach(t => {
+
+            // Užší klikací oblast, aby se
+            // sousední součástky nepřekrývaly.
+
+            const w =
+                Math.min(t.w,110);
+
+            const h =
+                Math.min(t.h,100);
+
+            createInspectionClick(
+                t.id,t.x,t.y,w,h,
+                refClicks
+            );
+
+            createInspectionClick(
+                t.id,t.x,t.y,w,h,
+                studentClicks
+            );
+        });
+
+        // SMT pozice.
+
+        Object.entries(
+            SMT_POSITIONS
+        ).forEach(([id,p]) => {
+
+            createInspectionClick(
+                id,p.x,p.y,50,37,
+                refClicks
+            );
+
+            createInspectionClick(
+                id,p.x,p.y,50,37,
+                studentClicks
+            );
+        });
+
+    } else {
+
+        renderInspectionBottom(
+            refParts,
+            true
+        );
+
+        renderInspectionBottom(
+            studentParts,
+            false
+        );
+
+        SOLDER_POINTS.forEach(p => {
+
+            createInspectionClick(
+                p.id,p.x,p.y,26,26,
+                refClicks
+            );
+
+            createInspectionClick(
+                p.id,p.x,p.y,26,26,
+                studentClicks
+            );
+        });
+    }
+}
+
+
+// ==========================================
+// 29. PŘEPÍNÁNÍ OPTICKÉ KONTROLY
+// ==========================================
+
+function openInspection() {
+
+    $("inspection").classList.remove(
+        "hidden"
+    );
+
+    inspectionSide = "top";
+
+    selectedInspection = null;
+
+    $("inspectionResult").textContent =
+        "Klikni na součástku, kterou chceš zkontrolovat.";
+
+    renderInspection();
+
+    $("inspection").scrollIntoView({
+        behavior:"smooth"
+    });
+}
+
+$("inspectionBtn").addEventListener(
+    "click",
+    openInspection
+);
+
+$("inspectTopBtn").addEventListener(
+    "click",
+    () => {
+
+        inspectionSide = "top";
+        selectedInspection = null;
+
+        $("inspectionResult").textContent =
+            "Vyber součástku na TOP straně.";
+
+        renderInspection();
+    }
+);
+
+$("inspectBottomBtn").addEventListener(
+    "click",
+    () => {
+
+        inspectionSide = "bottom";
+        selectedInspection = null;
+
+        $("inspectionResult").textContent =
+            "Vyber pájecí spoj na BOTTOM straně.";
+
+        renderInspection();
+    }
+);
+
+$("closeInspectionBtn").addEventListener(
+    "click",
+    () => {
+
+        $("inspection").classList.add(
+            "hidden"
+        );
+    }
+);
+
+
+// ==========================================
+// 30. NÁVRAT K OPRAVĚ
+// ==========================================
+
+$("returnToProductionBtn").addEventListener(
+    "click",
+    () => {
+
+        stopBlinking();
+
+        window.location.href =
+            "tp.html";
+    }
+);
+
+$("backBtn").addEventListener(
+    "click",
+    () => {
+
+        stopBlinking();
+
+        window.location.href =
+            "tp.html";
+    }
+);
+
+
+// ==========================================
+// 31. START
+// ==========================================
+
+$("startBtn").addEventListener(
+    "click",
+    () => {
+
+        $("intro").classList.add(
+            "hidden"
+        );
+
+        $("test").classList.remove(
+            "hidden"
+        );
+
+        renderTerminals();
+        renderTestBoard();
+    }
+);
+
+
+// ==========================================
+// 32. ZOBRAZENÍ OSÁZENÉ DPS PŘI TESTU
+// ==========================================
+
+function renderTestBoard() {
+
+    const layer =
+        $("componentsLayer");
+
+    layer.replaceChildren();
+
+    renderInspectionTop(
+        layer,
+        false
+    );
+}
+
+
+// ==========================================
+// 33. DOKONČENÍ CELÉ HRY
+// ==========================================
+
+$("finishGameBtn").addEventListener(
+    "click",
+    () => {
+
+        if (!testPassed) {
+            return;
+        }
+
+        stopBlinking();
+
+        window.location.href =
+            "tp.html";
+    }
+);
+
+
+// ==========================================
+// 34. SPUŠTĚNÍ
+// ==========================================
+
+updateSupply();
+renderTerminals();
+
+</script>
+
+
+
+<style>
+/* =====================================
+   VÝRAZNÉ BLIKÁNÍ LED PŘÍMO NA DPS
+===================================== */
+
+#board .pcb-led-light {
+    position: absolute;
+    transform: translate(-50%, -50%);
+
+    /* Větší zářící plocha */
+    width: 13%;
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 7;
+
+    opacity: 0;
+    visibility: hidden;
+
+    mix-blend-mode: normal;
+
+    transition: opacity 0.08s;
+}
+
+/* ČERVENÁ LED */
+
+#board .pcb-led-light.red {
+    background: radial-gradient(
+        circle,
+        #ffffff 0%,
+        #ffffff 10%,
+        #ff9999 22%,
+        #ff2525 43%,
+        rgba(255,0,0,0.65) 60%,
+        transparent 100%
+    );
+
+    filter: drop-shadow(0 0 12px #ff0000)
+            drop-shadow(0 0 24px #ff2020);
+}
+
+/* ŽLUTÁ LED */
+
+#board .pcb-led-light.yellow {
+    background: radial-gradient(
+        circle,
+        #ffffff 0%,
+        #ffffff 10%,
+        #fff7a0 22%,
+        #ffd000 43%,
+        rgba(255,200,0,0.65) 60%,
+        transparent 100%
+    );
+
+    filter: drop-shadow(0 0 12px #ffcc00)
+            drop-shadow(0 0 24px #ffd700);
+}
+
+/* ZELENÁ LED */
+
+#board .pcb-led-light.green {
+    background: radial-gradient(
+        circle,
+        #ffffff 0%,
+        #ffffff 10%,
+        #aaffbb 22%,
+        #00ed55 43%,
+        rgba(0,255,90,0.65) 60%,
+        transparent 100%
+    );
+
+    filter: drop-shadow(0 0 12px #00ff66)
+            drop-shadow(0 0 24px #00e64d);
+}
+
+/* ROZSVÍCENÁ LED */
+
+#board .pcb-led-light.lit {
+    visibility: visible;
+    opacity: 1;
+
+    animation: ledPulse 0.8s ease-in-out infinite;
+}
+
+/* MÍRNÉ PULZOVÁNÍ SVĚTLA */
+
+@keyframes ledPulse {
+
+    0%, 100% {
+        opacity: 1;
+        scale: 1;
+    }
+
+    50% {
+        opacity: 0.88;
+        scale: 1.08;
+    }
+}
+
+/* Původní samostatný semafor skryjeme */
+
+#test .traffic {
+    display: none;
+}
+</style>
+
+
+<script>
+"use strict";
+
+(function () {
+
+    // =====================================
+    // 1. VYTVOŘENÍ SVĚTEL NA DPS
+    // =====================================
+
+    const board = document.getElementById("board");
+
+    const ledPositions = {
+        red: {
+            x: 180,
+            y: 268
+        },
+        yellow: {
+            x: 449,
+            y: 268
+        },
+        green: {
+            x: 718,
+            y: 268
+        }
+    };
+
+    const boardLights = {};
+
+    Object.entries(ledPositions).forEach(
+        ([color, position]) => {
+
+            const led = document.createElement("div");
+
+            led.className =
+                "pcb-led-light " + color;
+
+            led.style.left =
+                (position.x / 897 * 100) + "%";
+
+            led.style.top =
+                (position.y / 537 * 100) + "%";
+
+            board.appendChild(led);
+
+            boardLights[color] = led;
+        }
+    );
+
+
+    // =====================================
+    // 2. PROPOJENÍ S ANIMACÍ SEMAFORU
+    // =====================================
+
+    const originalSetLights = setLights;
+
+    setLights = function (prefix, index) {
+
+        originalSetLights(prefix, index);
+
+        boardLights.red.classList.toggle(
+            "lit",
+            prefix === "light" && index === 0
+        );
+
+        boardLights.yellow.classList.toggle(
+            "lit",
+            prefix === "light" && index === 1
+        );
+
+        boardLights.green.classList.toggle(
+            "lit",
+            prefix === "light" && index === 2
+        );
+    };
+
+
+    // =====================================
+    // 3. VYPNUTÍ SVĚTEL
+    // =====================================
+
+    const originalStopBlinking = stopBlinking;
+
+    stopBlinking = function () {
+
+        originalStopBlinking();
+
+        Object.values(boardLights).forEach(
+            led => led.classList.remove("lit")
+        );
+    };
+
+
+    // =====================================
+    // 4. TLAČÍTKO DOKONČENÍ
+    // =====================================
+
+    const finishButton =
+        document.getElementById("finishGameBtn");
+
+    const runButton =
+        document.getElementById("runTestBtn");
+
+    const testScreen =
+        document.getElementById("test");
+
+    const successScreen =
+        document.getElementById("successScreen");
+
+    // Přesuneme tlačítko dokončení
+    // na testovací pracoviště.
+
+    runButton.insertAdjacentElement(
+        "afterend",
+        finishButton
+    );
+
+    finishButton.classList.add("hidden");
+
+    finishButton.textContent =
+        "Dokončit zkoušku a vrátit se na TP →";
+
+
+    // =====================================
+    // 5. ÚSPĚŠNÁ FUNKČNÍ ZKOUŠKA
+    // =====================================
+
+    runButton.addEventListener("click", function () {
+
+        if (testPassed) {
+
+            // Zůstaneme na testovacím pracovišti.
+
+            testScreen.classList.remove("hidden");
+
+            successScreen.classList.add("hidden");
+
+            // Spustíme animaci přímo na DPS.
+
+            startBlinking("light");
+
+            // Povolení dokončení hry.
+
+            finishButton.classList.remove("hidden");
+
+        } else {
+
+            // Při chybě neblikáme.
+
+            stopBlinking();
+
+            finishButton.classList.add("hidden");
+        }
+    });
+
+
+    // =====================================
+    // 6. PŘI ZMĚNĚ ZAPOJENÍ SKRYJEME
+    //    DOKONČENÍ ZKOUŠKY
+    // =====================================
+
+    const observer = new MutationObserver(() => {
+
+        if (!testPassed) {
+            finishButton.classList.add("hidden");
+        }
+    });
+
+    observer.observe(
+        document.getElementById("testMessage"),
+        {
+            childList: true,
+            subtree: true,
+            characterData: true
+        }
+    );
+
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,3210 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>V.P.S. ELEKTRO | Podavače FOX</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    color: white;
+    background: linear-gradient(135deg, #101d18, #244633);
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+button:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   HLAVIČKA
+========================================== */
+
+.header {
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.label {
+    color: #8bdba5;
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    margin-bottom: 12px;
+    font-size: clamp(26px, 4vw, 36px);
+}
+
+.description {
+    color: #d0e1d4;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+/* ==========================================
+   HLAVNÍ ROZLOŽENÍ
+========================================== */
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 22px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 10px 22px 40px;
+    align-items: start;
+}
+
+.machine {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #50765b;
+    border-radius: 14px;
+    background: #18291e;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.machine img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.machine-button {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    padding: 12px 17px;
+    background: rgba(17,57,32,0.95);
+    border: 2px solid #8bdba5;
+    border-radius: 9px;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.machine-button:hover {
+    background: #8bdba5;
+    color: #10291b;
+    transform: translate(-50%, -50%) scale(1.07);
+}
+
+.screen-button {
+    left: 43%;
+    top: 35%;
+}
+
+.feeder-button {
+    left: 28%;
+    top: 75%;
+}
+
+/* ==========================================
+   PRAVÝ PANEL
+========================================== */
+
+.side-panel {
+    position: sticky;
+    top: 20px;
+    padding: 23px;
+    background: #1b3425;
+    border: 1px solid #668b6d;
+    border-radius: 14px;
+}
+
+.side-panel h2 {
+    color: #8bdba5;
+    font-size: 23px;
+    margin-bottom: 15px;
+}
+
+.side-description {
+    color: #bed1c2;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid #47634e;
+    font-size: 14px;
+}
+
+.status-value {
+    color: #bed1c2;
+    font-weight: bold;
+    text-align: right;
+}
+
+.status-value.done {
+    color: #8bdba5;
+}
+
+.action-button,
+.load-button {
+    padding: 13px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #8bdba5;
+    color: #10291b;
+    font-size: 15px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.action-button {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.action-button:hover,
+.load-button:hover {
+    background: #b5f3c7;
+}
+
+/* ==========================================
+   MODÁLNÍ OKNA
+========================================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    padding: 20px;
+    background: rgba(0,0,0,0.84);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 1050px;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 28px;
+    background: #1c3325;
+    border: 2px solid #8bdba5;
+    border-radius: 16px;
+    box-shadow: 0 20px 70px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.modal-title {
+    color: #8bdba5;
+    font-size: 26px;
+    margin-bottom: 7px;
+}
+
+.modal-subtitle {
+    color: #bfd3c4;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.close-button {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 7px;
+    background: #3d5844;
+    color: white;
+    font-size: 25px;
+}
+
+.close-button:hover {
+    background: #a33b3b;
+}
+
+.panel {
+    padding: 20px;
+    background: #14231a;
+    border: 1px solid #496552;
+    border-radius: 12px;
+}
+
+.section-title {
+    color: #8bdba5;
+    font-size: 19px;
+    margin-bottom: 12px;
+}
+
+.helper {
+    color: #bed1c2;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+}
+
+.note {
+    margin-top: 18px;
+    padding: 14px;
+    border: 1px solid #476c51;
+    border-radius: 8px;
+    background: rgba(139,219,165,0.07);
+    color: #c9dfcf;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* ==========================================
+   SOFTWARE FOX - PROGRAMY
+========================================== */
+
+.program-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.program-button {
+    padding: 12px 18px;
+    background: #294833;
+    color: white;
+    border: 1px solid #64866b;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.program-button.active {
+    background: #39794c;
+    border-color: #8bdba5;
+}
+
+/* ==========================================
+   SOFTWARE FOX - SLOTY
+========================================== */
+
+.software-slots {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.software-slot {
+    min-height: 118px;
+    padding: 14px;
+    background: #294833;
+    color: white;
+    border: 2px dashed #6c9075;
+    border-radius: 9px;
+    text-align: left;
+    transition: 0.15s;
+}
+
+.software-slot.active {
+    border-style: solid;
+    border-color: #8bdba5;
+    background: #365e41;
+}
+
+.software-slot.drag-over {
+    border: 2px solid #7cc5ff;
+    background: #365d80;
+    box-shadow: 0 0 17px rgba(124,197,255,0.4);
+}
+
+.slot-number {
+    display: block;
+    color: #8bdba5;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 9px;
+}
+
+.slot-material {
+    display: block;
+    color: white;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.slot-program {
+    display: block;
+    margin-top: 8px;
+    color: #c0d7c7;
+    font-size: 11px;
+}
+
+.clear-slot {
+    margin: 12px 0 24px;
+    padding: 10px 14px;
+    border: 1px solid #bd8585;
+    border-radius: 7px;
+    background: transparent;
+    color: #ffd0d0;
+}
+
+/* ==========================================
+   SOFTWARE FOX - MATERIÁL
+========================================== */
+
+.material-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 9px;
+    max-height: 330px;
+    overflow-y: auto;
+    padding: 3px;
+}
+
+.material-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    min-height: 76px;
+    padding: 10px;
+
+    background: #294833;
+    border: 2px solid #587b61;
+    border-radius: 8px;
+    color: white;
+    text-align: left;
+
+    /* Přetahování na tabletu */
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    cursor: grab;
+}
+
+.material-button:active {
+    cursor: grabbing;
+}
+
+.material-button:hover {
+    background: #375e42;
+}
+
+.material-code {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.material-value {
+    color: #cbdacd;
+    font-size: 12px;
+}
+
+/* HLEDANÁ SOUČÁSTKA - ŽLUTÁ */
+
+.material-button.highlighted {
+    background: #615028;
+    border-color: #f0c66c;
+}
+
+.material-button.highlighted .material-value {
+    color: #ffe8b1;
+}
+
+.material-button.highlighted::after {
+    content: "HLEDANÁ POLOŽKA";
+    color: #ffe0a0;
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+}
+
+/* JIŽ NATAŽENÁ HLEDANÁ SOUČÁSTKA - MODRÁ */
+
+.material-button.assigned {
+    background: #205b9a;
+    border-color: #7cc5ff;
+}
+
+.material-button.assigned .material-value {
+    color: #d6edff;
+}
+
+.material-button.assigned::after {
+    content: "NAČTENO";
+    color: #c4e9ff;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.material-button.assigned:hover {
+    background: #2871bb;
+}
+
+/* ==========================================
+   PLOCHA PRO UCHYCENÍ DPS
+========================================== */
+
+.board-station {
+    padding: 18px;
+    margin-bottom: 24px;
+    background: #283b30;
+    border: 2px solid #687a6b;
+    border-radius: 12px;
+}
+
+.board-station-title {
+    color: #cfe3d3;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 14px;
+}
+
+.board-holder {
+    position: relative;
+    width: min(100%, 400px);
+    height: 140px;
+    margin: auto;
+    border: 8px solid #7e8882;
+    border-radius: 9px;
+
+    background: repeating-linear-gradient(
+        90deg,
+        #253b2c 0 18px,
+        #294530 18px 36px
+    );
+}
+
+.board-center {
+    position: absolute;
+    inset: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed #9bb99f;
+    border-radius: 6px;
+    color: #c8dfce;
+    font-size: 14px;
+    text-align: center;
+}
+
+.board-rail {
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    height: 8px;
+    background: #aeb6b0;
+}
+
+.board-rail.top {
+    top: 5px;
+}
+
+.board-rail.bottom {
+    bottom: 5px;
+}
+
+/* ==========================================
+   SPOLEČNÝ ZÁSOBNÍK HW SOUČÁSTEK
+========================================== */
+
+.material-pool {
+    margin: 16px 0 24px;
+    padding: 16px;
+    min-height: 115px;
+    background: #243d2c;
+    border: 2px solid #63896b;
+    border-radius: 11px;
+    transition: 0.15s;
+}
+
+.material-pool.drag-over {
+    background: #355b41;
+    border-color: #f0c66c;
+}
+
+.pool-title {
+    color: #8bdba5;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.pool-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: 55px;
+}
+
+.reel-card {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 12px;
+    min-width: 142px;
+
+    background: #345a40;
+    border: 2px solid #80ad88;
+    border-radius: 9px;
+    color: white;
+    text-align: left;
+
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    cursor: grab;
+}
+
+.reel-card:active {
+    cursor: grabbing;
+}
+
+.reel-card.picked {
+    background: #68572d;
+    border-color: #f4cf76;
+}
+
+.reel-code {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.reel-value {
+    color: #d0dfd3;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* ==========================================
+   VZHLED JEDNOTLIVÝCH SOUČÁSTEK
+========================================== */
+
+.part {
+    display: block;
+    flex-shrink: 0;
+    width: 24px;
+    height: 14px;
+    border-left: 5px solid #c4c8ca;
+    border-right: 5px solid #c4c8ca;
+    border-radius: 2px;
+}
+
+.part.resistor {
+    background: #222427;
+}
+
+.part.capacitor {
+    background: #c9ab79;
+}
+
+.part.inductor {
+    background: #294d7a;
+}
+
+.part.semiconductor {
+    background: #171a1d;
+}
+
+.part.empty {
+    background: transparent;
+    border: 1px dashed #9b9282;
+}
+
+/* ==========================================
+   HARDWAROVÉ PODAVAČE
+========================================== */
+
+.feeder-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 14px;
+}
+
+.feeder {
+    padding: 14px;
+    min-width: 0;
+    background: #294833;
+    border: 2px solid #64866b;
+    border-radius: 12px;
+}
+
+.feeder-title {
+    color: #8bdba5;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.feeder-display {
+    min-height: 76px;
+    padding: 12px;
+    margin-bottom: 12px;
+
+    background: #061910;
+    border: 3px solid #506456;
+    border-radius: 7px;
+
+    box-shadow: inset 0 0 12px #000;
+}
+
+.display-label {
+    color: #72c58c;
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.display-value {
+    color: #9df6b4;
+    font: bold 14px Consolas, monospace;
+    overflow-wrap: anywhere;
+}
+
+/* PLOCHA PRO PŘETAŽENÍ HW SOUČÁSTKY */
+
+.drop-zone {
+    min-height: 153px;
+    padding: 10px;
+
+    border: 3px dashed #829988;
+    border-radius: 9px;
+    background: #1d3426;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    transition: 0.15s;
+}
+
+.drop-zone.drag-over {
+    background: #315b3b;
+    border-color: #f1d27e;
+}
+
+.drop-hint {
+    color: #bdd4c3;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* STATICKÁ PÁSKA SOUČÁSTEK */
+
+.loaded-tape {
+    display: flex;
+    width: 100%;
+    gap: 3px;
+    padding: 8px 4px;
+
+    background: #bfa985;
+    border-top: 4px dotted #655847;
+    border-bottom: 4px dotted #655847;
+    border-radius: 4px;
+}
+
+.tape-pocket {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    height: 31px;
+
+    background: #776954;
+    border: 2px solid #554b3e;
+    border-radius: 3px;
+}
+
+.tape-pocket .part {
+    width: 20px;
+    max-width: 100%;
+}
+
+.loaded-material {
+    margin-top: 12px;
+    color: #d4ead8;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* ==========================================
+   PŘETAHOVÁNÍ MYŠÍ A PRSTEM
+========================================== */
+
+.drag-ghost {
+    position: fixed;
+    z-index: 100;
+    pointer-events: none;
+
+    opacity: 0.94;
+    transform: translate(-50%, -50%) scale(1.06);
+
+    max-width: 190px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.5);
+}
+
+.dragging-source {
+    opacity: 0.35;
+}
+
+/* ==========================================
+   PATIČKA
+========================================== */
+
+.footer {
+    padding: 0 20px 25px;
+    color: #90ab98;
+    text-align: center;
+    font-size: 12px;
+}
+
+/* ==========================================
+   TABLETY A MOBILY
+========================================== */
+
+@media (max-width: 1050px) {
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .side-panel {
+        position: static;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .layout {
+        padding: 10px 10px 25px;
+    }
+
+    .modal {
+        padding: 8px;
+    }
+
+    .modal-content {
+        padding: 17px 12px;
+        max-height: 96vh;
+    }
+
+    .software-slots,
+    .feeder-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .material-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+
+    .machine-button {
+        padding: 7px 9px;
+        font-size: 11px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ======================================
+     HLAVIČKA
+====================================== -->
+
+<header class="header">
+
+    <p class="label">
+        V.P.S. ELEKTRO | VÝROBNÍ OPERACE 02
+    </p>
+
+    <h1>Nabíjení podavačů osazovacího stroje</h1>
+
+    <p class="description">
+        Připravte osazovací programy a fyzicky
+        založte materiál do tří podavačů.
+    </p>
+
+</header>
+
+<!-- ======================================
+     FOTOGRAFIE STROJE
+====================================== -->
+
+<main class="layout">
+
+    <section class="machine">
+
+        <img
+            src="images/osazovaky.jpg"
+            alt="Osazovací stroje Essemtec FOX"
+        >
+
+        <button
+            class="machine-button screen-button"
+            onclick="openScreen()">
+            Obrazovka stroje
+        </button>
+
+        <button
+            class="machine-button feeder-button"
+            onclick="openFeeders()">
+            Podavače
+        </button>
+
+    </section>
+
+    <!-- STAV PŘÍPRAVY -->
+
+    <aside class="side-panel">
+
+        <h2>Příprava stroje</h2>
+
+        <p class="side-description">
+            Načtěte oba osazovací programy.
+            Potom softwarově přiřaďte SMT materiály
+            a fyzicky nabijte podavače.
+        </p>
+
+        <div class="status-row">
+            <span>Program semafor_bot</span>
+            <span class="status-value" id="botStatus">
+                Nenačten
+            </span>
+        </div>
+
+        <div class="status-row">
+            <span>Program semafor_top</span>
+            <span class="status-value" id="topStatus">
+                Nenačten
+            </span>
+        </div>
+
+        <div class="status-row">
+            <span>SW sloty</span>
+            <span class="status-value" id="swStatus">
+                0 / 3
+            </span>
+        </div>
+
+        <div class="status-row">
+            <span>HW podavače</span>
+            <span class="status-value" id="hwStatus">
+                0 / 3
+            </span>
+        </div>
+
+        <button
+            class="action-button"
+            onclick="finishOperation()">
+            Dokončit přípravu stroje →
+        </button>
+
+    </aside>
+
+</main>
+
+<!-- ======================================
+     SOFTWARE FOX
+====================================== -->
+
+<div
+    class="modal"
+    id="screenModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="screenTitle"
+>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 class="modal-title" id="screenTitle">
+                    FOX – ovládací software
+                </h2>
+
+                <p class="modal-subtitle">
+                    Softwarové přiřazení SMT součástek
+                    ke třem slotům.
+                </p>
+
+            </div>
+
+            <button
+                class="close-button"
+                onclick="closeModals()"
+                aria-label="Zavřít">
+                &times;
+            </button>
+
+        </div>
+
+        <div class="panel">
+
+            <!-- VÝBĚR PROGRAMU -->
+
+            <h3 class="section-title">
+                Osazovací program
+            </h3>
+
+            <div class="program-list">
+
+                <button
+                    class="program-button"
+                    id="programBot"
+                    onclick="selectProgram('bot')">
+                    semafor_bot
+                </button>
+
+                <button
+                    class="program-button"
+                    id="programTop"
+                    onclick="selectProgram('top')">
+                    semafor_top
+                </button>
+
+            </div>
+
+            <button
+                class="load-button"
+                onclick="loadProgram()">
+                Načíst vybraný program
+            </button>
+
+            <p
+                class="helper"
+                id="programMessage"
+                style="margin-top:14px">
+            </p>
+
+            <!-- SW SLOTY -->
+
+            <h3 class="section-title">
+                Softwarové sloty
+            </h3>
+
+            <p class="helper">
+                Přetáhněte součástku do jednoho
+                ze tří slotů. Všechny sloty
+                jsou dostupné.
+            </p>
+
+            <div
+                class="software-slots"
+                id="softwareSlots">
+            </div>
+
+            <button
+                class="clear-slot"
+                onclick="clearSoftwareSlot()">
+                Vymazat vybraný SW slot
+            </button>
+
+            <!-- SMT MATERIÁL -->
+
+            <h3 class="section-title">
+                SMT materiál
+            </h3>
+
+            <p class="helper">
+                Načtený program zvýrazní hledané
+                položky žlutě. Po jejich přiřazení
+                do slotu zmodrají.
+                Ostatní součástky zůstávají dostupné.
+            </p>
+
+            <div
+                class="material-grid"
+                id="softwareMaterials">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ======================================
+     HARDWARE FOX
+====================================== -->
+
+<div
+    class="modal"
+    id="feederModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="feederTitle"
+>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 class="modal-title" id="feederTitle">
+                    FOX – fyzické podavače
+                </h2>
+
+                <p class="modal-subtitle">
+                    Přetáhněte vychystané SMT součástky
+                    do jednotlivých podavačů.
+                </p>
+
+            </div>
+
+            <button
+                class="close-button"
+                onclick="closeModals()"
+                aria-label="Zavřít">
+                &times;
+            </button>
+
+        </div>
+
+        <!-- UCHYCENÍ DPS -->
+
+        <div class="board-station">
+
+            <p class="board-station-title">
+                Pracovní prostor – uchycení DPS
+            </p>
+
+            <div class="board-holder">
+
+                <div class="board-rail top"></div>
+                <div class="board-rail bottom"></div>
+
+                <div class="board-center">
+                    Prostor pro upevnění DPS
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SPOLEČNÁ NABÍDKA HW -->
+
+        <h3 class="section-title">
+            Vychystané SMT součástky
+        </h3>
+
+        <p class="helper">
+            Podržte prst na součástce a přetáhněte
+            ji do podavače. Součástku můžete
+            později přesunout nebo vrátit.
+        </p>
+
+        <div
+            class="material-pool"
+            id="materialPool"
+            data-drop="pool"
+        >
+
+            <p class="pool-title">
+                Materiál připravený k nabití
+            </p>
+
+            <div
+                class="pool-list"
+                id="poolList">
+            </div>
+
+        </div>
+
+        <!-- TŘI PODAVAČE -->
+
+        <h3 class="section-title">
+            Fyzické podavače
+        </h3>
+
+        <div
+            class="feeder-grid"
+            id="feederGrid">
+        </div>
+
+        <div
+            class="note"
+            id="warehouseMessage">
+        </div>
+
+    </div>
+
+</div>
+
+<footer class="footer">
+    V.P.S. ELEKTRO s.r.o. |
+    Interaktivní výuková hra
+</footer>
+
+<!-- CENTRÁLNÍ PAMĚŤ -->
+<script src="choices.js"></script>
+
+<script>
+
+// ==========================================
+// 1. KLÍČE ÚLOŽIŠTĚ
+// ==========================================
+
+const DATA_KEY =
+    "vps_semafor_podavace_data";
+
+const COMPLETED_KEY =
+    "vps_semafor_krok_2_dokonceno";
+
+const CHECK_KEY =
+    "vps_semafor_podavace_kontrola";
+
+const WAREHOUSE_KEY =
+    "vps_semafor_material";
+
+const CHOICES_KEY =
+    "vps_semafor_choices";
+
+
+// ==========================================
+// 2. SMT MATERIÁLY
+// ==========================================
+
+// Pravidla ze skladu:
+//
+// A1-A3 = SMT
+// B1-B2 = SMT
+// B3 = pouze sudá čísla SMT
+// C1-C3 = THT, zde se nenabízejí
+
+const materialValues = {
+
+    // SMT ODPORY
+
+    MR01: "100 Ω",
+    MR02: "1 kΩ",
+    MR03: "100 kΩ",
+    MR04: "220 Ω",
+    MR05: "470 Ω",
+    MR06: "2,2 kΩ",
+    MR07: "4,7 kΩ",
+    MR08: "22 kΩ",
+    MR09: "10 kΩ",
+    MR10: "47 kΩ",
+
+    // SMT KONDENZÁTORY
+
+    MC01: "100 nF",
+    MC02: "10 nF",
+    MC03: "1 nF",
+    MC04: "220 nF",
+    MC05: "470 nF",
+    MC06: "1 µF",
+    MC07: "2,2 µF",
+    MC08: "4,7 µF",
+    MC09: "22 pF",
+    MC10: "10 µF",
+
+    // SMT TLUMIVKY
+
+    MT01: "1 µH",
+    MT02: "2,2 µH",
+    MT03: "4,7 µH",
+    MT04: "10 µH",
+    MT05: "22 µH",
+    MT06: "47 µH",
+    MT07: "100 µH",
+    MT08: "220 µH",
+    MT09: "470 µH",
+    MT10: "1 mH",
+
+    // SMT DIODY
+
+    MP01: "1N4148",
+    MP02: "1N4007",
+    MP03: "BAV99",
+    MP04: "BAT54",
+    MP05: "SS14",
+    MP06: "SS34",
+    MP07: "M7",
+    MP08: "BAS16",
+    MP09: "BZX84-C5V1",
+    MP10: "BZX84-C12",
+
+    // SMT TRANZISTORY
+
+    MP11: "BC817",
+    MP12: "BC807",
+    MP13: "MMBT3904",
+    MP14: "MMBT3906",
+    MP15: "2N7002",
+    MP16: "BSS138",
+    MP17: "AO3400A",
+    MP18: "AO3401A",
+    MP19: "IRLML2502",
+    MP20: "IRLML6402",
+
+    // SMT INTEGROVANÉ OBVODY
+
+    MP22: "LM393",
+    MP24: "74HC14",
+    MP26: "CD4017",
+    MP28: "ATtiny85",
+    MP30: "ULN2003A"
+};
+
+const softwareMaterials =
+    Object.keys(materialValues);
+
+
+// ==========================================
+// 3. OSÁZECÍ PROGRAMY
+// ==========================================
+
+// Program zvýrazní hledané položky,
+// ale neomezuje dostupnost ostatních SMT.
+
+const programs = {
+
+    bot: {
+        name: "semafor_bot",
+        requested: ["MC01"]
+    },
+
+    top: {
+        name: "semafor_top",
+        requested: ["MR03", "MR09"]
+    }
+
+};
+
+
+// ==========================================
+// 4. VÝCHOZÍ STAV STROJE
+// ==========================================
+
+function initialState() {
+
+    return {
+
+        botLoaded: false,
+        topLoaded: false,
+
+        selectedProgram: "bot",
+
+        softwareSlots: {
+            1: "",
+            2: "",
+            3: ""
+        },
+
+        softwareProgram: {
+            1: "",
+            2: "",
+            3: ""
+        },
+
+        physicalSlots: {
+            1: "",
+            2: "",
+            3: ""
+        }
+
+    };
+}
+
+let state = initialState();
+
+let activeProgram = null;
+
+let selectedSlot = 1;
+
+// Dotykové přetahování.
+
+let dragSession = null;
+
+// Pomocné ovládání klepnutím.
+
+let tappedMaterial = null;
+
+
+// ==========================================
+// 5. NAČTENÍ ULOŽENÉHO STAVU
+// ==========================================
+
+function loadState() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(DATA_KEY);
+
+        if (!saved) return;
+
+        const parsed = JSON.parse(saved);
+
+        if (
+            !parsed ||
+            typeof parsed !== "object"
+        ) {
+            return;
+        }
+
+        const defaults = initialState();
+
+        state = {
+
+            ...defaults,
+            ...parsed,
+
+            softwareSlots: {
+                ...defaults.softwareSlots,
+                ...(parsed.softwareSlots || {})
+            },
+
+            softwareProgram: {
+                ...defaults.softwareProgram,
+                ...(parsed.softwareProgram || {})
+            },
+
+            physicalSlots: {
+                ...defaults.physicalSlots,
+                ...(parsed.physicalSlots ||
+                   parsed.physicalAssignments || {})
+            }
+
+        };
+
+    } catch (error) {
+
+        console.warn(
+            "Nepodařilo se načíst podavače.",
+            error
+        );
+    }
+}
+
+
+// ==========================================
+// 6. VYCHYSTANÝ MATERIÁL ZE SKLADU
+// ==========================================
+
+function getWarehouseMaterials() {
+
+    let codes = null;
+
+    // Nejdříve centrální výrobní karta.
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            localStorage.getItem(CHOICES_KEY)
+                !== null
+        ) {
+
+            const sklad =
+                VPSChoices.getStep("sklad");
+
+            if (
+                sklad &&
+                Array.isArray(sklad.materialy)
+            ) {
+                codes = sklad.materialy;
+            }
+        }
+
+    } catch (error) {
+        console.warn(error);
+    }
+
+    // Záložní starší úložiště.
+
+    if (codes === null) {
+
+        try {
+
+            const saved =
+                localStorage.getItem(WAREHOUSE_KEY);
+
+            const parsed = saved
+                ? JSON.parse(saved)
+                : [];
+
+            if (Array.isArray(parsed)) {
+
+                codes = parsed;
+
+            } else if (
+                parsed &&
+                typeof parsed === "object"
+            ) {
+
+                codes = Object.entries(parsed)
+                    .filter(([code, quantity]) =>
+                        Number(quantity) > 0
+                    )
+                    .map(([code]) => code);
+
+            } else {
+
+                codes = [];
+            }
+
+        } catch (error) {
+
+            codes = [];
+        }
+    }
+
+    // Pouze SMT součástky,
+    // které dítě skutečně vychystalo.
+
+    return [...new Set(codes)]
+        .filter(code =>
+            softwareMaterials.includes(code)
+        )
+        .sort((a, b) =>
+            a.localeCompare(
+                b,
+                "cs",
+                { numeric: true }
+            )
+        );
+}
+
+
+// ==========================================
+// 7. POMOCNÉ FUNKCE
+// ==========================================
+
+function materialLabel(code) {
+
+    if (!code) {
+        return "Nenastaveno";
+    }
+
+    return code + " – " + (
+        materialValues[code] || "Neznámá hodnota"
+    );
+}
+
+
+function partType(code) {
+
+    if (/^MR(0[1-9]|10)$/.test(code)) {
+        return "resistor";
+    }
+
+    if (/^MC(0[1-9]|10)$/.test(code)) {
+        return "capacitor";
+    }
+
+    if (/^MT(0[1-9]|10)$/.test(code)) {
+        return "inductor";
+    }
+
+    return code ? "semiconductor" : "empty";
+}
+
+
+function createPart(code) {
+
+    const part =
+        document.createElement("span");
+
+    part.className =
+        "part " + partType(code);
+
+    return part;
+}
+
+
+// ==========================================
+// 8. ULOŽENÍ DO VÝROBNÍ KARTY
+// ==========================================
+
+function saveConfiguration(completed = false) {
+
+    try {
+
+        if (
+            typeof VPSChoices === "undefined" ||
+            typeof VPSChoices.saveStep !== "function"
+        ) {
+
+            throw new Error(
+                "Soubor choices.js není dostupný."
+            );
+        }
+
+        const bottom = [];
+        const top = {};
+
+        [1,2,3].forEach(slot => {
+
+            const code =
+                state.softwareSlots[slot];
+
+            const program =
+                state.softwareProgram[slot];
+
+            if (code && program === "bot") {
+
+                bottom.push({
+                    slot: slot,
+                    material: code
+                });
+            }
+
+            if (code && program === "top") {
+
+                top[slot] = code;
+            }
+        });
+
+        const firstBottom =
+            bottom[0] || null;
+
+        const saved = VPSChoices.saveStep(
+            "podavace",
+            {
+
+                dokonceno: completed,
+
+                programBottom: {
+                    nacten: state.botLoaded,
+                    slot: firstBottom
+                        ? firstBottom.slot
+                        : null,
+                    material: firstBottom
+                        ? firstBottom.material
+                        : null,
+                    sloty: bottom
+                },
+
+                programTop: {
+                    nacten: state.topLoaded,
+                    sloty: top
+                },
+
+                softwareSlots: {
+                    ...state.softwareSlots
+                },
+
+                softwareProgram: {
+                    ...state.softwareProgram
+                },
+
+                fyzickyMaterial: {
+                    ...state.physicalSlots
+                }
+
+            }
+        );
+
+        if (!saved) {
+
+            throw new Error(
+                "Centrální výrobní karta nebyla uložena."
+            );
+        }
+
+        // Zachování kompatibility.
+
+        localStorage.setItem(
+            DATA_KEY,
+            JSON.stringify(state)
+        );
+
+        // Dokončení pro tp.html.
+
+        if (completed) {
+
+            localStorage.setItem(
+                COMPLETED_KEY,
+                "true"
+            );
+
+        } else {
+
+            localStorage.removeItem(
+                COMPLETED_KEY
+            );
+
+            localStorage.removeItem(
+                CHECK_KEY
+            );
+        }
+
+        updateStatus();
+
+        return true;
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Nastavení se nepodařilo uložit.\n" +
+            "Zkontrolujte soubor choices.js."
+        );
+
+        return false;
+    }
+}
+
+
+// ==========================================
+// 9. OTEVŘENÍ SOFTWAROVÉHO ROZHRANÍ
+// ==========================================
+
+function openScreen() {
+
+    closeModals();
+
+    document.getElementById(
+        "screenModal"
+    ).classList.add("active");
+
+    document.body.style.overflow = "hidden";
+
+    // Vybraný program zůstane v paměti,
+    // ale pro zvýraznění jej znovu načteme.
+
+    activeProgram = null;
+
+    renderSoftware();
+}
+
+
+// ==========================================
+// 10. VÝBĚR PROGRAMU
+// ==========================================
+
+function selectProgram(program) {
+
+    if (!programs[program]) {
+        return;
+    }
+
+    state.selectedProgram = program;
+
+    activeProgram = null;
+
+    saveConfiguration(false);
+
+    renderSoftware();
+}
+
+
+// ==========================================
+// 11. NAČTENÍ PROGRAMU
+// ==========================================
+
+function loadProgram() {
+
+    activeProgram = state.selectedProgram;
+
+    if (activeProgram === "bot") {
+
+        state.botLoaded = true;
+
+    } else {
+
+        state.topLoaded = true;
+    }
+
+    saveConfiguration(false);
+
+    renderSoftware();
+}
+
+
+// ==========================================
+// 12. VYKRESLENÍ SW ROZHRANÍ
+// ==========================================
+
+function renderSoftware() {
+
+    document.getElementById("programBot")
+        .classList.toggle(
+            "active",
+            state.selectedProgram === "bot"
+        );
+
+    document.getElementById("programTop")
+        .classList.toggle(
+            "active",
+            state.selectedProgram === "top"
+        );
+
+    const message =
+        document.getElementById("programMessage");
+
+    if (activeProgram) {
+
+        message.textContent =
+            "Načten program " +
+            programs[activeProgram].name +
+            ". Hledané součástky jsou zvýrazněny.";
+
+    } else {
+
+        message.textContent =
+            "Vyberte program a klikněte na Načíst.";
+    }
+
+    renderSoftwareSlots();
+    renderSoftwareMaterials();
+}
+
+
+// ==========================================
+// 13. VYKRESLENÍ TŘÍ SW SLOTŮ
+// ==========================================
+
+function renderSoftwareSlots() {
+
+    const container =
+        document.getElementById("softwareSlots");
+
+    container.innerHTML = "";
+
+    [1,2,3].forEach(number => {
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+        button.className = "software-slot";
+
+        button.dataset.swSlot = String(number);
+
+        if (number === selectedSlot) {
+            button.classList.add("active");
+        }
+
+        // ČÍSLO SLOTU
+
+        const title =
+            document.createElement("span");
+
+        title.className = "slot-number";
+
+        title.textContent = "Slot " + number;
+
+        // MATERIÁL
+
+        const material =
+            document.createElement("span");
+
+        material.className = "slot-material";
+
+        material.textContent = materialLabel(
+            state.softwareSlots[number]
+        );
+
+        // PROGRAM, PŘI KTERÉM BYL MATERIÁL
+        // SOFTWAROVĚ PŘIŘAZEN.
+
+        const program =
+            document.createElement("span");
+
+        program.className = "slot-program";
+
+        const assignedProgram =
+            state.softwareProgram[number];
+
+        program.textContent = assignedProgram
+            ? programs[assignedProgram]?.name || ""
+            : "Volný slot";
+
+        button.appendChild(title);
+        button.appendChild(material);
+        button.appendChild(program);
+
+        // Klepnutím lze zvolit aktivní slot.
+
+        button.addEventListener("click", () => {
+
+            selectedSlot = number;
+
+            renderSoftwareSlots();
+        });
+
+        container.appendChild(button);
+    });
+}
+
+
+// ==========================================
+// 14. VYKRESLENÍ SW MATERIÁLU
+// ==========================================
+
+function renderSoftwareMaterials() {
+
+    const container =
+        document.getElementById(
+            "softwareMaterials"
+        );
+
+    container.innerHTML = "";
+
+    const requested = activeProgram
+        ? programs[activeProgram].requested
+        : [];
+
+    softwareMaterials.forEach(code => {
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+        button.className = "material-button";
+
+        button.dataset.material = code;
+
+        // MATERIÁLOVÉ ČÍSLO
+
+        const name =
+            document.createElement("span");
+
+        name.className = "material-code";
+        name.textContent = code;
+
+        // HODNOTA
+
+        const value =
+            document.createElement("span");
+
+        value.className = "material-value";
+        value.textContent = materialValues[code];
+
+        button.appendChild(name);
+        button.appendChild(value);
+
+        // ==================================
+        // ROZLIŠENÍ ŽLUTÁ / MODRÁ
+        // ==================================
+
+        const isRequested =
+            requested.includes(code);
+
+        const isAssigned = [1,2,3].some(slot => {
+
+            return (
+                state.softwareSlots[slot] === code &&
+                state.softwareProgram[slot] ===
+                    activeProgram
+            );
+        });
+
+        if (isRequested && isAssigned) {
+
+            // Hledaný materiál je již přiřazený.
+            button.classList.add("assigned");
+
+        } else if (isRequested) {
+
+            // Hledaný materiál ještě není přiřazený.
+            button.classList.add("highlighted");
+        }
+
+        // ==================================
+        // PŘETAHOVÁNÍ PRSTEM NEBO MYŠÍ
+        // ==================================
+
+        button.addEventListener(
+            "pointerdown",
+            event => {
+
+                beginDrag(
+                    event,
+                    code,
+                    null,
+                    button,
+                    "software"
+                );
+            }
+        );
+
+        container.appendChild(button);
+    });
+}
+
+
+// ==========================================
+// 15. PŘIŘAZENÍ DO SW SLOTU
+// ==========================================
+
+function assignSoftwareMaterial(code, slot) {
+
+    if (!softwareMaterials.includes(code)) {
+        return;
+    }
+
+    if (![1,2,3].includes(slot)) {
+        return;
+    }
+
+    // Pro přiřazení musí být program načten.
+    // Nesprávnou součástku ale vybrat lze.
+
+    if (!activeProgram) {
+
+        alert(
+            "Nejprve vyberte a načtěte " +
+            "osazovací program."
+        );
+
+        return;
+    }
+
+    const oldCode =
+        state.softwareSlots[slot];
+
+    const oldProgram =
+        state.softwareProgram[slot];
+
+    state.softwareSlots[slot] = code;
+    state.softwareProgram[slot] =
+        activeProgram;
+
+    selectedSlot = slot;
+
+    if (!saveConfiguration(false)) {
+
+        state.softwareSlots[slot] = oldCode;
+        state.softwareProgram[slot] =
+            oldProgram;
+    }
+
+    renderSoftwareSlots();
+    renderSoftwareMaterials();
+}
+
+
+// ==========================================
+// 16. VYMAZÁNÍ SW SLOTU
+// ==========================================
+
+function clearSoftwareSlot() {
+
+    const oldCode =
+        state.softwareSlots[selectedSlot];
+
+    const oldProgram =
+        state.softwareProgram[selectedSlot];
+
+    state.softwareSlots[selectedSlot] = "";
+    state.softwareProgram[selectedSlot] = "";
+
+    if (!saveConfiguration(false)) {
+
+        state.softwareSlots[selectedSlot] =
+            oldCode;
+
+        state.softwareProgram[selectedSlot] =
+            oldProgram;
+    }
+
+    renderSoftwareSlots();
+    renderSoftwareMaterials();
+}
+
+
+// ==========================================
+// 17. OTEVŘENÍ HARDWAROVÉHO ROZHRANÍ
+// ==========================================
+
+function openFeeders() {
+
+    closeModals();
+
+    document.getElementById(
+        "feederModal"
+    ).classList.add("active");
+
+    document.body.style.overflow = "hidden";
+
+    tappedMaterial = null;
+
+    renderFeeders();
+}
+
+
+// ==========================================
+// 18. VYTVOŘENÍ HW KARTIČKY
+// ==========================================
+
+function createReelCard(code, sourceSlot = null) {
+
+    const card =
+        document.createElement("button");
+
+    card.type = "button";
+    card.className = "reel-card";
+
+    card.dataset.material = code;
+
+    // VIZUÁLNÍ PODOBA SOUČÁSTKY
+
+    card.appendChild(createPart(code));
+
+    const info =
+        document.createElement("div");
+
+    const name =
+        document.createElement("div");
+
+    name.className = "reel-code";
+    name.textContent = code;
+
+    const value =
+        document.createElement("div");
+
+    value.className = "reel-value";
+    value.textContent = materialValues[code];
+
+    info.appendChild(name);
+    info.appendChild(value);
+
+    card.appendChild(info);
+
+    card.setAttribute(
+        "aria-label",
+        "Přetáhnout " + materialLabel(code)
+    );
+
+    // Dotykové přetahování.
+
+    card.addEventListener(
+        "pointerdown",
+        event => {
+
+            beginDrag(
+                event,
+                code,
+                sourceSlot,
+                card,
+                "hardware"
+            );
+        }
+    );
+
+    if (
+        tappedMaterial &&
+        tappedMaterial.code === code &&
+        tappedMaterial.sourceSlot === sourceSlot
+    ) {
+        card.classList.add("picked");
+    }
+
+    return card;
+}
+
+
+// ==========================================
+// 19. STATICKÁ PÁSKA SOUČÁSTEK
+// ==========================================
+
+function createTape(code) {
+
+    const tape =
+        document.createElement("div");
+
+    tape.className = "loaded-tape";
+
+    for (let i = 0; i < 5; i++) {
+
+        const pocket =
+            document.createElement("div");
+
+        pocket.className = "tape-pocket";
+
+        pocket.appendChild(
+            createPart(code)
+        );
+
+        tape.appendChild(pocket);
+    }
+
+    return tape;
+}
+
+
+// ==========================================
+// 20. VYKRESLENÍ HW PODAVAČŮ
+// ==========================================
+
+function renderFeeders() {
+
+    const materials =
+        getWarehouseMaterials();
+
+    const pool =
+        document.getElementById("poolList");
+
+    const grid =
+        document.getElementById("feederGrid");
+
+    const message =
+        document.getElementById("warehouseMessage");
+
+    pool.innerHTML = "";
+    grid.innerHTML = "";
+
+    // ==================================
+    // SPOLEČNÝ ZÁSOBNÍK
+    // ==================================
+
+    materials.forEach(code => {
+
+        const occupied = [1,2,3].some(
+            slot =>
+                state.physicalSlots[slot] === code
+        );
+
+        if (!occupied) {
+
+            pool.appendChild(
+                createReelCard(code)
+            );
+        }
+    });
+
+    if (!pool.children.length) {
+
+        const empty =
+            document.createElement("p");
+
+        empty.className = "helper";
+
+        empty.textContent =
+            "Ve společném zásobníku nejsou " +
+            "žádné volné SMT součástky.";
+
+        pool.appendChild(empty);
+    }
+
+    // ==================================
+    // TŘI FYZICKÉ PODAVAČE
+    // ==================================
+
+    [1,2,3].forEach(number => {
+
+        const feeder =
+            document.createElement("div");
+
+        feeder.className = "feeder";
+
+        // ČÍSLO PODAVAČE
+
+        const title =
+            document.createElement("div");
+
+        title.className = "feeder-title";
+
+        title.textContent =
+            "Podavač " + number;
+
+        // ==================================
+        // SW DISPLEJ
+        // ==================================
+
+        const display =
+            document.createElement("div");
+
+        display.className = "feeder-display";
+
+        const label =
+            document.createElement("div");
+
+        label.className = "display-label";
+
+        label.textContent = "SW MATERIÁL";
+
+        const value =
+            document.createElement("div");
+
+        value.className = "display-value";
+
+        value.textContent = materialLabel(
+            state.softwareSlots[number]
+        );
+
+        display.appendChild(label);
+        display.appendChild(value);
+
+        // ==================================
+        // FYZICKÁ OBLAST
+        // ==================================
+
+        const zone =
+            document.createElement("div");
+
+        zone.className = "drop-zone";
+
+        zone.dataset.drop =
+            String(number);
+
+        const current =
+            state.physicalSlots[number];
+
+        if (current) {
+
+            // Po nabití zobrazíme statickou pásku.
+
+            zone.appendChild(
+                createTape(current)
+            );
+
+            // Založený materiál lze
+            // znovu přetáhnout.
+
+            zone.appendChild(
+                createReelCard(current, number)
+            );
+
+        } else {
+
+            const hint =
+                document.createElement("p");
+
+            hint.className = "drop-hint";
+
+            hint.textContent =
+                "Přetáhněte sem součástku";
+
+            zone.appendChild(hint);
+        }
+
+        // Pomocné ovládání klepnutím:
+        // vybrat materiál a klepnout na slot.
+
+        zone.addEventListener("click", event => {
+
+            if (
+                event.target.closest(".reel-card")
+            ) {
+                return;
+            }
+
+            if (tappedMaterial) {
+
+                placeMaterial(
+                    tappedMaterial.code,
+                    tappedMaterial.sourceSlot,
+                    number
+                );
+            }
+        });
+
+        const loaded =
+            document.createElement("p");
+
+        loaded.className = "loaded-material";
+
+        loaded.textContent = current
+            ? "Fyzicky založeno: " +
+              materialLabel(current)
+            : "Prázdný podavač";
+
+        feeder.appendChild(title);
+        feeder.appendChild(display);
+        feeder.appendChild(zone);
+        feeder.appendChild(loaded);
+
+        grid.appendChild(feeder);
+    });
+
+    // ==================================
+    // VRÁCENÍ DO ZÁSOBNÍKU KLEPNUTÍM
+    // ==================================
+
+    document.getElementById(
+        "materialPool"
+    ).onclick = event => {
+
+        if (
+            event.target.closest(".reel-card")
+        ) {
+            return;
+        }
+
+        if (
+            tappedMaterial &&
+            tappedMaterial.sourceSlot !== null
+        ) {
+
+            placeMaterial(
+                tappedMaterial.code,
+                tappedMaterial.sourceSlot,
+                "pool"
+            );
+        }
+    };
+
+    message.textContent = materials.length
+        ? "Vychystaný SMT materiál: " +
+          materials.map(materialLabel).join(", ")
+        : "Ve skladu není vychystaný žádný SMT materiál.";
+}
+
+
+// ==========================================
+// 21. FYZICKÉ PŘEMÍSTĚNÍ SOUČÁSTKY
+// ==========================================
+
+function placeMaterial(code, sourceSlot, destination) {
+
+    const materials = getWarehouseMaterials();
+
+    if (!materials.includes(code)) {
+        return;
+    }
+
+    if (
+        destination !== "pool" &&
+        ![1,2,3].includes(Number(destination))
+    ) {
+        return;
+    }
+
+    const previous = {
+        ...state.physicalSlots
+    };
+
+    // Najdeme původní umístění součástky.
+
+    const actualSource = [1,2,3].find(
+        slot =>
+            state.physicalSlots[slot] === code
+    ) || null;
+
+    if (
+        sourceSlot !== null &&
+        actualSource !== Number(sourceSlot)
+    ) {
+        return;
+    }
+
+    // Odebereme ji z původního podavače.
+
+    if (actualSource !== null) {
+        state.physicalSlots[actualSource] = "";
+    }
+
+    if (destination !== "pool") {
+
+        const targetSlot = Number(destination);
+
+        // Pokud byl cílový slot obsazen,
+        // původní materiál se vrátí do zásobníku.
+
+        state.physicalSlots[targetSlot] = code;
+    }
+
+    if (!saveConfiguration(false)) {
+        state.physicalSlots = previous;
+    }
+
+    tappedMaterial = null;
+
+    renderFeeders();
+}
+
+
+// ==========================================
+// 22. SPOLEČNÉ DOTYKOVÉ PŘETAHOVÁNÍ
+// ==========================================
+
+// Jedno přetahování pro SW i HW.
+//
+// Pointer Events podporují:
+// - myš
+// - dotyk prstem
+// - stylus na tabletu
+
+function beginDrag(
+    event,
+    code,
+    sourceSlot,
+    element,
+    kind
+) {
+
+    if (
+        dragSession ||
+        !event.isPrimary ||
+        event.button > 0
+    ) {
+        return;
+    }
+
+    event.preventDefault();
+
+    dragSession = {
+
+        pointerId: event.pointerId,
+
+        code: code,
+        sourceSlot: sourceSlot,
+        sourceElement: element,
+
+        kind: kind,
+
+        startX: event.clientX,
+        startY: event.clientY,
+
+        moved: false,
+        ghost: null
+    };
+
+    // Zachytíme pointer, aby se přetažení
+    // nepřerušilo mimo zdrojovou kartičku.
+
+    try {
+        element.setPointerCapture(event.pointerId);
+    } catch (error) {
+        console.warn(error);
+    }
+}
+
+
+// ==========================================
+// 23. POHYB PRSTU / MYŠI
+// ==========================================
+
+function moveDrag(event) {
+
+    if (
+        !dragSession ||
+        event.pointerId !== dragSession.pointerId
+    ) {
+        return;
+    }
+
+    const dx =
+        event.clientX - dragSession.startX;
+
+    const dy =
+        event.clientY - dragSession.startY;
+
+    // Za přetažení považujeme
+    // pohyb delší než 8 pixelů.
+
+    if (
+        !dragSession.moved &&
+        Math.hypot(dx, dy) > 8
+    ) {
+
+        dragSession.moved = true;
+
+        // Vytvoření plovoucí kopie kartičky.
+
+        const ghost =
+            dragSession.sourceElement.cloneNode(true);
+
+        ghost.classList.add("drag-ghost");
+
+        ghost.classList.remove(
+            "picked",
+            "highlighted",
+            "assigned"
+        );
+
+        ghost.style.left =
+            event.clientX + "px";
+
+        ghost.style.top =
+            event.clientY + "px";
+
+        document.body.appendChild(ghost);
+
+        dragSession.ghost = ghost;
+
+        dragSession.sourceElement.classList.add(
+            "dragging-source"
+        );
+    }
+
+    if (!dragSession.moved) {
+        return;
+    }
+
+    event.preventDefault();
+
+    if (dragSession.ghost) {
+
+        dragSession.ghost.style.left =
+            event.clientX + "px";
+
+        dragSession.ghost.style.top =
+            event.clientY + "px";
+    }
+
+    // Odstranění předchozích zvýraznění.
+
+    document.querySelectorAll(
+        ".drop-zone, .material-pool, .software-slot"
+    ).forEach(zone => {
+
+        zone.classList.remove("drag-over");
+    });
+
+    // Zjistíme, co je pod prstem.
+
+    const target = document.elementFromPoint(
+        event.clientX,
+        event.clientY
+    );
+
+    // SW nebo HW cílová oblast.
+
+    const selector =
+        dragSession.kind === "software"
+            ? "[data-sw-slot]"
+            : "[data-drop]";
+
+    const dropTarget =
+        target?.closest(selector);
+
+    if (dropTarget) {
+        dropTarget.classList.add("drag-over");
+    }
+}
+
+
+// ==========================================
+// 24. UVOLNĚNÍ PRSTU / MYŠI
+// ==========================================
+
+function endDrag(event) {
+
+    if (
+        !dragSession ||
+        event.pointerId !== dragSession.pointerId
+    ) {
+        return;
+    }
+
+    const session = dragSession;
+
+    // Cíl je potřeba zjistit ještě před
+    // překreslením stránky.
+
+    const target = document.elementFromPoint(
+        event.clientX,
+        event.clientY
+    );
+
+    const selector =
+        session.kind === "software"
+            ? "[data-sw-slot]"
+            : "[data-drop]";
+
+    const dropTarget =
+        target?.closest(selector);
+
+    // Odstraníme plovoucí kartičku.
+
+    if (session.ghost) {
+        session.ghost.remove();
+    }
+
+    session.sourceElement.classList.remove(
+        "dragging-source"
+    );
+
+    document.querySelectorAll(
+        ".drag-over"
+    ).forEach(zone => {
+
+        zone.classList.remove("drag-over");
+    });
+
+    dragSession = null;
+
+    // ======================================
+    // SW PŘETAHOVÁNÍ
+    // ======================================
+
+    if (session.kind === "software") {
+
+        let targetSlot = null;
+
+        if (session.moved && dropTarget) {
+
+            targetSlot = Number(
+                dropTarget.dataset.swSlot
+            );
+
+        } else if (!session.moved) {
+
+            // Alternativa pro tablet:
+            // klepnutí na součástku
+            // přiřadí materiál do vybraného slotu.
+
+            targetSlot = selectedSlot;
+        }
+
+        if ([1,2,3].includes(targetSlot)) {
+
+            assignSoftwareMaterial(
+                session.code,
+                targetSlot
+            );
+        }
+
+        return;
+    }
+
+    // ======================================
+    // HW PŘETAHOVÁNÍ
+    // ======================================
+
+    if (session.moved) {
+
+        // Materiál se přesune pouze
+        // při puštění na platné místo.
+
+        if (dropTarget) {
+
+            placeMaterial(
+                session.code,
+                session.sourceSlot,
+                dropTarget.dataset.drop
+            );
+        }
+
+    } else {
+
+        // Krátké klepnutí vybere materiál.
+        // Poté stačí klepnout na cílový slot.
+
+        tappedMaterial = {
+
+            code: session.code,
+            sourceSlot: session.sourceSlot
+        };
+
+        renderFeeders();
+    }
+}
+
+
+// ==========================================
+// 25. ZRUŠENÍ PŘETAHOVÁNÍ
+// ==========================================
+
+function cancelDrag(event) {
+
+    if (
+        !dragSession ||
+        event.pointerId !== dragSession.pointerId
+    ) {
+        return;
+    }
+
+    if (dragSession.ghost) {
+        dragSession.ghost.remove();
+    }
+
+    dragSession.sourceElement.classList.remove(
+        "dragging-source"
+    );
+
+    dragSession = null;
+
+    document.querySelectorAll(
+        ".drag-over"
+    ).forEach(zone => {
+
+        zone.classList.remove("drag-over");
+    });
+}
+
+
+// ==========================================
+// 26. REGISTRACE DOTYKOVÝCH UDÁLOSTÍ
+// ==========================================
+
+document.addEventListener(
+    "pointermove",
+    moveDrag
+);
+
+document.addEventListener(
+    "pointerup",
+    endDrag
+);
+
+document.addEventListener(
+    "pointercancel",
+    cancelDrag
+);
+
+
+// ==========================================
+// 27. AKTUALIZACE STAVOVÉHO PANELU
+// ==========================================
+
+function updateStatus() {
+
+    const bot =
+        document.getElementById("botStatus");
+
+    const top =
+        document.getElementById("topStatus");
+
+    const sw =
+        document.getElementById("swStatus");
+
+    const hw =
+        document.getElementById("hwStatus");
+
+    // Stav programů.
+
+    bot.textContent = state.botLoaded
+        ? "Načten"
+        : "Nenačten";
+
+    top.textContent = state.topLoaded
+        ? "Načten"
+        : "Nenačten";
+
+    bot.classList.toggle(
+        "done",
+        state.botLoaded
+    );
+
+    top.classList.toggle(
+        "done",
+        state.topLoaded
+    );
+
+    // Počet obsazených SW a HW slotů.
+
+    const swCount = [1,2,3].filter(
+        slot => state.softwareSlots[slot]
+    ).length;
+
+    const hwCount = [1,2,3].filter(
+        slot => state.physicalSlots[slot]
+    ).length;
+
+    sw.textContent = swCount + " / 3";
+
+    hw.textContent = hwCount + " / 3";
+
+    sw.classList.toggle(
+        "done",
+        swCount === 3
+    );
+
+    hw.classList.toggle(
+        "done",
+        hwCount === 3
+    );
+}
+
+
+// ==========================================
+// 28. INTERNÍ KONTROLA KONFIGURACE
+// ==========================================
+
+// Hráčům nezobrazujeme výsledek.
+//
+// Zaznamenáváme:
+// - nesprávné součástky v SW
+// - přiřazení k programu
+// - rozdíly mezi SW a HW
+// - chybějící materiál
+//
+// Tyto informace využijeme při
+// závěrečné funkční zkoušce DPS.
+
+function checkConfiguration() {
+
+    const issues = [];
+
+    const expected = [
+        "MC01",
+        "MR03",
+        "MR09"
+    ];
+
+    const software = [1,2,3].map(
+        slot => state.softwareSlots[slot]
+    );
+
+    const physical = [1,2,3].map(
+        slot => state.physicalSlots[slot]
+    );
+
+    // ==================================
+    // NAČTENÍ OBOU PROGRAMŮ
+    // ==================================
+
+    if (
+        !state.botLoaded ||
+        !state.topLoaded
+    ) {
+
+        issues.push(
+            "PROGRAM_NOT_LOADED"
+        );
+    }
+
+    // ==================================
+    // POŽADOVANÉ SOUČÁSTKY
+    // ==================================
+
+    if (
+        JSON.stringify([...software].sort()) !==
+        JSON.stringify([...expected].sort())
+    ) {
+
+        issues.push(
+            "WRONG_SOFTWARE_MATERIALS"
+        );
+    }
+
+    // ==================================
+    // KONTROLA JEDNOTLIVÝCH SLOTŮ
+    // ==================================
+
+    [1,2,3].forEach(slot => {
+
+        const code =
+            state.softwareSlots[slot];
+
+        const program =
+            state.softwareProgram[slot];
+
+        const hw =
+            state.physicalSlots[slot];
+
+        // BOTTOM – KONDENZÁTOR
+
+        if (
+            code === "MC01" &&
+            program !== "bot"
+        ) {
+
+            issues.push(
+                "WRONG_BOTTOM_PROGRAM"
+            );
+        }
+
+        // TOP – REZISTORY
+
+        if (
+            ["MR03", "MR09"].includes(code) &&
+            program !== "top"
+        ) {
+
+            issues.push(
+                "WRONG_TOP_PROGRAM_SLOT_" + slot
+            );
+        }
+
+        // PRÁZDNÝ SW SLOT
+
+        if (!code) {
+
+            issues.push(
+                "SW_SLOT_" + slot + "_EMPTY"
+            );
+        }
+
+        // PRÁZDNÝ HW SLOT
+
+        if (!hw) {
+
+            issues.push(
+                "HW_SLOT_" + slot + "_EMPTY"
+            );
+        }
+
+        // NESOULAD SW / HW
+
+        if (
+            code &&
+            hw &&
+            code !== hw
+        ) {
+
+            issues.push(
+                "SW_HW_MISMATCH_SLOT_" + slot
+            );
+        }
+
+    });
+
+    // ==================================
+    // KONTROLA VYCHYSTANÉHO MATERIÁLU
+    // ==================================
+
+    const picked =
+        getWarehouseMaterials();
+
+    physical.forEach(code => {
+
+        if (
+            code &&
+            !picked.includes(code)
+        ) {
+
+            issues.push(
+                "MATERIAL_NOT_PICKED_" + code
+            );
+        }
+    });
+
+    return {
+
+        passed: issues.length === 0,
+
+        issues: issues,
+
+        softwareSlots: {
+            ...state.softwareSlots
+        },
+
+        softwareProgram: {
+            ...state.softwareProgram
+        },
+
+        physicalSlots: {
+            ...state.physicalSlots
+        },
+
+        warehouseSMT: [...picked]
+
+    };
+}
+
+
+// ==========================================
+// 29. DOKONČENÍ OPERACE
+// ==========================================
+
+function finishOperation() {
+
+    // Programy musí být načtené.
+
+    if (
+        !state.botLoaded ||
+        !state.topLoaded
+    ) {
+
+        alert(
+            "Nejprve načtěte oba osazovací programy."
+        );
+
+        return;
+    }
+
+    // Všechny tři SW sloty musí být obsazené.
+
+    const swCount = [1,2,3].filter(
+        slot => state.softwareSlots[slot]
+    ).length;
+
+    if (swCount < 3) {
+
+        alert(
+            "Nejprve softwarově nabijte " +
+            "všechny tři sloty."
+        );
+
+        return;
+    }
+
+    // Všechny tři HW podavače musí být nabité.
+    // Správnost materiálů neověřujeme
+    // před hráčem.
+
+    const hwCount = [1,2,3].filter(
+        slot => state.physicalSlots[slot]
+    ).length;
+
+    if (hwCount < 3) {
+
+        alert(
+            "Nejprve fyzicky nabijte " +
+            "všechny tři podavače."
+        );
+
+        return;
+    }
+
+    const confirmed = confirm(
+        "Chcete dokončit přípravu stroje?\n\n" +
+        "Vaše nastavení SW a HW bude " +
+        "uloženo do výrobní karty."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    // Nejprve uložíme výrobní kartu
+    // a stav dokončené operace.
+
+    if (!saveConfiguration(true)) {
+        return;
+    }
+
+    // Interní kontrola.
+    // Výsledek se dětem nezobrazuje.
+
+    const result = checkConfiguration();
+
+    try {
+
+        localStorage.setItem(
+            CHECK_KEY,
+            JSON.stringify(result)
+        );
+
+        // Uložení kontroly také
+        // do centrální výrobní karty.
+
+        VPSChoices.saveStep(
+            "podavace",
+            {
+                kontrola: result
+            }
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Kontrolní záznam nebyl uložen.",
+            error
+        );
+    }
+
+    alert(
+        "Příprava osazovacího stroje " +
+        "byla dokončena."
+    );
+
+    // Návrat na technologický postup.
+
+    window.location.href = "tp.html";
+}
+
+
+// ==========================================
+// 30. ZAVÍRÁNÍ OKEN
+// ==========================================
+
+function closeModals() {
+
+    // Případné přetahování ukončíme.
+
+    if (dragSession) {
+
+        if (dragSession.ghost) {
+            dragSession.ghost.remove();
+        }
+
+        dragSession = null;
+    }
+
+    document.querySelectorAll(
+        ".modal"
+    ).forEach(modal => {
+
+        modal.classList.remove("active");
+    });
+
+    document.body.style.overflow = "";
+}
+
+
+// Kliknutí mimo dialog.
+
+document.querySelectorAll(
+    ".modal"
+).forEach(modal => {
+
+    modal.addEventListener(
+        "click",
+        event => {
+
+            if (event.target === modal) {
+                closeModals();
+            }
+        }
+    );
+});
+
+
+// Klávesa Escape.
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Escape") {
+            closeModals();
+        }
+    }
+);
+
+
+// ==========================================
+// 31. SPUŠTĚNÍ HRY
+// ==========================================
+
+loadState();
+
+updateStatus();
+
+window.addEventListener(
+    "pageshow",
+    () => {
+        updateStatus();
+    }
+);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>V.P.S. ELEKTRO | Technologický postup</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Trebuchet MS", Arial, sans-serif;
+            background: linear-gradient(135deg, #101d18, #244633);
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 45px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .label {
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: #a8d8b7;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: clamp(26px, 4vw, 36px);
+            margin-bottom: 20px;
+        }
+
+        .divider {
+            width: 90px;
+            height: 3px;
+            background: #8bdba5;
+            border-radius: 5px;
+            margin: 0 auto 25px;
+        }
+
+        .description {
+            text-align: center;
+            font-size: 17px;
+            line-height: 1.7;
+            color: #dce9df;
+            margin-bottom: 30px;
+        }
+
+        /* PRŮBĚH VÝROBY */
+
+        .progress-section {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 12px;
+            color: #c5d8ca;
+            font-size: 15px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 12px;
+            background: #263b2d;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #8bdba5;
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+
+        /* SEZNAM TECHNOLOGICKÝCH OPERACÍ */
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            width: 100%;
+            padding: 17px 20px;
+            border-radius: 10px;
+            text-align: left;
+            font-family: inherit;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 43px;
+            height: 43px;
+            border-radius: 9px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .step-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .step-text {
+            font-size: 17px;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+
+        .step-detail {
+            font-size: 13px;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        .step-status {
+            flex-shrink: 0;
+            width: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        /* DOKONČENÁ OPERACE */
+
+        .step.completed {
+            background: rgba(57, 159, 89, 0.13);
+            border: 1px solid #478f5b;
+            cursor: default;
+        }
+
+        .step.completed .step-number {
+            background: #428c54;
+            color: white;
+        }
+
+        .step.completed .step-detail {
+            color: #a8cbb1;
+        }
+
+        .step.completed .step-status {
+            color: #8bdba5;
+        }
+
+        /* AKTUÁLNÍ OPERACE */
+
+        .step.current {
+            background: rgba(139, 219, 165, 0.12);
+            border: 2px solid #8bdba5;
+            cursor: pointer;
+        }
+
+        .step.current .step-number {
+            background: #8bdba5;
+            color: #10291b;
+        }
+
+        .step.current .step-detail {
+            color: #c5d8ca;
+        }
+
+        .step.current:hover {
+            background: rgba(139, 219, 165, 0.22);
+            transform: translateX(5px);
+            box-shadow: 0 0 18px rgba(139, 219, 165, 0.12);
+        }
+
+        .step.current:focus-visible {
+            outline: 3px solid white;
+            outline-offset: 3px;
+        }
+
+        /* UZAMČENÁ OPERACE */
+
+        .step.locked {
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .step.locked .step-number {
+            background: #39483d;
+            color: #a8b9ad;
+        }
+
+        .step.locked .step-detail {
+            color: #9aaba0;
+        }
+
+        .step.locked .step-status {
+            color: #a8b9ad;
+        }
+
+        /* TLAČÍTKO ZPĚT */
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .back-button {
+            padding: 14px 32px;
+            background: transparent;
+            border: 1px solid #8bdba5;
+            border-radius: 8px;
+            color: #8bdba5;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .back-button:hover {
+            background: rgba(139, 219, 165, 0.15);
+        }
+
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 12px;
+            color: #9ab4a3;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 18px;
+            }
+
+            .step {
+                gap: 12px;
+                padding: 14px;
+            }
+
+            .step-text {
+                font-size: 15px;
+            }
+
+            .step-number {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            .step-status {
+                width: 28px;
+                font-size: 21px;
+            }
+
+            .description {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <p class="label">
+            Výrobní dokumentace
+        </p>
+
+        <h1>Technologický postup</h1>
+
+        <div class="divider"></div>
+
+        <p class="description">
+            Pro správné osazení desky plošných spojů
+            je nutné dodržet následující technologický postup.
+            <br>
+            Jednotlivé operace provádějte ve stanoveném pořadí.
+        </p>
+
+        <!-- PRŮBĚH VÝROBY -->
+
+        <div class="progress-section">
+
+            <div class="progress-info">
+                <span>Průběh výroby</span>
+                <span id="progressText">0 / 11 operací</span>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+        </div>
+
+        <!-- SEZNAM OPERACÍ -->
+
+        <div class="steps" id="stepsContainer"></div>
+
+        <!-- NÁVRAT -->
+
+        <div class="buttons">
+
+            <button class="back-button" onclick="goBack()">
+                ← Zpět na seznámení
+            </button>
+
+        </div>
+
+        <p class="footer">
+            V.P.S. ELEKTRO s.r.o. | Technologický postup
+        </p>
+
+    </main>
+
+    <script>
+
+        // ==========================================
+        // 1. TECHNOLOGICKÝ POSTUP
+        // ==========================================
+
+        const technologicalSteps = [
+
+            {
+                title: "Vyhledávání součástek podle kusovníku",
+                detail: "Příprava materiálu ve skladu.",
+                page: "ks.html",
+                storageKey: "vps_semafor_sklad_dokonceno"
+            },
+
+            {
+                title: "Nabít podavače osazovacího stroje",
+                detail: "Příprava osazovacího stroje.",
+                page: "podavace.html",
+                storageKey: "vps_semafor_krok_2_dokonceno"
+            },
+
+            {
+                title: "Nanést pastu na stranu BOTTOM",
+                detail: "Nanesení pájecí pasty na spodní stranu DPS.",
+                page: "pasta_bottom.html",
+                storageKey: "vps_semafor_krok_3_dokonceno"
+            },
+
+            {
+                title: "Osadit stranu BOTTOM",
+                detail: "Osazení SMD součástek na spodní stranu DPS.",
+                page: "osazeni_bottom.html",
+                storageKey: "vps_semafor_krok_4_dokonceno"
+            },
+
+            {
+                title: "Reflow strany BOTTOM",
+                detail: "Přetavení pájecí pasty v reflow peci.",
+                page: "reflow_bottom.html",
+                storageKey: "vps_semafor_krok_5_dokonceno"
+            },
+
+            {
+                title: "Nanést pastu na stranu TOP",
+                detail: "Nanesení pájecí pasty na horní stranu DPS.",
+                page: "pasta_top.html",
+                storageKey: "vps_semafor_krok_6_dokonceno"
+            },
+
+            {
+                title: "Osadit stranu TOP SMD",
+                detail: "Osazení SMD součástek na horní stranu DPS.",
+                page: "osazeni_top_smd.html",
+                storageKey: "vps_semafor_krok_7_dokonceno"
+            },
+
+            {
+                title: "Reflow strany TOP",
+                detail: "Přetavení pájecí pasty na horní straně.",
+                page: "reflow_top.html",
+                storageKey: "vps_semafor_krok_8_dokonceno"
+            },
+
+            {
+                title: "Osadit stranu TOP THT",
+                detail: "Ruční osazení vývodových součástek.",
+                page: "osazeni_top_tht.html",
+                storageKey: "vps_semafor_krok_9_dokonceno"
+            },
+
+            {
+                title: "Zapájet stranu TOP",
+                detail: "Zapájení vývodových součástek.",
+                page: "pajeni_top.html",
+                storageKey: "vps_semafor_krok_10_dokonceno"
+            },
+
+            {
+                title: "Provést provozně funkční zkoušku semaforu",
+                detail: "Ověření správné funkce hotové DPS.",
+                page: "zkouska.html",
+                storageKey: "vps_semafor_krok_11_dokonceno"
+            }
+
+        ];
+
+
+        // ==========================================
+        // 2. NAČTENÍ DOKONČENÝCH OPERACÍ
+        // ==========================================
+
+        function getCompletedCount() {
+
+            let completed = 0;
+
+            for (const step of technologicalSteps) {
+
+                const saved = localStorage.getItem(
+                    step.storageKey
+                );
+
+                if (saved === "true") {
+
+                    completed++;
+
+                } else {
+
+                    // Další operace zůstávají uzamčené.
+                    break;
+
+                }
+
+            }
+
+            return completed;
+        }
+
+
+        // ==========================================
+        // 3. VYKRESLENÍ TECHNOLOGICKÉHO POSTUPU
+        // ==========================================
+
+        function renderSteps() {
+
+            const container =
+                document.getElementById("stepsContainer");
+
+            container.innerHTML = "";
+
+            const completedCount = getCompletedCount();
+
+            technologicalSteps.forEach((step, index) => {
+
+                const row = document.createElement("button");
+
+                row.type = "button";
+                row.className = "step";
+
+                // ČÍSLO OPERACE
+
+                const number = document.createElement("div");
+
+                number.className = "step-number";
+                number.textContent = index + 1;
+
+                // TEXT OPERACE
+
+                const content = document.createElement("div");
+
+                content.className = "step-content";
+
+                const title = document.createElement("div");
+
+                title.className = "step-text";
+                title.textContent = step.title;
+
+                const detail = document.createElement("div");
+
+                detail.className = "step-detail";
+                detail.textContent = step.detail;
+
+                content.appendChild(title);
+                content.appendChild(detail);
+
+                // STAVOVÁ IKONA
+
+                const status = document.createElement("div");
+
+                status.className = "step-status";
+
+                // ==================================
+                // DOKONČENÁ OPERACE
+                // ==================================
+
+                if (index < completedCount) {
+
+                    row.classList.add("completed");
+
+                    status.textContent = "✓";
+
+                    row.disabled = true;
+
+                    row.title = "Operace dokončena";
+
+                }
+
+                // ==================================
+                // AKTUÁLNÍ OPERACE
+                // ==================================
+
+                else if (index === completedCount) {
+
+                    row.classList.add("current");
+
+                    // Aktuální operace bez ikonky.
+
+                    status.textContent = "";
+
+                    row.title = "Zahájit operaci";
+
+                    row.addEventListener("click", () => {
+
+                        // Otevře stránku příslušné operace.
+                        window.location.href = step.page;
+
+                    });
+
+                }
+
+                // ==================================
+                // UZAMČENÁ OPERACE
+                // ==================================
+
+                else {
+
+                    row.classList.add("locked");
+
+                    status.textContent = "🔒";
+
+                    row.disabled = true;
+
+                    row.title = "Operace je uzamčena";
+
+                }
+
+                // SESTAVENÍ ŘÁDKU
+
+                row.appendChild(number);
+                row.appendChild(content);
+                row.appendChild(status);
+
+                container.appendChild(row);
+
+            });
+
+            updateProgress(completedCount);
+
+        }
+
+
+        // ==========================================
+        // 4. UKAZATEL PRŮBĚHU VÝROBY
+        // ==========================================
+
+        function updateProgress(completedCount) {
+
+            const total = technologicalSteps.length;
+
+            const percentage =
+                (completedCount / total) * 100;
+
+            document.getElementById(
+                "progressText"
+            ).textContent =
+                completedCount + " / " + total + " operací";
+
+            document.getElementById(
+                "progressFill"
+            ).style.width = percentage + "%";
+
+        }
+
+
+        // ==========================================
+        // 5. NÁVRAT NA SEZNÁMENÍ
+        // ==========================================
+
+        function goBack() {
+
+            window.location.href = "seznameni.html";
+
+        }
+
+
+        // ==========================================
+        // 6. AUTOMATICKÁ AKTUALIZACE
+        // ==========================================
+
+        // Vykreslení při otevření stránky.
+
+        renderSteps();
+
+        // Aktualizace po návratu z jiné stránky.
+
+        window.addEventListener("pageshow", () => {
+
+            renderSteps();
+
+        });
+
+        // Aktualizace po změně localStorage
+        // v jiném panelu stejného prohlížeče.
+
+        window.addEventListener("storage", () => {
+
+            renderSteps();
+
+        });
+
+    </script>
+
+</body>
+</html>

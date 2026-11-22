@@ -1,0 +1,1020 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>V.P.S. ELEKTRO | Nanesení pasty BOTTOM</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    color: #f6fbf7;
+    background: linear-gradient(135deg, #101d18, #244633);
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+}
+
+button:focus-visible {
+    outline: 3px solid #d8f4dd;
+    outline-offset: 3px;
+}
+
+/* HLAVIČKA */
+
+header {
+    text-align: center;
+    padding: 28px 18px 18px;
+}
+
+.eyebrow {
+    font-size: 12px;
+    letter-spacing: 2.2px;
+    color: #95daad;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-size: clamp(25px, 3.5vw, 36px);
+    margin: 12px 0;
+}
+
+.intro {
+    color: #d1e4d6;
+    line-height: 1.65;
+    margin: auto;
+    max-width: 850px;
+}
+
+/* ROZLOŽENÍ */
+
+.layout {
+    max-width: 1350px;
+    padding: 18px 22px 44px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 285px;
+    gap: 22px;
+    align-items: start;
+}
+
+.panel {
+    background: #1b3425;
+    border: 1px solid #53775b;
+    border-radius: 15px;
+    padding: 21px;
+    box-shadow: 0 12px 35px #0003;
+}
+
+.scene {
+    min-width: 0;
+}
+
+.photo {
+    width: 100%;
+    display: block;
+    border-radius: 11px;
+    border: 1px solid #668b6d;
+}
+
+.section-title {
+    font-size: 22px;
+    color: #95daad;
+    margin: 0 0 14px;
+}
+
+.sub {
+    font-size: 14px;
+    color: #c7d9cb;
+    line-height: 1.65;
+    margin: 10px 0 18px;
+}
+
+/* TLAČÍTKA */
+
+.primary {
+    background: #8bdba5;
+    border: 0;
+    color: #112d1b;
+    padding: 14px 18px;
+    border-radius: 9px;
+    font-weight: 700;
+}
+
+.primary:hover {
+    background: #b2f0c4;
+}
+
+.primary:disabled {
+    background: #607b66;
+    color: #bed3c4;
+    cursor: not-allowed;
+}
+
+.wide {
+    width: 100%;
+}
+
+.secondary {
+    color: #d6f0dd;
+    background: #2a5036;
+    border: 1px solid #77a883;
+    padding: 11px 15px;
+    border-radius: 8px;
+}
+
+.secondary:hover {
+    background: #376645;
+}
+
+/* STAV OPERACE */
+
+.status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #476550;
+    padding: 13px 0;
+    font-size: 14px;
+}
+
+.status strong {
+    color: #95daad;
+}
+
+.progress {
+    height: 12px;
+    margin-top: 18px;
+    border-radius: 15px;
+    background: #314a37;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: #8bdba5;
+    height: 100%;
+    width: 0;
+    transition: width 0.2s;
+}
+
+/* DESKA PLOŠNÝCH SPOJŮ */
+
+.instructions {
+    margin: 0 0 16px;
+    color: #d7e6db;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.board-scroll {
+    width: 100%;
+    overflow: auto;
+    background: #12231a;
+    border: 1px solid #57745d;
+    border-radius: 10px;
+    padding: 12px;
+    touch-action: pan-x pan-y;
+}
+
+/*
+   Obrázek je fyzicky otočený o 90°.
+   Rozměry: 897 × 537 px.
+
+   Klikací oblasti se umisťují procentuálně,
+   aby zůstaly na svých místech i při
+   změně velikosti obrazovky.
+*/
+
+.board-stage {
+    position: relative;
+    min-width: 820px;
+    width: 100%;
+    line-height: 0;
+    overflow: hidden;
+}
+
+.board-stage img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* KLIKACÍ SMT PLOŠKY */
+
+.pad {
+    position: absolute;
+    z-index: 2;
+
+    transform: translate(-50%, -50%);
+
+    border: 1px dashed rgba(255, 255, 255, 0.85);
+    border-radius: 3px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    padding: 0;
+
+    touch-action: manipulation;
+
+    transition:
+        background 0.13s,
+        border-color 0.13s;
+
+    box-shadow: 0 0 0 3px #163f2430;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pad:hover,
+.pad:focus-visible {
+    border: 2px solid #fdf3c0;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* NANESENÁ PÁJECÍ PASTA */
+
+.pad.pasted {
+    border: 1px solid #a6b0ae;
+
+    background: linear-gradient(
+        130deg,
+        rgba(232,235,233,0.95),
+        rgba(161,171,169,0.9)
+    );
+
+    box-shadow:
+        inset 0 0 4px #343a39b0,
+        0 0 0 2px #fff5;
+}
+
+.pad.pasted::after {
+    content: "";
+
+    width: 62%;
+    height: 55%;
+
+    border-radius: 2px;
+
+    background: linear-gradient(
+        125deg,
+        #dedfdf,
+        #a1a9a8
+    );
+
+    box-shadow: 0 1px 3px #4448;
+}
+
+/* NÁSTROJE POD DESKOU */
+
+.board-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.legend {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: #d4e7d8;
+    font-size: 13px;
+}
+
+.dot {
+    width: 20px;
+    height: 15px;
+    border-radius: 3px;
+
+    background: linear-gradient(
+        130deg,
+        #d9dddc,
+        #a6b1af
+    );
+
+    border: 1px solid #87948f;
+}
+
+/* STAV C3 A C4 */
+
+.pads-status {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.component-status {
+    background: #294a34;
+    border: 1px solid #4f745b;
+    border-radius: 7px;
+    padding: 12px;
+    text-align: center;
+}
+
+.component-status strong {
+    font-size: 16px;
+}
+
+.component-status span {
+    display: block;
+    font-size: 12px;
+    color: #c3d5c6;
+    margin-top: 5px;
+}
+
+.hint {
+    margin-top: 14px;
+    color: #b5d5be;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.hidden {
+    display: none !important;
+}
+
+footer {
+    text-align: center;
+    color: #a9c3ae;
+    padding: 6px 20px 23px;
+    font-size: 12px;
+}
+
+/* TABLETY */
+
+@media (max-width: 970px) {
+    .layout {
+        grid-template-columns: 1fr;
+        padding: 12px 12px 30px;
+    }
+
+    .side {
+        order: -1;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HLAVIČKA -->
+
+<header>
+
+    <div class="eyebrow">
+        V.P.S. ELEKTRO · VÝROBNÍ OPERACE 03
+    </div>
+
+    <h1>
+        Nanášení pájecí pasty – BOTTOM
+    </h1>
+
+    <p class="intro">
+        Připravte spodní stranu desky plošných spojů.
+        Naneste pájecí pastu dotykem na každou SMT
+        plošku kondenzátorů C3 a C4.
+    </p>
+
+</header>
+
+<main class="layout">
+
+    <!-- PRACOVNÍ PLOCHA -->
+
+    <section class="panel scene">
+
+        <!-- FOTOGRAFIE PRACOVIŠTĚ -->
+
+        <div id="machineView">
+
+            <h2 class="section-title">
+                Pracoviště nanášení pasty
+            </h2>
+
+            <img
+                src="images/pasta.jpg"
+                class="photo"
+                alt="Pracoviště nanášení pájecí pasty"
+            >
+
+            <p class="sub">
+                Otevřete pracovní plochu
+                a připravte pájecí pastu
+                na spodní straně DPS.
+            </p>
+
+            <button
+                type="button"
+                class="primary"
+                id="openBoard">
+                Přejít k nanášení pasty →
+            </button>
+
+        </div>
+
+        <!-- DESKA BOTTOM -->
+
+        <div id="boardView" class="hidden">
+
+            <h2 class="section-title">
+                DPS – strana BOTTOM
+            </h2>
+
+            <p class="instructions">
+                Na obrázku jsou čtyři obdélníkové
+                SMT plošky – dvě pro C3 a dvě pro C4.
+
+                <strong>
+                    Klepněte na každou z nich.
+                </strong>
+
+                Šedá vrstva znázorňuje nanesenou
+                pájecí pastu.
+
+                Opětovným klepnutím můžete pastu
+                z plošky odstranit.
+            </p>
+
+            <!-- OTOČENÁ DPS -->
+
+            <div class="board-scroll">
+
+                <div
+                    class="board-stage"
+                    id="boardStage">
+
+                    <img
+                        src="images/blikac_bot.png?v=2"
+                        alt="Spodní strana DPS otočená o 90 stupňů"
+                        draggable="false"
+                    >
+
+                    <!-- SEM SE VYKRESLÍ SMT PLOŠKY -->
+
+                    <div id="padsLayer"></div>
+
+                </div>
+
+            </div>
+
+            <div class="board-toolbar">
+
+                <div class="legend">
+
+                    <span class="dot"></span>
+
+                    Nanesená pájecí pasta
+
+                </div>
+
+                <button
+                    class="secondary"
+                    id="backMachine"
+                    type="button">
+                    ← Zpět na pracoviště
+                </button>
+
+            </div>
+
+            <p class="hint">
+                Na menším displeji můžete
+                obrázek vodorovně posouvat,
+                aby šly plošky pohodlně označit prstem.
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- PRAVÝ PANEL -->
+
+    <aside class="panel side">
+
+        <h2 class="section-title">
+            Průběh operace
+        </h2>
+
+        <p class="sub">
+            Pasta se nanáší pouze na SMT
+            pájecí plošky.
+
+            Prokovy a kruhové THT otvory
+            se v tomto kroku neoznačují.
+        </p>
+
+        <div class="status">
+
+            <span>
+                Nanesené plošky
+            </span>
+
+            <strong id="count">
+                0 / 4
+            </strong>
+
+        </div>
+
+        <div class="progress">
+
+            <div
+                class="progress-fill"
+                id="progressFill">
+            </div>
+
+        </div>
+
+        <div class="pads-status">
+
+            <div class="component-status">
+
+                <strong>C3</strong>
+
+                <span id="c3Status">
+                    0 / 2 plošky
+                </span>
+
+            </div>
+
+            <div class="component-status">
+
+                <strong>C4</strong>
+
+                <span id="c4Status">
+                    0 / 2 plošky
+                </span>
+
+            </div>
+
+        </div>
+
+        <button
+            class="primary wide"
+            style="margin-top:22px"
+            type="button"
+            id="finish">
+            Dokončit nanášení pasty →
+        </button>
+
+        <p class="hint">
+            Každé klepnutí se průběžně ukládá
+            do výrobní karty hry.
+        </p>
+
+    </aside>
+
+</main>
+
+<footer>
+    V.P.S. ELEKTRO s.r.o. |
+    Interaktivní výuková hra
+</footer>
+
+<!-- CENTRÁLNÍ PAMĚŤ -->
+
+<script src="choices.js"></script>
+
+<script>
+"use strict";
+
+// ==========================================
+// 1. ÚLOŽIŠTĚ
+// ==========================================
+
+const STEP_NAME = "pastaBottom";
+
+const COMPLETE_KEY =
+    "vps_semafor_krok_3_dokonceno";
+
+const BACKUP_KEY =
+    "vps_semafor_pasta_bottom_rozhodnuti";
+
+
+// ==========================================
+// 2. SKUTEČNÉ POLOHY SMT PLOŠEK
+// ==========================================
+
+// Obrázek blikac_bot_90.png
+// má rozměry 897 × 537 pixelů.
+//
+// Souřadnice odpovídají otočené DPS.
+//
+// C3 = 2 SMT plošky
+// C4 = 2 SMT plošky
+
+const SIZE = {
+    w: 897,
+    h: 537
+};
+
+const PADS = [
+
+    {
+        id: "C4_L",
+        component: "C4",
+        x: 517,
+        y: 81,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C4_R",
+        component: "C4",
+        x: 517,
+        y: 134,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C3_L",
+        component: "C3",
+        x: 386,
+        y: 404,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C3_R",
+        component: "C3",
+        x: 386,
+        y: 458,
+        w: 34,
+        h: 20
+    }
+
+];
+
+
+// ==========================================
+// 3. AKTUÁLNÍ STAV NANESENÍ PASTY
+// ==========================================
+
+let pasted = {};
+
+
+// ==========================================
+// 4. NAČTENÍ ULOŽENÝCH ROZHODNUTÍ
+// ==========================================
+
+function loadChoices() {
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.getStep === "function"
+        ) {
+
+            const saved =
+                VPSChoices.getStep(STEP_NAME);
+
+            if (
+                saved &&
+                saved.rozhodnuti &&
+                typeof saved.rozhodnuti === "object"
+            ) {
+
+                pasted = {
+                    ...saved.rozhodnuti
+                };
+
+                return;
+            }
+        }
+
+        // Záložní úložiště pro starší verzi hry.
+
+        const old =
+            localStorage.getItem(BACKUP_KEY);
+
+        if (old) {
+
+            pasted = JSON.parse(old) || {};
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Chyba při načítání pasty:",
+            error
+        );
+
+        pasted = {};
+    }
+}
+
+
+// ==========================================
+// 5. ULOŽENÍ ROZHODNUTÍ
+// ==========================================
+
+function persist(done = false) {
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.saveStep === "function"
+        ) {
+
+            VPSChoices.saveStep(
+                STEP_NAME,
+                {
+                    rozhodnuti: {
+                        ...pasted
+                    },
+
+                    dokonceno: done
+                }
+            );
+        }
+
+        localStorage.setItem(
+            BACKUP_KEY,
+            JSON.stringify(pasted)
+        );
+
+        // Kompatibilita s tp.html.
+
+        if (done) {
+
+            localStorage.setItem(
+                COMPLETE_KEY,
+                "true"
+            );
+
+        } else {
+
+            localStorage.removeItem(
+                COMPLETE_KEY
+            );
+        }
+
+        return true;
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Nepodařilo se uložit stav hry."
+        );
+
+        return false;
+    }
+}
+
+
+// ==========================================
+// 6. VYKRESLENÍ KLIKACÍCH SMT PLOŠEK
+// ==========================================
+
+function renderPads() {
+
+    const layer =
+        document.getElementById("padsLayer");
+
+    layer.replaceChildren();
+
+    PADS.forEach(pad => {
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.className =
+            "pad" +
+            (pasted[pad.id] ? " pasted" : "");
+
+        // Převod pixelových souřadnic
+        // na procenta skutečného obrázku.
+
+        button.style.left =
+            (pad.x / SIZE.w * 100) + "%";
+
+        button.style.top =
+            (pad.y / SIZE.h * 100) + "%";
+
+        button.style.width =
+            (pad.w / SIZE.w * 100) + "%";
+
+        button.style.height =
+            (pad.h / SIZE.h * 100) + "%";
+
+        button.title =
+            pad.component + ": " +
+            (
+                pasted[pad.id]
+                    ? "odebrat pastu"
+                    : "nanést pastu"
+            );
+
+        button.setAttribute(
+            "aria-label",
+            button.title
+        );
+
+        button.setAttribute(
+            "aria-pressed",
+            String(Boolean(pasted[pad.id]))
+        );
+
+        // NANESENÍ / ODEBRÁNÍ PASTY
+
+        button.addEventListener("click", () => {
+
+            pasted[pad.id] =
+                !pasted[pad.id];
+
+            persist(false);
+
+            renderPads();
+
+            updateStatus();
+
+        });
+
+        layer.appendChild(button);
+
+    });
+}
+
+
+// ==========================================
+// 7. AKTUALIZACE PRŮBĚHU OPERACE
+// ==========================================
+
+function updateStatus() {
+
+    const count = PADS.filter(
+        pad => pasted[pad.id]
+    ).length;
+
+    document.getElementById(
+        "count"
+    ).textContent =
+        count + " / " + PADS.length;
+
+    document.getElementById(
+        "progressFill"
+    ).style.width =
+        (100 * count / PADS.length) + "%";
+
+    // Stav C3 a C4 samostatně.
+
+    ["C3", "C4"].forEach(component => {
+
+        const qty = PADS.filter(
+            pad =>
+                pad.component === component &&
+                pasted[pad.id]
+        ).length;
+
+        document.getElementById(
+            component.toLowerCase() + "Status"
+        ).textContent =
+            qty + " / 2 plošky";
+
+    });
+}
+
+
+// ==========================================
+// 8. PŘEPÍNÁNÍ PRACOVIŠTĚ / DPS
+// ==========================================
+
+function toggleView(board) {
+
+    document.getElementById(
+        "machineView"
+    ).classList.toggle(
+        "hidden",
+        board
+    );
+
+    document.getElementById(
+        "boardView"
+    ).classList.toggle(
+        "hidden",
+        !board
+    );
+}
+
+
+// ==========================================
+// 9. OVLÁDÁNÍ TLAČÍTEK
+// ==========================================
+
+// Otevření DPS.
+
+document.getElementById(
+    "openBoard"
+).addEventListener("click", () => {
+
+    toggleView(true);
+
+});
+
+
+// Návrat na pracoviště.
+
+document.getElementById(
+    "backMachine"
+).addEventListener("click", () => {
+
+    toggleView(false);
+
+});
+
+
+// ==========================================
+// 10. DOKONČENÍ NANÁŠENÍ PASTY
+// ==========================================
+
+document.getElementById(
+    "finish"
+).addEventListener("click", () => {
+
+    const count = PADS.filter(
+        pad => pasted[pad.id]
+    ).length;
+
+    // Všechny čtyři SMT plošky
+    // musí mít nanesenou pastu.
+
+    if (count < 4) {
+
+        const remaining = 4 - count;
+
+        alert(
+            "Ještě zbývá nanést pastu na " +
+            remaining +
+            (
+                remaining === 1
+                    ? " SMT plošku."
+                    : " SMT plošky."
+            )
+        );
+
+        toggleView(true);
+
+        return;
+    }
+
+    const confirmed = confirm(
+        "Dokončit nanášení pájecí pasty " +
+        "na stranu BOTTOM?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    // Uložení dokončené operace.
+
+    if (!persist(true)) {
+        return;
+    }
+
+    // Návrat do technologického postupu.
+
+    window.location.href = "tp.html";
+
+});
+
+
+// ==========================================
+// 11. SPUŠTĚNÍ HRY
+// ==========================================
+
+loadChoices();
+
+renderPads();
+
+updateStatus();
+
+</script>
+
+</body>
+</html>

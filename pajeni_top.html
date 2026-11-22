@@ -1,0 +1,1739 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>V.P.S. ELEKTRO | Selektivní pájení THT</title>
+
+<style>
+
+/* ==========================================
+   ZÁKLAD
+========================================== */
+
+* {
+    box-sizing:border-box;
+}
+
+html,body {
+    margin:0;
+    width:100%;
+    min-height:100%;
+}
+
+body {
+    min-height:100dvh;
+    font-family:"Trebuchet MS",Arial,sans-serif;
+    color:#f0f8f1;
+    background:linear-gradient(
+        135deg,
+        #101d18,
+        #244633
+    );
+}
+
+button {
+    font:inherit;
+    cursor:pointer;
+}
+
+button:disabled {
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.hidden {
+    display:none!important;
+}
+
+header {
+    text-align:center;
+    padding:10px 12px 6px;
+}
+
+header small {
+    color:#9ce5b2;
+    letter-spacing:2px;
+}
+
+h1 {
+    margin:6px 0;
+    font-size:clamp(20px,2.5vw,30px);
+}
+
+header p {
+    margin:4px 0;
+    font-size:12px;
+    color:#c6dccc;
+}
+
+/* ==========================================
+   ROZLOŽENÍ
+========================================== */
+
+main {
+    width:100%;
+    max-width:1500px;
+    margin:auto;
+    padding:8px 12px 16px;
+}
+
+.panel {
+    padding:13px;
+    background:#1b3426;
+    border:1px solid #577a62;
+    border-radius:11px;
+}
+
+.primary {
+    padding:11px 15px;
+    border:0;
+    border-radius:8px;
+    color:#10291b;
+    background:#98e5ac;
+    font-weight:bold;
+}
+
+.secondary {
+    padding:10px 14px;
+    border-radius:8px;
+    color:#f2faf3;
+    background:#2e5039;
+    border:1px solid #7caa89;
+}
+
+.muted {
+    color:#c6d8c9;
+    line-height:1.5;
+}
+
+/* ==========================================
+   ÚVOD
+========================================== */
+
+#intro {
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:20px;
+    align-items:center;
+}
+
+#intro img {
+    display:block;
+    width:100%;
+    max-height:65vh;
+    object-fit:contain;
+    border-radius:8px;
+}
+
+#intro h2 {
+    margin-top:0;
+}
+
+/* ==========================================
+   PRACOVNÍ PLOCHA
+========================================== */
+
+#work {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 270px;
+    gap:12px;
+}
+
+.work-left {
+    min-width:0;
+}
+
+.work-left h2 {
+    margin:0 0 5px;
+    font-size:18px;
+}
+
+.tip {
+    color:#c6d8c9;
+    font-size:12px;
+    line-height:1.5;
+}
+
+.board-outer {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    min-height:260px;
+    overflow:hidden;
+
+    margin-top:8px;
+    padding:8px;
+
+    background:#0d2016;
+    border:1px solid #567962;
+    border-radius:10px;
+}
+
+#board {
+    position:relative;
+
+    width:100%;
+    max-width:1000px;
+    aspect-ratio:897 / 537;
+
+    background:#729077;
+    border-radius:5px;
+    overflow:hidden;
+
+    box-shadow:0 7px 20px #0009;
+    touch-action:pan-y;
+}
+
+#board > img {
+    display:block;
+    width:100%;
+    height:100%;
+
+    pointer-events:none;
+    user-select:none;
+    -webkit-user-drag:none;
+}
+
+/* ==========================================
+   SMT KONDENZÁTORY C3 A C4
+========================================== */
+
+/*
+   KONDENZÁTORY PO REFLOW PÁJENÍ
+
+   Každý kondenzátor tvoří:
+
+   1) Dvě stříbrné plošky na DPS
+   2) Jedno keramické tělo
+   3) Dvě kovové koncovky
+
+   ŽÁDNÉ další překrývající se
+   stříbrné krytky.
+
+   Všechny souřadnice se počítají
+   z původního obrázku 897 × 537.
+*/
+
+#smtLayer {
+    position:absolute;
+    inset:0;
+    z-index:2;
+    pointer-events:none;
+}
+
+/* Dvojice lesklých pájených plošek */
+
+.smt-solder-pad {
+    position:absolute;
+    transform:translate(-50%,-50%);
+
+    border-radius:3px;
+
+    background:linear-gradient(
+        145deg,
+        #ffffff 0%,
+        #dde5e7 22%,
+        #adbcc3 48%,
+        #82949d 73%,
+        #cbd7db 100%
+    );
+
+    border:1px solid #d9e5e9;
+
+    box-shadow:
+        inset 0 1px 2px #ffffff,
+        inset 0 -1px 2px #647780,
+        0 1px 2px #0006;
+}
+
+/* Celek keramického kondenzátoru */
+
+.smt-cap {
+    position:absolute;
+
+    transform:translate(-50%,-50%);
+
+    pointer-events:none;
+
+    filter:drop-shadow(
+        1px 2px 2px #0007
+    );
+}
+
+/* Béžové keramické tělo */
+
+.smt-cap .ceramic {
+    position:absolute;
+
+    left:10%;
+    right:10%;
+    top:13%;
+    bottom:13%;
+
+    border-radius:2px;
+
+    background:linear-gradient(
+        90deg,
+        #978064 0%,
+        #c6ac87 20%,
+        #e1caa4 45%,
+        #cbb38c 75%,
+        #958067 100%
+    );
+
+    border:1px solid #a59070;
+
+    box-shadow:
+        inset 1px 0 2px #f4e2c6,
+        inset -1px 0 2px #79644e;
+}
+
+/*
+   Horní a spodní pokovení
+   je součástí kondenzátoru.
+
+   Nepřidáváme další fillet.
+*/
+
+.smt-cap .terminal {
+    position:absolute;
+
+    left:0;
+    width:100%;
+
+    height:21%;
+
+    border-radius:2px;
+
+    background:linear-gradient(
+        100deg,
+        #899ba1 0%,
+        #e9f1f3 28%,
+        #f9fcfd 48%,
+        #b0c0c7 72%,
+        #70858d 100%
+    );
+
+    border:1px solid #dbe6e9;
+
+    box-shadow:
+        inset 0 1px 2px #ffffff,
+        0 1px 2px #0006;
+}
+
+.smt-cap .terminal.top {
+    top:0;
+}
+
+.smt-cap .terminal.bottom {
+    bottom:0;
+}
+
+/* ==========================================
+   THT PÁJECÍ BODY
+========================================== */
+
+#pins {
+    position:absolute;
+    inset:0;
+    z-index:5;
+    pointer-events:none;
+}
+
+.pin {
+    position:absolute;
+    transform:translate(-50%,-50%);
+
+    width:4.25%;
+    aspect-ratio:1 / 1;
+
+    padding:0;
+    border:0;
+    background:transparent;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    pointer-events:auto;
+
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-tap-highlight-color:transparent;
+
+    cursor:crosshair;
+}
+
+/* Zlatá ploška */
+
+.pin .joint {
+    position:relative;
+    z-index:2;
+    display:block;
+
+    width:78%;
+    height:78%;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle at 50% 50%,
+        #29322e 0%,
+        #29322e 23%,
+        #8e7033 26%,
+        #f8da39 35%,
+        #e6b91d 60%,
+        #a97b1c 82%,
+        #d6aa2f 100%
+    );
+
+    border:1px solid #f6d848;
+
+    box-shadow:
+        inset 0 0 0 1px #aa8520,
+        0 1px 3px #0009;
+}
+
+/* Úzká nožička */
+
+.pin .joint::after {
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:13%;
+    height:47%;
+    min-width:2px;
+
+    border-radius:3px;
+
+    transform:
+        translate(-50%,-50%)
+        rotate(8deg);
+
+    background:linear-gradient(
+        90deg,
+        #52646b,
+        #f6fafb 45%,
+        #627078
+    );
+
+    box-shadow:0 1px 2px #0009;
+}
+
+/* Animace během pájení */
+
+.pin .ring {
+    position:absolute;
+    inset:0;
+
+    border:3px solid transparent;
+    border-radius:50%;
+
+    z-index:4;
+    pointer-events:none;
+}
+
+.pin.holding .ring {
+    border-color:#ffdc74;
+    border-left-color:transparent;
+    animation:spin .7s linear infinite;
+}
+
+.pin.holding .joint {
+    box-shadow:
+        0 0 13px #ffcf50,
+        inset 0 0 0 1px #ffdf87;
+}
+
+.pin.holding .joint::before {
+    content:"";
+
+    position:absolute;
+    inset:14%;
+    z-index:1;
+
+    border-radius:50%;
+    background:#ffd88b88;
+
+    animation:
+        meltPulse .4s ease-in-out
+        infinite alternate;
+}
+
+@keyframes spin {
+    to {
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes meltPulse {
+    from {
+        opacity:.25;
+        transform:scale(.75);
+    }
+
+    to {
+        opacity:.8;
+        transform:scale(1.2);
+    }
+}
+
+/* Správný THT spoj – stříbrný */
+
+.pin.good .joint {
+    background:radial-gradient(
+        circle at 28% 22%,
+        #ffffff,
+        #e7f0f3 17%,
+        #bdcbd2 39%,
+        #879aa5 65%,
+        #dce5e9 86%,
+        #637682 100%
+    );
+
+    border:1px solid #f5ffff;
+
+    box-shadow:
+        inset 0 1px 3px #fff,
+        0 1px 3px #0009;
+}
+
+/* Kulička cínu */
+
+.pin.ball .joint {
+    background:radial-gradient(
+        circle at 50% 50%,
+        #363c40 0 22%,
+        #f2d23b 26% 51%,
+        #c58e19 70%,
+        #e9bd33 100%
+    );
+
+    border:1px solid #f7d549;
+}
+
+.pin.ball .joint::before {
+    content:"";
+
+    position:absolute;
+    z-index:3;
+
+    left:50%;
+    top:50%;
+
+    width:57%;
+    height:57%;
+
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle at 30% 25%,
+        #ffffff,
+        #dce7e8 24%,
+        #8b9aa0 58%,
+        #3d4b52
+    );
+
+    box-shadow:1px 2px 3px #000a;
+}
+
+/* Přehřátý spoj */
+
+.pin.burnt .joint {
+    background:radial-gradient(
+        circle,
+        #423d36 0 23%,
+        #775e40 33%,
+        #3d3027 64%,
+        #1b1a1a 100%
+    );
+
+    border:1px solid #927052;
+
+    box-shadow:
+        inset 0 0 5px #000,
+        0 0 0 2px #5b3827,
+        0 2px 3px #0009;
+}
+
+.pin.burnt .joint::after {
+    background:#6f655d;
+}
+
+.pin.selected:not(.holding) .ring {
+    border-color:#f7f7f6;
+    animation:none;
+}
+
+/* ==========================================
+   ČASOMÍRA
+========================================== */
+
+#holdMeter {
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:8px;
+    align-items:center;
+    margin-top:12px;
+}
+
+.meter {
+    height:14px;
+    border:1px solid #68846e;
+    border-radius:12px;
+    background:#314b3b;
+    overflow:hidden;
+}
+
+#meterFill {
+    width:0%;
+    height:100%;
+    background:#df8d52;
+}
+
+#clock {
+    min-width:75px;
+    font-size:20px;
+    font-weight:bold;
+    font-variant-numeric:tabular-nums;
+    text-align:right;
+}
+
+/* ==========================================
+   LEGENDA A PANEL
+========================================== */
+
+.legend {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:12px 0;
+    font-size:12px;
+}
+
+.dot {
+    display:inline-block;
+    width:12px;
+    height:12px;
+    margin-right:4px;
+    border-radius:50%;
+}
+
+.dot.gold {background:#edca31}
+.dot.orange {background:#c19a64}
+.dot.silver {background:#cbd6db}
+.dot.black {background:#463630}
+
+.right {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.stat {
+    background:#263f30;
+    border:1px solid #547961;
+    border-radius:8px;
+    padding:9px;
+    font-size:12px;
+}
+
+.stat strong {
+    display:block;
+    margin-top:4px;
+    font-size:20px;
+}
+
+.status {
+    min-height:75px;
+    line-height:1.5;
+}
+
+.actions {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+}
+
+.right button {
+    width:100%;
+}
+
+@media (max-width:850px) {
+    #intro,#work {
+        grid-template-columns:1fr;
+    }
+
+    .right {
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .right .status,
+    .right #finishBtn,
+    .right .tip {
+        grid-column:1 / -1;
+    }
+}
+
+@media (max-width:480px) {
+    main {padding:4px}
+    .panel {padding:8px}
+    .right {grid-template-columns:1fr}
+    .pin {width:5.5%}
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <small>
+        V.P.S. ELEKTRO · VÝROBNÍ OPERACE 10
+    </small>
+
+    <h1>
+        Selektivní pájení THT – BOTTOM
+    </h1>
+
+    <p>
+        Podrž prst na pájecím bodu.
+        Výsledek závisí na době pájení.
+    </p>
+</header>
+
+<main>
+
+    <!-- ÚVOD -->
+
+    <section id="intro" class="panel">
+
+        <img
+            src="images/selektivka.jpg"
+            alt="ERSA VERSAFLOW ONE">
+
+        <div>
+
+            <h2>ERSA VERSAFLOW ONE</h2>
+
+            <p class="muted">
+                Deska již obsahuje SMT kondenzátory
+                C3 a C4 zapájené při předchozí
+                operaci reflow.
+            </p>
+
+            <p class="muted">
+                Nyní je potřeba zapájet
+                THT vývody na BOTTOM straně.
+            </p>
+
+            <p class="muted">
+                <b>Méně než 2 sekundy:</b>
+                kulička cínu.
+                <br>
+
+                <b>2 až 5 sekund:</b>
+                správný spoj.
+                <br>
+
+                <b>Více než 5 sekund:</b>
+                přehřátý spoj.
+            </p>
+
+            <button
+                id="startBtn"
+                class="primary"
+                type="button">
+                Spustit selektivní pájení →
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- PRACOVNÍ OBRAZOVKA -->
+
+    <section id="work" class="hidden">
+
+        <div class="panel work-left">
+
+            <h2>DPS – strana BOTTOM</h2>
+
+            <p class="tip">
+                Drž prst na kovovém vývodu.
+                Při správném pájení se ploška
+                změní na stříbrnou.
+            </p>
+
+            <div class="board-outer">
+
+                <div id="board">
+
+                    <img
+                        src="images/blikac_bot.png"
+                        alt="BOTTOM DPS"
+                        draggable="false">
+
+                    <!-- HOTOVÉ SMT -->
+                    <div id="smtLayer"></div>
+
+                    <!-- PÁJENÍ THT -->
+                    <div id="pins"></div>
+
+                </div>
+
+            </div>
+
+            <div id="holdMeter">
+
+                <div class="meter">
+                    <div id="meterFill"></div>
+                </div>
+
+                <span id="clock">0,0 s</span>
+
+            </div>
+
+            <div class="legend">
+
+                <span>
+                    <i class="dot gold"></i>
+                    Nezapájeno
+                </span>
+
+                <span>
+                    <i class="dot orange"></i>
+                    Kulička
+                </span>
+
+                <span>
+                    <i class="dot silver"></i>
+                    Správný spoj
+                </span>
+
+                <span>
+                    <i class="dot black"></i>
+                    Přehřátí
+                </span>
+
+            </div>
+
+            <div class="actions">
+
+                <button
+                    id="backBtn"
+                    class="secondary"
+                    type="button">
+                    ← Zpět ke stroji
+                </button>
+
+                <button
+                    id="resetBtn"
+                    class="secondary"
+                    type="button">
+                    Resetovat pájení
+                </button>
+
+            </div>
+
+        </div>
+
+        <aside class="panel right">
+
+            <div class="stat">
+                Zpracované body
+                <strong id="progress">0 / 39</strong>
+            </div>
+
+            <div class="stat">
+                Správné spoje
+                <strong id="goodCount">0</strong>
+            </div>
+
+            <div class="stat">
+                Kuličky cínu
+                <strong id="ballCount">0</strong>
+            </div>
+
+            <div class="stat">
+                Přehřáté spoje
+                <strong id="burntCount">0</strong>
+            </div>
+
+            <div
+                class="stat status"
+                id="message">
+                Přilož prst na pájecí bod.
+            </div>
+
+            <button
+                id="finishBtn"
+                class="primary"
+                type="button"
+                disabled>
+                Dokončit pájení THT →
+            </button>
+
+            <p class="tip">
+                Výsledky spojů se ukládají
+                pro závěrečnou funkční zkoušku.
+            </p>
+
+        </aside>
+
+    </section>
+
+</main>
+
+<script src="choices.js"></script>
+
+<script>
+"use strict";
+
+// ==========================================
+// 1. NASTAVENÍ
+// ==========================================
+
+const STEP_NAME = "pajeniTop";
+
+const BACKUP_KEY =
+    "vps_semafor_pajeni_top_data";
+
+const COMPLETE_KEY =
+    "vps_semafor_krok_10_dokonceno";
+
+const BOARD_W = 897;
+const BOARD_H = 537;
+
+const MIN_GOOD_MS = 2000;
+const MAX_GOOD_MS = 5000;
+
+
+// ==========================================
+// 2. THT PÁJECÍ BODY
+// ==========================================
+
+const GROUPS = {
+
+    U2: [
+        [381,38],[426,38],[471,38],[517,38],
+        [381,176],[426,176],[471,176],[517,176]
+    ],
+
+    U1: [
+        [386,363],[432,363],[477,363],[523,363],
+        [386,500],[432,500],[477,500],[523,500]
+    ],
+
+    C2: [
+        [282,74],[327,74]
+    ],
+
+    C1: [
+        [597,466],[642,466]
+    ],
+
+    D1: [
+        [180,246],[180,291]
+    ],
+
+    D2: [
+        [449,246],[449,291]
+    ],
+
+    D3: [
+        [718,246],[718,291]
+    ],
+
+    R5: [
+        [66,179],[66,361]
+    ],
+
+    R7: [
+        [309,183],[309,363]
+    ],
+
+    R8: [
+        [604,176],[604,361]
+    ],
+
+    R6: [
+        [678,361],[861,361]
+    ],
+
+    SW1: [
+        [821,38],[821,84],[821,128]
+    ],
+
+    BT1: [
+        [875,152],[875,513]
+    ]
+};
+
+
+// ==========================================
+// 3. SMT C3 A C4 – NOVÝ VZHLED
+// ==========================================
+
+/*
+   Kondenzátory jsou svislé.
+
+   solderOffset:
+     vzdálenost středu horní
+     a spodní stříbrné plošky
+     od středu kondenzátoru.
+
+   solderWidth / solderHeight:
+     rozměry pocínované plošky.
+
+   bodyWidth / bodyHeight:
+     rozměry celého kondenzátoru
+     včetně kovových koncovek.
+*/
+
+const SMT_CAPACITORS = [
+
+    {
+        id:"C3",
+
+        x:386,
+        y:431,
+
+        solderOffset:29,
+        solderWidth:32,
+        solderHeight:27,
+
+        bodyWidth:27,
+        bodyHeight:53
+    },
+
+    {
+        id:"C4",
+
+        x:517,
+        y:108,
+
+        solderOffset:29,
+        solderWidth:32,
+        solderHeight:27,
+
+        bodyWidth:27,
+        bodyHeight:53
+    }
+];
+
+
+// ==========================================
+// 4. SEZNAM VÝVODŮ
+// ==========================================
+
+const POINTS = Object.entries(GROUPS)
+    .flatMap(([group,positions]) => {
+
+        return positions.map(
+            ([x,y],index) => ({
+
+                id:group+"_"+(index+1),
+                group,
+                x,
+                y
+            })
+        );
+    });
+
+
+// ==========================================
+// 5. POMOCNÉ FUNKCE
+// ==========================================
+
+const $ = id =>
+    document.getElementById(id);
+
+function pct(value,max) {
+    return (value/max*100)+"%";
+}
+
+function cloneData(data) {
+    return JSON.parse(
+        JSON.stringify(data)
+    );
+}
+
+function readJSON(key) {
+
+    try {
+        return JSON.parse(
+            localStorage.getItem(key)||"null"
+        );
+
+    } catch(error) {
+        console.warn(error);
+        return null;
+    }
+}
+
+
+// ==========================================
+// 6. STAV HRY
+// ==========================================
+
+const joints = {};
+
+let active = null;
+let selected = null;
+
+
+// ==========================================
+// 7. NAČTENÍ ULOŽENÝCH SPOJŮ
+// ==========================================
+
+function loadState() {
+
+    let step = {};
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.getStep === "function"
+        ) {
+            step =
+                VPSChoices.getStep(STEP_NAME)||{};
+        }
+
+    } catch(error) {
+        console.warn(error);
+    }
+
+    const backup =
+        readJSON(BACKUP_KEY)||{};
+
+    const saved =
+        step.spoje||backup.spoje||{};
+
+    POINTS.forEach(point => {
+
+        const value =
+            saved[point.id];
+
+        if (
+            value &&
+            ["ball","good","burnt"].includes(
+                value.result
+            )
+        ) {
+
+            joints[point.id] = {
+
+                result:value.result,
+
+                durationMs:
+                    Number(value.durationMs)||0,
+
+                attempts:
+                    Number(value.attempts)||1
+            };
+        }
+    });
+}
+
+
+// ==========================================
+// 8. VYKRESLENÍ SMT KONDENZÁTORŮ
+// ==========================================
+
+function renderSMT() {
+
+    const layer = $("smtLayer");
+
+    layer.replaceChildren();
+
+    SMT_CAPACITORS.forEach(cap => {
+
+        // Horní a spodní pájecí ploška.
+
+        [-1,1].forEach(side => {
+
+            const pad =
+                document.createElement("span");
+
+            pad.className =
+                "smt-solder-pad";
+
+            pad.style.left =
+                pct(cap.x,BOARD_W);
+
+            pad.style.top =
+                pct(
+                    cap.y + side*cap.solderOffset,
+                    BOARD_H
+                );
+
+            pad.style.width =
+                pct(cap.solderWidth,BOARD_W);
+
+            pad.style.height =
+                pct(cap.solderHeight,BOARD_H);
+
+            layer.appendChild(pad);
+        });
+
+        // Jeden keramický kondenzátor.
+        // Dvě kovové koncovky.
+        // Žádné další překrývající krytky.
+
+        const component =
+            document.createElement("div");
+
+        component.className =
+            "smt-cap";
+
+        component.style.left =
+            pct(cap.x,BOARD_W);
+
+        component.style.top =
+            pct(cap.y,BOARD_H);
+
+        component.style.width =
+            pct(cap.bodyWidth,BOARD_W);
+
+        component.style.height =
+            pct(cap.bodyHeight,BOARD_H);
+
+        component.innerHTML = `
+            <span class="ceramic"></span>
+            <span class="terminal top"></span>
+            <span class="terminal bottom"></span>
+        `;
+
+        component.title =
+            cap.id+" – zapájeno po reflow";
+
+        layer.appendChild(component);
+    });
+}
+
+
+// ==========================================
+// 9. KONTROLA THT SPOJŮ
+// ==========================================
+
+function evaluate() {
+
+    const issues = [];
+
+    let good=0;
+    let ball=0;
+    let burnt=0;
+    let done=0;
+
+    POINTS.forEach(point => {
+
+        const result =
+            joints[point.id]?.result;
+
+        if (result) {
+            done++;
+        }
+
+        if (result==="good") {
+            good++;
+
+        } else if (result==="ball") {
+            ball++;
+            issues.push(
+                "COLD_JOINT_"+point.id
+            );
+
+        } else if (result==="burnt") {
+            burnt++;
+            issues.push(
+                "OVERHEATED_"+point.id
+            );
+
+        } else {
+            issues.push(
+                "UNSOLDERED_"+point.id
+            );
+        }
+    });
+
+    return {
+        passed:issues.length===0,
+        status:issues.length===0
+            ?"passed":"failed",
+        issues,
+        zpracovano:done,
+        celkem:POINTS.length,
+        dobre:good,
+        kulicky:ball,
+        prehrate:burnt
+    };
+}
+
+
+// ==========================================
+// 10. UKLÁDÁNÍ
+// ==========================================
+
+function saveState(done=false) {
+
+    const data = {
+        dokonceno:done,
+        spoje:cloneData(joints),
+        kontrola:evaluate()
+    };
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.saveStep === "function"
+        ) {
+
+            const saved =
+                VPSChoices.saveStep(
+                    STEP_NAME,data
+                );
+
+            if (saved===false) {
+                throw new Error(
+                    "Uložení selhalo."
+                );
+            }
+        }
+
+        localStorage.setItem(
+            BACKUP_KEY,
+            JSON.stringify(data)
+        );
+
+        if (done) {
+            localStorage.setItem(
+                COMPLETE_KEY,"true"
+            );
+        } else {
+            localStorage.removeItem(
+                COMPLETE_KEY
+            );
+        }
+
+        return true;
+
+    } catch(error) {
+
+        console.error(error);
+
+        alert(
+            "Nepodařilo se uložit pájení."
+        );
+
+        return false;
+    }
+}
+
+
+// ==========================================
+// 11. VYKRESLENÍ THT BODŮ
+// ==========================================
+
+function renderPins() {
+
+    const layer = $("pins");
+    layer.replaceChildren();
+
+    POINTS.forEach(point => {
+
+        const button =
+            document.createElement("button");
+
+        button.type="button";
+        button.className="pin";
+
+        button.dataset.id=point.id;
+
+        button.style.left=
+            pct(point.x,BOARD_W);
+
+        button.style.top=
+            pct(point.y,BOARD_H);
+
+        button.title=
+            point.id+" – podrž prst";
+
+        button.setAttribute(
+            "aria-label",
+            "Pájecí bod "+point.id
+        );
+
+        button.innerHTML=`
+            <span class="joint"></span>
+            <span class="ring"></span>
+        `;
+
+        const result=
+            joints[point.id]?.result;
+
+        if (result) {
+            button.classList.add(result);
+        }
+
+        if (selected===point.id) {
+            button.classList.add("selected");
+        }
+
+        button.addEventListener(
+            "pointerdown",
+            event=>beginHold(
+                event,point.id,button
+            )
+        );
+
+        button.addEventListener(
+            "pointerup",
+            event=>endHold(event,false)
+        );
+
+        button.addEventListener(
+            "pointercancel",
+            event=>endHold(event,true)
+        );
+
+        button.addEventListener(
+            "lostpointercapture",
+            event=>endHold(event,true)
+        );
+
+        button.addEventListener(
+            "contextmenu",
+            event=>event.preventDefault()
+        );
+
+        layer.appendChild(button);
+    });
+}
+
+
+// ==========================================
+// 12. ZAČÁTEK PÁJENÍ
+// ==========================================
+
+function beginHold(event,id,button) {
+
+    if (
+        active ||
+        !event.isPrimary ||
+        event.button>0
+    ) return;
+
+    event.preventDefault();
+
+    selected=id;
+
+    active={
+        id,
+        button,
+        pointerId:event.pointerId,
+        start:performance.now(),
+        frame:null
+    };
+
+    button.classList.add(
+        "holding","selected"
+    );
+
+    try {
+        button.setPointerCapture(
+            event.pointerId
+        );
+    } catch(error) {
+        console.warn(error);
+    }
+
+    $("message").textContent=
+        "Pájení "+id+" – drž prst…";
+
+    updateMeter(0);
+
+    active.frame=
+        requestAnimationFrame(tick);
+}
+
+
+// ==========================================
+// 13. ANIMACE
+// ==========================================
+
+function tick(now) {
+
+    if (!active) return;
+
+    updateMeter(
+        now-active.start
+    );
+
+    active.frame=
+        requestAnimationFrame(tick);
+}
+
+
+// ==========================================
+// 14. ČASOMÍRA
+// ==========================================
+
+function updateMeter(ms) {
+
+    $("clock").textContent=
+        (Math.max(0,ms)/1000)
+        .toFixed(1)
+        .replace(".",",")+" s";
+
+    const meter=$("meterFill");
+
+    meter.style.width=
+        Math.min(ms/6000*100,100)+"%";
+
+    if (ms<MIN_GOOD_MS) {
+        meter.style.background="#df9452";
+
+    } else if (ms<=MAX_GOOD_MS) {
+        meter.style.background="#8fdfa7";
+
+    } else {
+        meter.style.background="#49332e";
+    }
+}
+
+
+// ==========================================
+// 15. KONEC PÁJENÍ
+// ==========================================
+
+function endHold(event,cancelled=false) {
+
+    if (
+        !active ||
+        active.pointerId!==event.pointerId
+    ) return;
+
+    const session=active;
+
+    const durationMs=Math.max(
+        0,
+        performance.now()-session.start
+    );
+
+    active=null;
+
+    cancelAnimationFrame(
+        session.frame
+    );
+
+    session.button.classList.remove(
+        "holding"
+    );
+
+    try {
+        if (
+            session.button.hasPointerCapture(
+                event.pointerId
+            )
+        ) {
+            session.button.releasePointerCapture(
+                event.pointerId
+            );
+        }
+    } catch(error) {
+        console.warn(error);
+    }
+
+    if (cancelled) {
+
+        $("message").textContent=
+            "Pájení přerušeno.";
+
+        updateMeter(0);
+        renderPins();
+        return;
+    }
+
+    let result;
+
+    if (durationMs<MIN_GOOD_MS) {
+        result="ball";
+
+    } else if (durationMs<=MAX_GOOD_MS) {
+        result="good";
+
+    } else {
+        result="burnt";
+    }
+
+    const previousAttempts=
+        joints[session.id]?.attempts||0;
+
+    joints[session.id]={
+        result,
+        durationMs:Math.round(durationMs),
+        attempts:previousAttempts+1
+    };
+
+    saveState(false);
+
+    let description;
+
+    if (result==="good") {
+        description=
+            "Správný stříbrný spoj.";
+
+    } else if (result==="ball") {
+        description=
+            "Kulička cínu – příliš krátce.";
+
+    } else {
+        description=
+            "Přehřátý spoj – příliš dlouho.";
+    }
+
+    $("message").textContent=
+        session.id+": "+description+
+        " Doba "+
+        (durationMs/1000)
+        .toFixed(1)
+        .replace(".",",")+" s.";
+
+    renderPins();
+    updateCounters();
+}
+
+
+// ==========================================
+// 16. STATISTIKY
+// ==========================================
+
+function updateCounters() {
+
+    const state=evaluate();
+
+    $("progress").textContent=
+        state.zpracovano+
+        " / "+state.celkem;
+
+    $("goodCount").textContent=
+        state.dobre;
+
+    $("ballCount").textContent=
+        state.kulicky;
+
+    $("burntCount").textContent=
+        state.prehrate;
+
+    $("finishBtn").disabled=
+        state.zpracovano!==state.celkem;
+}
+
+
+// ==========================================
+// 17. TLAČÍTKA
+// ==========================================
+
+$("startBtn").addEventListener(
+    "click",()=>{
+        $("intro").classList.add("hidden");
+        $("work").classList.remove("hidden");
+
+        renderSMT();
+        renderPins();
+        updateCounters();
+    }
+);
+
+$("backBtn").addEventListener(
+    "click",()=>{
+        if (active) return;
+
+        $("work").classList.add("hidden");
+        $("intro").classList.remove("hidden");
+    }
+);
+
+$("resetBtn").addEventListener(
+    "click",()=>{
+
+        if (active) return;
+
+        if (!confirm(
+            "Resetovat všechny THT pájecí spoje?"
+        )) return;
+
+        Object.keys(joints).forEach(
+            key=>delete joints[key]
+        );
+
+        selected=null;
+
+        saveState(false);
+
+        renderPins();
+        updateCounters();
+        updateMeter(0);
+
+        $("message").textContent=
+            "Pájení bylo resetováno.";
+    }
+);
+
+$("finishBtn").addEventListener(
+    "click",()=>{
+
+        if (active) return;
+
+        const result=evaluate();
+
+        if (
+            result.zpracovano!==result.celkem
+        ) {
+            alert(
+                "Nejprve zapájej všechny body."
+            );
+            return;
+        }
+
+        if (!confirm(
+            "Dokončit selektivní pájení?\n\n"+
+            "Výsledky budou uloženy "+
+            "pro závěrečnou zkoušku."
+        )) return;
+
+        if (!saveState(true)) return;
+
+        window.location.href="tp.html";
+    }
+);
+
+
+// ==========================================
+// 18. SPUŠTĚNÍ
+// ==========================================
+
+loadState();
+renderSMT();
+renderPins();
+updateCounters();
+
+</script>
+</body>
+</html>

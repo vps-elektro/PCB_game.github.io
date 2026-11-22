@@ -1,0 +1,2760 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>V.P.S. ELEKTRO | Osazení BOTTOM</title>
+
+<style>
+
+/* ==========================================
+   ZÁKLADNÍ NASTAVENÍ
+========================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    color: white;
+
+    background: linear-gradient(
+        135deg,
+        #101d18,
+        #244633
+    );
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+}
+
+button:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 3px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   KOMPAKTNÍ HLAVIČKA
+========================================== */
+
+header {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 10px 15px 6px;
+}
+
+.eyebrow {
+    color: #91dba8;
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+h1 {
+    font-size: clamp(19px, 2vw, 25px);
+    margin: 5px 0;
+}
+
+.intro {
+    color: #d0e3d5;
+    font-size: 12px;
+    line-height: 1.35;
+    margin: 0;
+}
+
+/* ==========================================
+   HLAVNÍ ROZLOŽENÍ
+========================================== */
+
+.layout {
+    flex: 1;
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr) 275px;
+
+    gap: 12px;
+
+    width: 100%;
+    max-width: 1600px;
+
+    margin: 0 auto;
+
+    padding: 6px 14px 12px;
+
+    align-items: stretch;
+}
+
+.panel {
+    min-width: 0;
+    min-height: 0;
+
+    padding: 12px;
+
+    background: #1b3425;
+
+    border: 1px solid #567961;
+    border-radius: 14px;
+
+    overflow: hidden;
+}
+
+.panel h2 {
+    color: #91dba8;
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.helper {
+    color: #c5d8ca;
+
+    font-size: 12px;
+    line-height: 1.35;
+
+    margin: 5px 0 8px;
+}
+
+/* ==========================================
+   LEVÁ PRACOVNÍ ČÁST
+========================================== */
+
+.layout > section.panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* ==========================================
+   ÚVODNÍ NÁHLED FOXU
+========================================== */
+
+#machineView {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    min-height: 0;
+}
+
+#machineView h2 {
+    align-self: flex-start;
+}
+
+.machine-image {
+    display: block;
+
+    max-width: 100%;
+    max-height: 65vh;
+
+    width: auto;
+    height: auto;
+
+    min-height: 0;
+
+    object-fit: contain;
+
+    border: 1px solid #73917b;
+    border-radius: 10px;
+}
+
+#machineView .helper {
+    margin-top: 12px;
+    align-self: stretch;
+}
+
+#machineView .primary {
+    margin-top: 10px;
+    max-width: 360px;
+}
+
+/* ==========================================
+   PRACOVNÍ PLOCHA DPS
+========================================== */
+
+#boardView:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+
+    width: 100%;
+
+    min-height: 0;
+}
+
+#boardView > h2,
+#boardView > .helper {
+    flex-shrink: 0;
+}
+
+/* KONTEJNER DPS */
+
+.board-scroll {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+
+    width: 100%;
+
+    padding: 6px;
+
+    background: #11241a;
+
+    border: 1px solid #5a7d62;
+    border-radius: 11px;
+
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*
+    DPS má rozměry 897 × 537.
+
+    Procentuální umístění plošek
+    zůstává stále stejné.
+
+    Zachováváme poměr stran 897:537.
+*/
+
+.board-stage {
+    position: relative;
+
+    height: 100%;
+    width: auto;
+
+    max-width: 100%;
+
+    aspect-ratio: 897 / 537;
+
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    line-height: 0;
+
+    border-radius: 5px;
+
+    background: #738e78;
+}
+
+.board-stage img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: fill;
+
+    user-select: none;
+    -webkit-user-select: none;
+
+    pointer-events: none;
+}
+
+/* ==========================================
+   PÁJECÍ PASTA Z PŘEDCHOZÍ OPERACE
+========================================== */
+
+.paste-pad {
+    position: absolute;
+    z-index: 2;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 2px;
+
+    pointer-events: none;
+}
+
+.paste-pad.pasted {
+    background: linear-gradient(
+        120deg,
+        #dce0dd,
+        #979f9d
+    );
+
+    border: 1px solid #777f7c;
+
+    box-shadow:
+        inset 0 0 3px #4a5553,
+        0 1px 3px #1e2725;
+}
+
+/* ==========================================
+   CÍLOVÉ POZICE C3 A C4
+========================================== */
+
+.component-target {
+    position: absolute;
+    z-index: 4;
+
+    transform: translate(-50%, -50%);
+
+    border: 2px dashed rgba(235,255,237,0.95);
+    border-radius: 6px;
+
+    background: rgba(125,230,149,0.07);
+
+    padding: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    touch-action: manipulation;
+}
+
+.component-target.drag-over {
+    background: rgba(255,215,90,0.3);
+
+    border: 3px solid #ffdf83;
+
+    box-shadow: 0 0 17px #f7d66b;
+}
+
+.component-target .target-name {
+    position: absolute;
+
+    top: -23px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    padding: 5px 8px;
+
+    border-radius: 5px;
+
+    color: white;
+
+    background: rgba(10,35,19,0.86);
+
+    font-size: 12px;
+    line-height: 1;
+
+    font-weight: bold;
+
+    pointer-events: none;
+}
+
+.component-target.occupied {
+    border-color: rgba(245,245,245,0.3);
+    background: transparent;
+}
+
+.component-target.selected {
+    outline: 2px solid #f4d47e;
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   OSazená SOUČÁSTKA NA DPS
+========================================== */
+
+.placed-component {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 30%;
+    height: 54%;
+
+    min-width: 10px;
+
+    border-radius: 3px;
+
+    background: #c4a57a;
+
+    border-top: 5px solid #c4c9cb;
+    border-bottom: 5px solid #c4c9cb;
+
+    box-shadow:
+        0 3px 5px #1b2925a8,
+        inset 0 0 4px #554635;
+
+    pointer-events: none;
+}
+
+.placed-component.resistor {
+    background: #252629;
+}
+
+.placed-component.capacitor {
+    background: #c4a57a;
+}
+
+.placed-component.inductor {
+    background: #325a82;
+}
+
+.placed-component.semiconductor {
+    background: #17191c;
+}
+
+/* ==========================================
+   KOMPAKTNÍ PODAVAČE POD DPS
+========================================== */
+
+.feeders-section {
+    flex-shrink: 0;
+
+    margin-top: 8px;
+    padding: 9px;
+
+    background: #253c2c;
+
+    border: 1px solid #5a7c62;
+    border-radius: 10px;
+}
+
+.feeders-title {
+    color: #91dba8;
+
+    font-size: 15px;
+
+    margin: 0 0 3px;
+}
+
+.feeders-section .helper {
+    font-size: 11px;
+    line-height: 1.25;
+    margin: 3px 0;
+}
+
+.feeders-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+
+    margin-top: 7px;
+}
+
+.feeder {
+    min-width: 0;
+
+    padding: 7px;
+
+    border: 1px solid #6c9073;
+    border-radius: 8px;
+
+    background: #314d38;
+
+    text-align: center;
+}
+
+.feeder-number {
+    color: #9de6b1;
+
+    font-size: 13px;
+    font-weight: bold;
+
+    margin-bottom: 4px;
+}
+
+.feeder-display {
+    padding: 5px;
+    margin-bottom: 5px;
+
+    border-radius: 5px;
+
+    background: #071a10;
+
+    border: 2px solid #506657;
+}
+
+.feeder-display-label {
+    color: #7bbd90;
+
+    font-size: 9px;
+
+    margin-bottom: 2px;
+}
+
+.feeder-display-value {
+    color: #9bffb4;
+
+    font: bold 11px Consolas, monospace;
+
+    overflow-wrap: anywhere;
+}
+
+.feeder-material {
+    min-height: 0;
+
+    font-size: 10px;
+    line-height: 1.2;
+
+    color: #d0e2d4;
+
+    margin-bottom: 5px;
+}
+
+/* ==========================================
+   STATICKÁ PÁSKA PODAVAČE
+========================================== */
+
+.feeder-tape {
+    display: flex;
+
+    gap: 3px;
+
+    padding: 3px;
+
+    margin-bottom: 6px;
+
+    background: #bfa985;
+
+    border-top: 3px dotted #695c49;
+    border-bottom: 3px dotted #695c49;
+}
+
+.feeder-pocket {
+    flex: 1;
+    min-width: 0;
+
+    height: 17px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #736652;
+
+    border: 1px solid #554d40;
+}
+
+/* ==========================================
+   SOUČÁSTKY V PODAVAČI
+========================================== */
+
+.part-icon {
+    display: inline-block;
+
+    flex-shrink: 0;
+
+    width: 24px;
+    height: 13px;
+
+    border-left: 5px solid #bdc2c4;
+    border-right: 5px solid #bdc2c4;
+
+    border-radius: 2px;
+
+    background: #25272a;
+}
+
+.part-icon.capacitor {
+    background: #c9ad82;
+}
+
+.part-icon.resistor {
+    background: #25272a;
+}
+
+.part-icon.inductor {
+    background: #345e88;
+}
+
+.part-icon.semiconductor {
+    background: #17191c;
+}
+
+.part-icon.empty {
+    background: transparent;
+    border: 1px dashed #b5ad9e;
+}
+
+.feeder-pocket .part-icon {
+    transform: scale(0.75);
+}
+
+/* ==========================================
+   PŘETAHOVATELNÉ SOUČÁSTKY
+========================================== */
+
+.feeder-part {
+    width: 100%;
+    min-height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    padding: 6px;
+
+    background: #447c51;
+
+    border: 2px solid #8dc99a;
+    border-radius: 8px;
+
+    color: white;
+
+    touch-action: none;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+
+    cursor: grab;
+}
+
+.feeder-part:active {
+    cursor: grabbing;
+}
+
+.feeder-part:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.feeder-part-label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.drag-ghost {
+    position: fixed;
+
+    z-index: 1000;
+
+    pointer-events: none;
+
+    opacity: 0.95;
+
+    transform: translate(-50%, -50%);
+
+    width: max-content;
+    max-width: 175px;
+
+    box-shadow: 0 10px 25px #0008;
+}
+
+.dragging {
+    opacity: 0.35;
+}
+
+/* ==========================================
+   PRAVÝ PANEL – OSÁZECÍ PŘEDPIS
+========================================== */
+
+.right-panel {
+    position: static;
+
+    height: 100%;
+    min-height: 0;
+
+    overflow-y: auto;
+}
+
+.right-panel .helper {
+    font-size: 12px;
+}
+
+.recipe-card {
+    padding: 10px;
+
+    margin-bottom: 7px;
+
+    border: 1px solid #5f8467;
+    border-radius: 9px;
+
+    background: #294833;
+}
+
+.recipe-card h3 {
+    color: #a9e9b8;
+
+    margin: 0 0 5px;
+
+    font-size: 16px;
+}
+
+.recipe-value {
+    color: white;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+}
+
+.recipe-status {
+    color: #d0e1d4;
+
+    font-size: 11px;
+}
+
+.recipe-card.done {
+    border-color: #91daa5;
+}
+
+.progress-track {
+    height: 12px;
+
+    margin: 9px 0;
+
+    border-radius: 15px;
+
+    background: #344d3a;
+
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0;
+
+    background: #8bdba5;
+
+    transition: width 0.2s;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 9px;
+
+    color: #d7e9dc;
+
+    font-size: 12px;
+}
+
+.status-row strong {
+    color: #9ee5b1;
+}
+
+/* ==========================================
+   TLAČÍTKA
+========================================== */
+
+.primary {
+    width: 100%;
+
+    padding: 11px 9px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #8bdba5;
+    color: #10291b;
+
+    font-size: 13px;
+    font-weight: bold;
+
+    margin-top: 9px;
+}
+
+.primary:hover {
+    background: #b1f2c5;
+}
+
+.primary:disabled {
+    background: #66836c;
+    color: #c8d4ca;
+
+    cursor: not-allowed;
+}
+
+.secondary {
+    padding: 9px 12px;
+
+    border: 1px solid #77a883;
+    border-radius: 8px;
+
+    background: #2a5036;
+    color: white;
+
+    font-size: 12px;
+}
+
+.secondary:hover {
+    background: #376b45;
+}
+
+.right-panel .secondary {
+    width: 100%;
+    margin-top: 8px;
+}
+
+#backMachine {
+    flex-shrink: 0;
+
+    margin-top: 7px !important;
+
+    padding: 7px 12px;
+}
+
+/* ==========================================
+   UPOZORNĚNÍ
+========================================== */
+
+.warning {
+    padding: 10px;
+
+    border: 1px solid #a68757;
+    border-radius: 8px;
+
+    background: #57462a;
+    color: #ffe3ba;
+
+    font-size: 11px;
+    line-height: 1.4;
+
+    margin-top: 9px;
+}
+
+.hint {
+    color: #b3ceba;
+
+    font-size: 11px;
+    line-height: 1.35;
+
+    margin-top: 9px;
+}
+
+/* Patička nezabírá výšku */
+
+footer {
+    display: none;
+}
+
+/* ==========================================
+   TABLET NA ŠÍŘKU
+========================================== */
+
+@media (max-width: 1100px)
+       and (orientation: landscape) {
+
+    .layout {
+        grid-template-columns:
+            minmax(0,1fr) 230px;
+
+        gap: 8px;
+
+        padding: 4px 8px 8px;
+    }
+
+    header {
+        padding: 5px;
+    }
+
+    header h1 {
+        font-size: 19px;
+    }
+
+    .intro {
+        font-size: 11px;
+    }
+
+    .panel {
+        padding: 8px;
+    }
+
+    .feeders-section {
+        padding: 6px;
+    }
+
+    .feeder {
+        padding: 5px;
+    }
+
+    .feeder-tape {
+        display: none;
+    }
+
+    .right-panel .hint {
+        display: none;
+    }
+}
+
+/* ==========================================
+   VELMI NÍZKÉ OBRAZOVKY
+========================================== */
+
+@media (max-height: 750px)
+       and (orientation: landscape) {
+
+    header {
+        padding: 4px 10px;
+    }
+
+    header h1 {
+        font-size: 18px;
+        margin: 3px 0;
+    }
+
+    .layout {
+        padding-top: 3px;
+        padding-bottom: 5px;
+    }
+
+    .panel {
+        padding: 7px;
+    }
+
+    .panel h2 {
+        font-size: 16px;
+    }
+
+    .feeders-section {
+        margin-top: 5px;
+        padding: 5px;
+    }
+
+    .feeders-title {
+        font-size: 13px;
+    }
+
+    .feeders-section .helper {
+        display: none;
+    }
+
+    .feeders-grid {
+        margin-top: 4px;
+    }
+
+    .feeder-tape {
+        display: none;
+    }
+
+    .feeder-display {
+        margin-bottom: 3px;
+    }
+
+    .feeder-material {
+        margin-bottom: 3px;
+    }
+
+    .feeder-part {
+        min-height: 32px;
+        padding: 4px;
+    }
+
+    #backMachine {
+        padding: 5px;
+    }
+}
+
+/* ==========================================
+   TABLETY NA VÝŠKU A TELEFONY
+========================================== */
+
+@media (orientation: portrait),
+       (max-width: 650px) {
+
+    body {
+        height: auto;
+        min-height: 100dvh;
+
+        overflow-y: auto;
+    }
+
+    .layout {
+        flex: none;
+
+        grid-template-columns: 1fr;
+
+        height: auto;
+        min-height: 0;
+
+        padding: 8px;
+    }
+
+    .panel {
+        overflow: visible;
+    }
+
+    #boardView:not(.hidden) {
+        display: flex;
+    }
+
+    .board-scroll {
+        flex: none;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        justify-content: flex-start;
+    }
+
+    .board-stage {
+        width: 100%;
+        min-width: 600px;
+        height: auto;
+
+        aspect-ratio: 897 / 537;
+    }
+
+    .right-panel {
+        height: auto;
+        overflow: visible;
+    }
+
+    .feeders-grid {
+        gap: 6px;
+    }
+
+    .feeder {
+        padding: 6px;
+    }
+
+    .feeder-part {
+        flex-direction: column;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ======================================
+     HLAVIČKA
+====================================== -->
+
+<header>
+
+    <p class="eyebrow">
+        V.P.S. ELEKTRO · VÝROBNÍ OPERACE 04
+    </p>
+
+    <h1>Osazení DPS – BOTTOM</h1>
+
+    <p class="intro">
+        Odeberte součástky z podavačů stroje FOX
+        a umístěte je na správné pozice DPS.
+    </p>
+
+</header>
+
+<main class="layout">
+
+    <!-- ==================================
+         LEVÁ PRACOVNÍ PLOCHA
+    ================================== -->
+
+    <section class="panel">
+
+        <!-- NÁHLED FOXU -->
+
+        <div id="machineView">
+
+            <h2>Osazovací stroj FOX</h2>
+
+            <img
+                class="machine-image"
+                src="images/osazovaky.jpg"
+                alt="Osazovací stroj FOX"
+            >
+
+            <p class="helper">
+                Deska plošných spojů je připravena
+                pro osazování strany BOTTOM.
+                Otevřete pracovní plochu
+                a odebírejte součástky z podavačů.
+            </p>
+
+            <button
+                class="primary"
+                type="button"
+                id="openBoard">
+                Zahájit osazování →
+            </button>
+
+        </div>
+
+        <!-- ==================================
+             PRACOVNÍ PLOCHA DPS
+        ================================== -->
+
+        <div id="boardView" class="hidden">
+
+            <h2>DPS – strana BOTTOM</h2>
+
+            <p class="helper">
+                Přetáhněte součástku z podavače
+                na odpovídající místo na DPS.
+                Na ploškách je zobrazena pájecí pasta
+                nanesená v předchozí operaci.
+            </p>
+
+            <!-- DPS -->
+
+            <div class="board-scroll">
+
+                <div
+                    class="board-stage"
+                    id="boardStage">
+
+                    <img
+                        src="images/blikac_bot.png"
+                        alt="DPS BOTTOM s pájecí pastou"
+                        draggable="false"
+                    >
+
+                    <div id="pasteLayer"></div>
+
+                    <div id="componentsLayer"></div>
+
+                </div>
+
+            </div>
+
+            <!-- ==================================
+                 PODAVAČE POD DPS
+            ================================== -->
+
+            <div class="feeders-section">
+
+                <h3 class="feeders-title">
+                    Podavače osazovacího stroje FOX
+                </h3>
+
+                <p class="helper">
+                    Přetáhněte součástku z podavače
+                    přímo na DPS.
+                    Podavače obsahují skutečně
+                    založený materiál.
+                </p>
+
+                <div
+                    class="feeders-grid"
+                    id="feedersGrid">
+                </div>
+
+            </div>
+
+            <button
+                class="secondary"
+                id="backMachine"
+                type="button">
+                ← Zpět na náhled FOXu
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- ==================================
+         PRAVÝ PANEL
+    ================================== -->
+
+    <aside class="panel right-panel">
+
+        <h2>Osazovací předpis</h2>
+
+        <p class="helper">
+            Podle tohoto předpisu určete,
+            kam mají být součástky umístěny.
+        </p>
+
+        <!-- C3 -->
+
+        <div
+            class="recipe-card"
+            id="recipeC3">
+
+            <h3>C3</h3>
+
+            <p class="recipe-value">
+                MC01 – 100 nF
+            </p>
+
+            <p
+                class="recipe-status"
+                id="statusC3">
+                Neosazeno
+            </p>
+
+        </div>
+
+        <!-- C4 -->
+
+        <div
+            class="recipe-card"
+            id="recipeC4">
+
+            <h3>C4</h3>
+
+            <p class="recipe-value">
+                MC01 – 100 nF
+            </p>
+
+            <p
+                class="recipe-status"
+                id="statusC4">
+                Neosazeno
+            </p>
+
+        </div>
+
+        <div class="status-row">
+
+            <span>Osazené pozice</span>
+
+            <strong id="count">
+                0 / 2
+            </strong>
+
+        </div>
+
+        <div class="progress-track">
+
+            <div
+                class="progress-fill"
+                id="progressFill">
+            </div>
+
+        </div>
+
+        <!-- UPOZORNĚNÍ NA CHYBĚJÍCÍ PASTU -->
+
+        <div
+            class="warning"
+            id="pasteWarning"
+            style="display:none">
+
+            Pozor: Na některých pájecích ploškách
+            nebyla v předchozí operaci nanesena pasta.
+
+        </div>
+
+        <!-- ODEBRÁNÍ SOUČÁSTKY -->
+
+        <button
+            class="secondary"
+            id="removeComponent"
+            type="button">
+            Odebrat vybranou součástku
+        </button>
+
+        <!-- DOKONČENÍ -->
+
+        <button
+            class="primary"
+            id="finish"
+            type="button">
+            Dokončit osazení BOTTOM →
+        </button>
+
+        <p class="hint">
+            Po osazení obou pozic lze operaci dokončit.
+            Skutečně použité součástky se ukládají
+            do výrobní karty.
+        </p>
+
+    </aside>
+
+</main>
+
+<footer>
+    V.P.S. ELEKTRO s.r.o. |
+    Interaktivní výuková hra
+</footer>
+
+<!-- ======================================
+     CENTRÁLNÍ PAMĚŤ
+====================================== -->
+
+<script src="choices.js"></script>
+
+<script>
+"use strict";
+
+// ==========================================
+// 1. KLÍČE ÚLOŽIŠTĚ
+// ==========================================
+
+const STEP_NAME = "osazeniBottom";
+
+const COMPLETE_KEY =
+    "vps_semafor_krok_4_dokonceno";
+
+const BACKUP_KEY =
+    "vps_semafor_osazeni_bottom_data";
+
+const FEEDER_KEY =
+    "vps_semafor_podavace_data";
+
+const PASTE_KEY =
+    "vps_semafor_pasta_bottom_rozhodnuti";
+
+
+// ==========================================
+// 2. ROZMĚRY OTOČENÉ DPS
+// ==========================================
+
+const BOARD = {
+    width: 897,
+    height: 537
+};
+
+
+// ==========================================
+// 3. POLOHY PÁJECÍCH PLOŠEK
+// ==========================================
+
+// Stejné souřadnice jako v pasta_bottom.html.
+
+const PASTE_PADS = [
+
+    {
+        id: "C4_L",
+        x: 517,
+        y: 81,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C4_R",
+        x: 517,
+        y: 134,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C3_L",
+        x: 386,
+        y: 404,
+        w: 34,
+        h: 20
+    },
+
+    {
+        id: "C3_R",
+        x: 386,
+        y: 458,
+        w: 34,
+        h: 20
+    }
+
+];
+
+
+// ==========================================
+// 4. OSÁZECÍ POZICE
+// ==========================================
+
+const TARGETS = [
+
+    {
+        id: "C4",
+        x: 517,
+        y: 107.5,
+        w: 67,
+        h: 103,
+        expected: "MC01"
+    },
+
+    {
+        id: "C3",
+        x: 386,
+        y: 431,
+        w: 67,
+        h: 103,
+        expected: "MC01"
+    }
+
+];
+
+
+// ==========================================
+// 5. SMT MATERIÁLY
+// ==========================================
+
+const MATERIAL_VALUES = {
+
+    MR01:"100 Ω",
+    MR02:"1 kΩ",
+    MR03:"100 kΩ",
+    MR04:"220 Ω",
+    MR05:"470 Ω",
+    MR06:"2,2 kΩ",
+    MR07:"4,7 kΩ",
+    MR08:"22 kΩ",
+    MR09:"10 kΩ",
+    MR10:"47 kΩ",
+
+    MC01:"100 nF",
+    MC02:"10 nF",
+    MC03:"1 nF",
+    MC04:"220 nF",
+    MC05:"470 nF",
+    MC06:"1 µF",
+    MC07:"2,2 µF",
+    MC08:"4,7 µF",
+    MC09:"22 pF",
+    MC10:"10 µF",
+
+    MT01:"1 µH",
+    MT02:"2,2 µH",
+    MT03:"4,7 µH",
+    MT04:"10 µH",
+    MT05:"22 µH",
+    MT06:"47 µH",
+    MT07:"100 µH",
+    MT08:"220 µH",
+    MT09:"470 µH",
+    MT10:"1 mH",
+
+    MP01:"1N4148",
+    MP02:"1N4007",
+    MP03:"BAV99",
+    MP04:"BAT54",
+    MP05:"SS14",
+    MP06:"SS34",
+    MP07:"M7",
+    MP08:"BAS16",
+    MP09:"BZX84-C5V1",
+    MP10:"BZX84-C12",
+
+    MP11:"BC817",
+    MP12:"BC807",
+    MP13:"MMBT3904",
+    MP14:"MMBT3906",
+    MP15:"2N7002",
+    MP16:"BSS138",
+    MP17:"AO3400A",
+    MP18:"AO3401A",
+    MP19:"IRLML2502",
+    MP20:"IRLML6402",
+
+    MP22:"LM393",
+    MP24:"74HC14",
+    MP26:"CD4017",
+    MP28:"ATtiny85",
+    MP30:"ULN2003A"
+
+};
+
+
+// ==========================================
+// 6. STAV OSÁZENÍ
+// ==========================================
+
+let placedComponents = {};
+
+let pasteData = {};
+
+let feeders = {
+
+    software: {
+        1: "",
+        2: "",
+        3: ""
+    },
+
+    physical: {
+        1: "",
+        2: "",
+        3: ""
+    }
+
+};
+
+let selectedTarget = null;
+
+let dragSession = null;
+
+
+// ==========================================
+// 7. POMOCNÉ FUNKCE
+// ==========================================
+
+function materialLabel(code) {
+
+    if (!code) {
+        return "Nenabito";
+    }
+
+    return code + " – " +
+        (
+            MATERIAL_VALUES[code] ||
+            "Neznámá hodnota"
+        );
+}
+
+
+function materialType(code) {
+
+    if (/^MC(0[1-9]|10)$/.test(code)) {
+        return "capacitor";
+    }
+
+    if (/^MR(0[1-9]|10)$/.test(code)) {
+        return "resistor";
+    }
+
+    if (/^MT(0[1-9]|10)$/.test(code)) {
+        return "inductor";
+    }
+
+    return code
+        ? "semiconductor"
+        : "empty";
+}
+
+
+function percentage(value, maximum) {
+
+    return (value / maximum * 100) + "%";
+}
+
+
+function getStep(name) {
+
+    try {
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.getStep === "function"
+        ) {
+
+            return VPSChoices.getStep(name);
+        }
+
+    } catch (error) {
+
+        console.warn(error);
+    }
+
+    return null;
+}
+
+
+// ==========================================
+// 8. NAČTENÍ PÁJECÍ PASTY
+// ==========================================
+
+function loadPaste() {
+
+    const step = getStep("pastaBottom");
+
+    if (
+        step &&
+        step.rozhodnuti &&
+        typeof step.rozhodnuti === "object"
+    ) {
+
+        pasteData = {
+            ...step.rozhodnuti
+        };
+
+        return;
+    }
+
+    try {
+
+        const saved =
+            localStorage.getItem(PASTE_KEY);
+
+        pasteData = saved
+            ? JSON.parse(saved)
+            : {};
+
+    } catch (error) {
+
+        pasteData = {};
+    }
+}
+
+
+// ==========================================
+// 9. NAČTENÍ PODAVAČŮ
+// ==========================================
+
+function loadFeeders() {
+
+    const step = getStep("podavace");
+
+    if (step) {
+
+        if (step.softwareSlots) {
+
+            feeders.software = {
+                ...feeders.software,
+                ...step.softwareSlots
+            };
+        }
+
+        if (step.fyzickyMaterial) {
+
+            feeders.physical = {
+                ...feeders.physical,
+                ...step.fyzickyMaterial
+            };
+
+            return;
+        }
+    }
+
+    // Záložní úložiště.
+
+    try {
+
+        const saved =
+            localStorage.getItem(FEEDER_KEY);
+
+        if (!saved) {
+            return;
+        }
+
+        const data = JSON.parse(saved);
+
+        feeders.software = {
+            ...feeders.software,
+            ...(
+                data.softwareSlots ||
+                data.programAssignments ||
+                {}
+            )
+        };
+
+        feeders.physical = {
+            ...feeders.physical,
+            ...(
+                data.physicalSlots ||
+                data.physicalAssignments ||
+                {}
+            )
+        };
+
+    } catch (error) {
+
+        console.warn(error);
+    }
+}
+
+
+// ==========================================
+// 10. NAČTENÍ ULOŽENÉHO OSÁZENÍ
+// ==========================================
+
+function loadPlacement() {
+
+    const step = getStep(STEP_NAME);
+
+    if (
+        step &&
+        step.soucastky &&
+        typeof step.soucastky === "object"
+    ) {
+
+        placedComponents = {
+            ...step.soucastky
+        };
+
+        return;
+    }
+
+    try {
+
+        const saved =
+            localStorage.getItem(BACKUP_KEY);
+
+        if (saved) {
+
+            const data = JSON.parse(saved);
+
+            placedComponents =
+                data.soucastky || {};
+        }
+
+    } catch (error) {
+
+        console.warn(error);
+    }
+}
+
+
+// ==========================================
+// 11. ULOŽENÍ OSÁZENÍ
+// ==========================================
+
+function savePlacement(completed = false) {
+
+    try {
+
+        const data = {
+
+            dokonceno: completed,
+
+            soucastky: {
+                ...placedComponents
+            }
+
+        };
+
+        if (
+            typeof VPSChoices === "undefined" ||
+            typeof VPSChoices.saveStep !== "function"
+        ) {
+
+            throw new Error(
+                "Není dostupný choices.js."
+            );
+        }
+
+        const saved = VPSChoices.saveStep(
+            STEP_NAME,
+            data
+        );
+
+        if (saved === false) {
+
+            throw new Error(
+                "Výrobní kartu nelze uložit."
+            );
+        }
+
+        localStorage.setItem(
+            BACKUP_KEY,
+            JSON.stringify(data)
+        );
+
+        if (completed) {
+
+            localStorage.setItem(
+                COMPLETE_KEY,
+                "true"
+            );
+
+        } else {
+
+            localStorage.removeItem(
+                COMPLETE_KEY
+            );
+        }
+
+        return true;
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Osazení se nepodařilo uložit."
+        );
+
+        return false;
+    }
+}
+
+
+// ==========================================
+// 12. VYKRESLENÍ PÁJECÍ PASTY
+// ==========================================
+
+function renderPaste() {
+
+    const layer =
+        document.getElementById("pasteLayer");
+
+    layer.replaceChildren();
+
+    PASTE_PADS.forEach(pad => {
+
+        if (!pasteData[pad.id]) {
+            return;
+        }
+
+        const element =
+            document.createElement("div");
+
+        element.className =
+            "paste-pad pasted";
+
+        element.style.left =
+            percentage(pad.x, BOARD.width);
+
+        element.style.top =
+            percentage(pad.y, BOARD.height);
+
+        element.style.width =
+            percentage(pad.w, BOARD.width);
+
+        element.style.height =
+            percentage(pad.h, BOARD.height);
+
+        layer.appendChild(element);
+    });
+
+    const missing = PASTE_PADS.some(
+        pad => !pasteData[pad.id]
+    );
+
+    document.getElementById(
+        "pasteWarning"
+    ).style.display =
+        missing ? "block" : "none";
+}
+
+
+// ==========================================
+// 13. VYKRESLENÍ OSÁZECÍCH POZIC
+// ==========================================
+
+function renderTargets() {
+
+    const layer =
+        document.getElementById(
+            "componentsLayer"
+        );
+
+    layer.replaceChildren();
+
+    TARGETS.forEach(target => {
+
+        const zone =
+            document.createElement("button");
+
+        zone.type = "button";
+
+        zone.className =
+            "component-target";
+
+        zone.dataset.target = target.id;
+
+        zone.style.left =
+            percentage(target.x, BOARD.width);
+
+        zone.style.top =
+            percentage(target.y, BOARD.height);
+
+        zone.style.width =
+            percentage(target.w, BOARD.width);
+
+        zone.style.height =
+            percentage(target.h, BOARD.height);
+
+        const name =
+            document.createElement("span");
+
+        name.className = "target-name";
+
+        name.textContent = target.id;
+
+        zone.appendChild(name);
+
+        const placed =
+            placedComponents[target.id];
+
+        if (
+            placed &&
+            placed.material
+        ) {
+
+            zone.classList.add("occupied");
+
+            const component =
+                document.createElement("span");
+
+            component.className =
+                "placed-component " +
+                materialType(placed.material);
+
+            zone.appendChild(component);
+
+            zone.title =
+                target.id + ": " +
+                materialLabel(placed.material);
+
+        } else {
+
+            zone.title =
+                "Umístit součástku na " +
+                target.id;
+        }
+
+        if (selectedTarget === target.id) {
+
+            zone.classList.add("selected");
+        }
+
+        zone.addEventListener("click", () => {
+
+            selectedTarget = target.id;
+
+            renderTargets();
+            updateStatus();
+        });
+
+        layer.appendChild(zone);
+    });
+}
+
+
+// ==========================================
+// 14. VYTVOŘENÍ PÁSKY PODAVAČE
+// ==========================================
+
+function createFeederTape(code) {
+
+    const tape =
+        document.createElement("div");
+
+    tape.className = "feeder-tape";
+
+    for (let i = 0; i < 5; i++) {
+
+        const pocket =
+            document.createElement("div");
+
+        pocket.className =
+            "feeder-pocket";
+
+        const part =
+            document.createElement("span");
+
+        part.className =
+            "part-icon " +
+            materialType(code);
+
+        pocket.appendChild(part);
+
+        tape.appendChild(pocket);
+    }
+
+    return tape;
+}
+
+
+// ==========================================
+// 15. VYKRESLENÍ TŘÍ PODAVAČŮ
+// ==========================================
+
+function renderFeeders() {
+
+    const grid =
+        document.getElementById(
+            "feedersGrid"
+        );
+
+    grid.replaceChildren();
+
+    [1,2,3].forEach(slot => {
+
+        const card =
+            document.createElement("div");
+
+        card.className = "feeder";
+
+        // ČÍSLO PODAVAČE
+
+        const title =
+            document.createElement("div");
+
+        title.className =
+            "feeder-number";
+
+        title.textContent =
+            "Podavač " + slot;
+
+        // ==================================
+        // SW DISPLEJ
+        // ==================================
+
+        const display =
+            document.createElement("div");
+
+        display.className =
+            "feeder-display";
+
+        const displayLabel =
+            document.createElement("div");
+
+        displayLabel.className =
+            "feeder-display-label";
+
+        displayLabel.textContent =
+            "SW MATERIÁL";
+
+        const displayValue =
+            document.createElement("div");
+
+        displayValue.className =
+            "feeder-display-value";
+
+        displayValue.textContent =
+            materialLabel(
+                feeders.software[slot]
+            );
+
+        display.appendChild(
+            displayLabel
+        );
+
+        display.appendChild(
+            displayValue
+        );
+
+        // ==================================
+        // FYZICKY NABITÝ MATERIÁL
+        // ==================================
+
+        const code =
+            feeders.physical[slot] || "";
+
+        const actual =
+            document.createElement("div");
+
+        actual.className =
+            "feeder-material";
+
+        actual.textContent =
+            "Fyzicky: " +
+            materialLabel(code);
+
+        card.appendChild(title);
+        card.appendChild(display);
+        card.appendChild(actual);
+
+        card.appendChild(
+            createFeederTape(code)
+        );
+
+        // ==================================
+        // PŘETAHOVATELNÁ SOUČÁSTKA
+        // ==================================
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.className =
+            "feeder-part";
+
+        button.disabled = !code;
+
+        const icon =
+            document.createElement("span");
+
+        icon.className =
+            "part-icon " +
+            materialType(code);
+
+        const text =
+            document.createElement("span");
+
+        text.className =
+            "feeder-part-label";
+
+        text.textContent =
+            code || "Prázdný";
+
+        button.appendChild(icon);
+        button.appendChild(text);
+
+        if (code) {
+
+            button.addEventListener(
+                "pointerdown",
+                event => {
+
+                    beginDrag(
+                        event,
+                        code,
+                        slot,
+                        button
+                    );
+                }
+            );
+        }
+
+        card.appendChild(button);
+
+        grid.appendChild(card);
+    });
+}
+
+
+// ==========================================
+// 16. ZAČÁTEK PŘETAHOVÁNÍ
+// ==========================================
+
+function beginDrag(
+    event,
+    code,
+    slot,
+    element
+) {
+
+    if (
+        dragSession ||
+        !event.isPrimary ||
+        event.button > 0
+    ) {
+        return;
+    }
+
+    event.preventDefault();
+
+    dragSession = {
+
+        pointerId: event.pointerId,
+
+        code: code,
+
+        slot: slot,
+
+        source: element,
+
+        startX: event.clientX,
+
+        startY: event.clientY,
+
+        ghost: null,
+
+        moved: false
+
+    };
+
+    try {
+
+        element.setPointerCapture(
+            event.pointerId
+        );
+
+    } catch (error) {
+
+        console.warn(error);
+    }
+}
+
+
+// ==========================================
+// 17. POHYB PRSTU / MYŠI
+// ==========================================
+
+function moveDrag(event) {
+
+    if (
+        !dragSession ||
+        dragSession.pointerId !== event.pointerId
+    ) {
+        return;
+    }
+
+    const dx =
+        event.clientX - dragSession.startX;
+
+    const dy =
+        event.clientY - dragSession.startY;
+
+    if (
+        !dragSession.moved &&
+        Math.hypot(dx,dy) > 7
+    ) {
+
+        dragSession.moved = true;
+
+        const ghost =
+            dragSession.source.cloneNode(true);
+
+        ghost.disabled = false;
+
+        ghost.classList.add(
+            "drag-ghost"
+        );
+
+        document.body.appendChild(ghost);
+
+        dragSession.ghost = ghost;
+
+        dragSession.source.classList.add(
+            "dragging"
+        );
+    }
+
+    if (!dragSession.moved) {
+        return;
+    }
+
+    event.preventDefault();
+
+    if (dragSession.ghost) {
+
+        dragSession.ghost.style.left =
+            event.clientX + "px";
+
+        dragSession.ghost.style.top =
+            event.clientY + "px";
+    }
+
+    // Odebrání starých zvýraznění.
+
+    document.querySelectorAll(
+        ".component-target"
+    ).forEach(zone => {
+
+        zone.classList.remove(
+            "drag-over"
+        );
+    });
+
+    // Vyhledání cílové pozice pod prstem.
+
+    const element =
+        document.elementFromPoint(
+            event.clientX,
+            event.clientY
+        );
+
+    const target =
+        element?.closest(
+            "[data-target]"
+        );
+
+    if (target) {
+
+        target.classList.add(
+            "drag-over"
+        );
+    }
+}
+
+
+// ==========================================
+// 18. UVOLNĚNÍ SOUČÁSTKY
+// ==========================================
+
+function endDrag(event) {
+
+    if (
+        !dragSession ||
+        dragSession.pointerId !== event.pointerId
+    ) {
+        return;
+    }
+
+    const session = dragSession;
+
+    const element =
+        document.elementFromPoint(
+            event.clientX,
+            event.clientY
+        );
+
+    const target =
+        element?.closest(
+            "[data-target]"
+        );
+
+    if (session.ghost) {
+        session.ghost.remove();
+    }
+
+    if (session.source.isConnected) {
+
+        session.source.classList.remove(
+            "dragging"
+        );
+    }
+
+    document.querySelectorAll(
+        ".component-target.drag-over"
+    ).forEach(zone => {
+
+        zone.classList.remove(
+            "drag-over"
+        );
+    });
+
+    dragSession = null;
+
+    // Osazení při puštění nad cílovou pozicí.
+
+    if (
+        session.moved &&
+        target
+    ) {
+
+        placeComponent(
+            target.dataset.target,
+            session.code,
+            session.slot
+        );
+    }
+}
+
+
+// ==========================================
+// 19. ZRUŠENÍ PŘETAHOVÁNÍ
+// ==========================================
+
+function cancelDrag(event) {
+
+    if (
+        !dragSession ||
+        dragSession.pointerId !== event.pointerId
+    ) {
+        return;
+    }
+
+    if (dragSession.ghost) {
+
+        dragSession.ghost.remove();
+    }
+
+    if (dragSession.source.isConnected) {
+
+        dragSession.source.classList.remove(
+            "dragging"
+        );
+    }
+
+    dragSession = null;
+
+    document.querySelectorAll(
+        ".component-target.drag-over"
+    ).forEach(zone => {
+
+        zone.classList.remove(
+            "drag-over"
+        );
+    });
+}
+
+
+// ==========================================
+// 20. OSADIT SOUČÁSTKU NA DPS
+// ==========================================
+
+function placeComponent(
+    targetId,
+    code,
+    slot
+) {
+
+    const target = TARGETS.find(
+        item => item.id === targetId
+    );
+
+    if (!target) {
+        return;
+    }
+
+    const previous = {
+        ...placedComponents
+    };
+
+    // Ukládáme skutečný materiál,
+    // nikoli pouze požadavek programu.
+
+    placedComponents[targetId] = {
+
+        material: code,
+
+        slot: slot,
+
+        softwareMaterial:
+            feeders.software[slot] || null
+
+    };
+
+    selectedTarget = targetId;
+
+    if (!savePlacement(false)) {
+
+        placedComponents = previous;
+    }
+
+    renderTargets();
+
+    updateStatus();
+}
+
+
+// ==========================================
+// 21. ODEBRÁNÍ SOUČÁSTKY
+// ==========================================
+
+function removeSelectedComponent() {
+
+    if (!selectedTarget) {
+
+        alert(
+            "Nejprve klepněte na osazenou pozici DPS."
+        );
+
+        return;
+    }
+
+    if (
+        !placedComponents[selectedTarget]
+    ) {
+
+        alert(
+            "Na vybrané pozici není žádná součástka."
+        );
+
+        return;
+    }
+
+    const previous = {
+        ...placedComponents
+    };
+
+    delete placedComponents[
+        selectedTarget
+    ];
+
+    if (!savePlacement(false)) {
+
+        placedComponents = previous;
+    }
+
+    renderTargets();
+
+    updateStatus();
+}
+
+
+// ==========================================
+// 22. PRŮBĚH OSÁZENÍ
+// ==========================================
+
+function updateStatus() {
+
+    const count = TARGETS.filter(
+        target =>
+            placedComponents[target.id]?.material
+    ).length;
+
+    document.getElementById(
+        "count"
+    ).textContent =
+        count + " / 2";
+
+    document.getElementById(
+        "progressFill"
+    ).style.width =
+        (count / TARGETS.length * 100) + "%";
+
+    TARGETS.forEach(target => {
+
+        const item =
+            placedComponents[target.id];
+
+        const status =
+            document.getElementById(
+                "status" + target.id
+            );
+
+        const card =
+            document.getElementById(
+                "recipe" + target.id
+            );
+
+        if (
+            item &&
+            item.material
+        ) {
+
+            status.textContent =
+                "Osazeno ze slotu " +
+                item.slot;
+
+            card.classList.add(
+                "done"
+            );
+
+        } else {
+
+            status.textContent =
+                "Neosazeno";
+
+            card.classList.remove(
+                "done"
+            );
+        }
+    });
+
+    // Dokončení až po obsazení C3 a C4.
+    // Správnost materiálu zůstává skrytá.
+
+    document.getElementById(
+        "finish"
+    ).disabled =
+        count < 2;
+}
+
+
+// ==========================================
+// 23. INTERNÍ KONTROLA
+// ==========================================
+
+function checkPlacement() {
+
+    const issues = [];
+
+    TARGETS.forEach(target => {
+
+        const placed =
+            placedComponents[target.id];
+
+        if (!placed) {
+
+            issues.push(
+                "MISSING_" + target.id
+            );
+
+            return;
+        }
+
+        // Kontrola hodnoty součástky.
+
+        if (
+            placed.material !==
+            target.expected
+        ) {
+
+            issues.push(
+                "WRONG_MATERIAL_" +
+                target.id
+            );
+        }
+
+        // Kontrola pájecí pasty.
+
+        const pads = PASTE_PADS.filter(
+            pad =>
+                pad.id.startsWith(
+                    target.id + "_"
+                )
+        );
+
+        pads.forEach(pad => {
+
+            if (!pasteData[pad.id]) {
+
+                issues.push(
+                    "MISSING_PASTE_" +
+                    pad.id
+                );
+            }
+        });
+    });
+
+    return {
+
+        passed: issues.length === 0,
+
+        issues: issues,
+
+        soucastky: {
+            ...placedComponents
+        }
+
+    };
+}
+
+
+// ==========================================
+// 24. DOKONČENÍ OPERACE
+// ==========================================
+
+function finishOperation() {
+
+    const occupied =
+        TARGETS.filter(
+            target =>
+                placedComponents[target.id]?.material
+        ).length;
+
+    if (occupied < 2) {
+
+        alert(
+            "Nejprve osaďte pozice C3 a C4."
+        );
+
+        return;
+    }
+
+    const confirmed = confirm(
+        "Dokončit osazení strany BOTTOM?\n\n" +
+        "Použité součástky budou uloženy " +
+        "do výrobní karty."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    if (!savePlacement(true)) {
+        return;
+    }
+
+    const control =
+        checkPlacement();
+
+    // Výsledek kontroly je určený
+    // pro pozdější funkční zkoušku.
+
+    try {
+
+        VPSChoices.saveStep(
+            STEP_NAME,
+            {
+                kontrola: control
+            }
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Kontrolní záznam nebyl uložen.",
+            error
+        );
+    }
+
+    window.location.href =
+        "tp.html";
+}
+
+
+// ==========================================
+// 25. PŘEPÍNÁNÍ NÁHLEDU A DPS
+// ==========================================
+
+function showBoard(show) {
+
+    document.getElementById(
+        "machineView"
+    ).classList.toggle(
+        "hidden",
+        show
+    );
+
+    document.getElementById(
+        "boardView"
+    ).classList.toggle(
+        "hidden",
+        !show
+    );
+}
+
+
+// ==========================================
+// 26. TLAČÍTKA
+// ==========================================
+
+document.getElementById(
+    "openBoard"
+).addEventListener("click", () => {
+
+    showBoard(true);
+});
+
+
+document.getElementById(
+    "backMachine"
+).addEventListener("click", () => {
+
+    showBoard(false);
+});
+
+
+document.getElementById(
+    "removeComponent"
+).addEventListener("click", () => {
+
+    removeSelectedComponent();
+});
+
+
+document.getElementById(
+    "finish"
+).addEventListener("click", () => {
+
+    finishOperation();
+});
+
+
+// ==========================================
+// 27. DOTYKOVÉ UDÁLOSTI
+// ==========================================
+
+document.addEventListener(
+    "pointermove",
+    moveDrag
+);
+
+document.addEventListener(
+    "pointerup",
+    endDrag
+);
+
+document.addEventListener(
+    "pointercancel",
+    cancelDrag
+);
+
+
+// ==========================================
+// 28. SPUŠTĚNÍ HRY
+// ==========================================
+
+loadPaste();
+
+loadFeeders();
+
+loadPlacement();
+
+renderPaste();
+
+renderTargets();
+
+renderFeeders();
+
+updateStatus();
+
+</script>
+
+</body>
+</html>
