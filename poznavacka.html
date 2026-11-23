@@ -1528,7 +1528,7 @@ clearCart = function() {
 </script>
 
 
-<!-- VLOŽIT JEDNOU TĚSNĚ PŘED </body> V SOUBORU sklad.html -->
+<!-- VLOŽIT JEDNOU TĚSNĚ PŘED V SOUBORU sklad.html -->
 
 <style>
 body.vps-uceni > header.header,
@@ -1697,9 +1697,31 @@ body.vps-uceni #vps-minihra {
     border-radius: 8px;
     padding: 13px 8px;
     min-height: 53px;
-    touch-action: manipulation;
+    touch-action: none; /* Pohyb prstem řídí JavaScript */
 }
 
+/* NÁHLED TAHANÉHO NÁZVU NA TABLETU */
+#vps-minihra .nazev.taha-se { opacity: .45; }
+#vps-minihra .cil.nad-cilem {
+    outline: 3px solid #ffe18a;
+    outline-offset: 2px;
+    background: #466d46;
+}
+.vps-tahany-nazev {
+    position: fixed;
+    z-index: 99999;
+    pointer-events: none;
+    width: min(240px, 65vw);
+    padding: 13px 8px;
+    border: 2px solid white;
+    border-radius: 8px;
+    background: #8bdba5;
+    color: #10291b;
+    text-align: center;
+    font: bold 15px "Trebuchet MS", Arial, sans-serif;
+    box-shadow: 0 8px 24px #0009;
+    transform: translate(-50%, -50%);
+}
 #vps-minihra .nazev.vybrany {
     outline: 3px solid white;
 }
@@ -2184,6 +2206,78 @@ body.vps-uceni #vps-minihra {
     }
 
     // ==========================================
+    // OVLÁDÁNÍ PRSTEM NA TABLETU (POINTER EVENTS)
+    // ==========================================
+
+    let dotykovyPresun = null;
+    let ignorovatKliknutiDo = 0;
+
+    function zrusZvyrazneniCilu() {
+        document.querySelectorAll(
+            "#vps-minihra .cil.nad-cilem"
+        ).forEach(el => el.classList.remove("nad-cilem"));
+    }
+
+    function cilPodPrstem(x, y) {
+        const el = document.elementFromPoint(x, y);
+        const cil = el ? el.closest("#vps-minihra .cil") : null;
+        return cil && !zamcene.has(cil.dataset.id) ? cil : null;
+    }
+
+    function zacniDotykovyPresun(e, btn, id) {
+        // Myš má původní HTML drag-and-drop; zde řešíme dotyk/pero.
+        if (e.pointerType === "mouse" || !e.isPrimary || btn.disabled || dotykovyPresun) return;
+        dotykovyPresun = {
+            id, btn, pointerId: e.pointerId,
+            x: e.clientX, y: e.clientY,
+            presouva: false, nahled: null
+        };
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+
+    function pohybDotykovehoPresunu(e) {
+        const d = dotykovyPresun;
+        if (!d || d.pointerId !== e.pointerId) return;
+        if (!d.presouva && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 7) return;
+        e.preventDefault();
+        if (!d.presouva) {
+            d.presouva = true;
+            d.btn.classList.add("taha-se");
+            d.nahled = document.createElement("div");
+            d.nahled.className = "vps-tahany-nazev";
+            d.nahled.textContent = d.btn.textContent;
+            document.body.appendChild(d.nahled);
+        }
+        d.nahled.style.left = e.clientX + "px";
+        d.nahled.style.top = e.clientY + "px";
+        zrusZvyrazneniCilu();
+        const cil = cilPodPrstem(e.clientX, e.clientY);
+        if (cil) cil.classList.add("nad-cilem");
+    }
+
+    function konecDotykovehoPresunu(e, zruseno = false) {
+        const d = dotykovyPresun;
+        if (!d || d.pointerId !== e.pointerId) return;
+        const cil = !zruseno && d.presouva
+            ? cilPodPrstem(e.clientX, e.clientY) : null;
+        d.nahled?.remove();
+        d.btn.classList.remove("taha-se");
+        zrusZvyrazneniCilu();
+        dotykovyPresun = null;
+        try {
+            if (d.btn.hasPointerCapture(e.pointerId)) {
+                d.btn.releasePointerCapture(e.pointerId);
+            }
+        } catch (_) {}
+        if (d.presouva) {
+            // Zabránit následnému syntetickému kliknutí na tlačítko.
+            ignorovatKliknutiDo = performance.now() + 450;
+            e.preventDefault();
+            if (cil) prirad(cil.dataset.id, d.id);
+        }
+    }
+
+    // ==========================================
     // 8. SPUŠTĚNÍ PŘIŘAZOVÁNÍ
     // ==========================================
 
@@ -2285,7 +2379,7 @@ body.vps-uceni #vps-minihra {
                 "click",
                 () => {
 
-                    if (btn.disabled) {
+                    if (btn.disabled || performance.now() < ignorovatKliknutiDo) {
                         return;
                     }
 
@@ -2298,6 +2392,12 @@ body.vps-uceni #vps-minihra {
 
                 }
             );
+
+            // Opravdové přetahování prstem na Android/iPad tabletu.
+            btn.addEventListener("pointerdown", e => zacniDotykovyPresun(e, btn, s.id));
+            btn.addEventListener("pointermove", pohybDotykovehoPresunu);
+            btn.addEventListener("pointerup", e => konecDotykovehoPresunu(e));
+            btn.addEventListener("pointercancel", e => konecDotykovehoPresunu(e, true));
 
             btn.addEventListener(
                 "dragstart",
