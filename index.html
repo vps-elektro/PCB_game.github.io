@@ -157,7 +157,13 @@
 
     <script>
         function startGame() {
-            window.location.href = "seznameni.html";
+            const heslo = prompt("Pro pokračování zadejte heslo:");
+
+            if (heslo === "VPSelektro") {
+                window.location.href = "seznameni.html";
+            } else if (heslo !== null) {
+                alert("Nesprávné heslo! Požádejte technologa o pomoc.");
+            }
         }
     </script>
 

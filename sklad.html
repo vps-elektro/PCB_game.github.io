@@ -203,6 +203,18 @@ h1 {
     font-size: 23px;
 }
 
+/* VÝSLEDKY KONTROLY MATERIÁLU */
+
+.material-check {
+    flex-shrink: 0;
+    font-size: 23px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.material-check.correct { color: #8bdba5; }
+.material-check.incorrect { color: #ff7777; }
+
 /* TLAČÍTKA */
 
 .action-button {
@@ -539,6 +551,12 @@ h1 {
         </button>
 
         <button
+            class="action-button secondary-button"
+            onclick="checkMaterials()">
+            ✓ Zkontrolovat materiál
+        </button>
+
+        <button
             class="action-button primary-button"
             onclick="finishPicking()">
             Dokončit vychystávání →
@@ -830,6 +848,20 @@ const STEP_COMPLETE_KEY =
 
 let selectedMaterials = new Set();
 
+// Materiály požadované kusovníkem semaforu (každý kód stačí vybrat jednou).
+const REQUIRED_MATERIALS = new Set([
+    "MR03", "MR09", "MC01", "MC11", "MR12", "MC14",
+    "MP25", "MP31", "MP34", "MP35", "MR13", "MS01"
+]);
+
+// Kontrola se zobrazuje jen po kliknutí na příslušné tlačítko.
+let materialCheckVisible = false;
+
+function checkMaterials() {
+    materialCheckVisible = true;
+    renderCart();
+}
+
 const allowedCodes = new Set(
     Object.values(warehouseData)
         .flatMap(zone => zone.components)
@@ -1028,6 +1060,9 @@ function toggleMaterial(code) {
         selectedMaterials.add(code);
     }
 
+    // Po změně výběru je potřeba provést kontrolu znovu.
+    materialCheckVisible = false;
+
     // Změna materiálu zruší dokončení skladu.
 
     try {
@@ -1118,6 +1153,20 @@ function renderCart() {
         );
 
         row.appendChild(name);
+
+        if (materialCheckVisible) {
+            const check = document.createElement("span");
+            const correct = REQUIRED_MATERIALS.has(code);
+            check.className = "material-check " +
+                (correct ? "correct" : "incorrect");
+            check.textContent = correct ? "✓" : "✗";
+            check.title = correct
+                ? "Správný materiál"
+                : "Tento materiál není v kusovníku";
+            check.setAttribute("aria-label", check.title);
+            row.appendChild(check);
+        }
+
         row.appendChild(remove);
 
         cart.appendChild(row);
@@ -1353,6 +1402,7 @@ function clearCart() {
     if (!confirmed) return;
 
     selectedMaterials.clear();
+    materialCheckVisible = false;
 
     saveMaterials(false);
 
@@ -1368,7 +1418,7 @@ function clearCart() {
 function openBOM() {
 
     window.open(
-        "ks.html",
+        "poznavacka.html",
         "_blank",
         "noopener"
     );
@@ -1380,6 +1430,29 @@ function openBOM() {
 // =========================================
 
 function finishPicking() {
+
+    // Do další operace lze odejít jen s přesně správným kusovníkem.
+    const missing = [...REQUIRED_MATERIALS].filter(
+        code => !selectedMaterials.has(code)
+    );
+    const extra = [...selectedMaterials].filter(
+        code => !REQUIRED_MATERIALS.has(code)
+    );
+
+    if (missing.length || extra.length) {
+        materialCheckVisible = true;
+        renderCart();
+        // Starší stav dokončení nesmí umožnit obejít kontrolu.
+        saveMaterials(false);
+        alert(
+            "Vychystávání ještě není správně dokončeno.\n\n" +
+            (missing.length ? "Chybí vám " + missing.length + " požadovaných položek.\n" : "") +
+            (extra.length ? "Máte navíc " + extra.length + " nesprávných položek.\n" : "") +
+            "\nZkontrolujte zelené fajfky a červené křížky v seznamu. " +
+            "Chybějící položky si najděte podle kusovníku."
+        );
+        return;
+    }
 
     const count = selectedMaterials.size;
 
@@ -1429,5 +1502,26 @@ renderCart();
 
 </script>
 
+<script>
+// Heslo před dokončením skladu – při správném vychystání.
+(function () {
+  const puvodniDokonceni = finishPicking;
+  finishPicking = function () {
+    const chybi = [...REQUIRED_MATERIALS].some(kod => !selectedMaterials.has(kod));
+    const navic = [...selectedMaterials].some(kod => !REQUIRED_MATERIALS.has(kod));
+    if (chybi || navic) {
+      puvodniDokonceni(); // původní detailní kontrola správného materiálu
+      return;
+    }
+    const heslo = prompt("Pro dokončení vychystávání zadejte heslo:");
+    if (heslo === null) return;
+    if (heslo.trim().toLowerCase() !== "material") {
+      alert("Nesprávné heslo.");
+      return;
+    }
+    puvodniDokonceni();
+  };
+})();
+</script>
 </body>
 </html>

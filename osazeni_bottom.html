@@ -2616,6 +2616,25 @@ function finishOperation() {
         return;
     }
 
+
+    // HESLO PRO DOKONČENÍ OPERACE
+
+    const heslo = prompt(
+        "Pro dokončení operace zadejte heslo:"
+    );
+
+    if (heslo === null) {
+        return;
+    }
+
+    if (heslo.trim() !== "FOX") {
+        alert(
+            "Nesprávné heslo! Požádejte technologa o pomoc."
+        );
+        return;
+    }
+
+
     const confirmed = confirm(
         "Dokončit osazení strany BOTTOM?\n\n" +
         "Použité součástky budou uloženy " +

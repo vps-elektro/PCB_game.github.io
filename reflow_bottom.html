@@ -2649,6 +2649,7 @@ function showFinishedBoard() {
 // 27. DOKONČENÍ OPERACE
 // ==========================================
 
+
 function finishOperation() {
 
     if (!completed) {
@@ -2661,13 +2662,36 @@ function finishOperation() {
         return;
     }
 
+    // HESLO PRO DOKONČENÍ REFLOW
+
+    const heslo = prompt(
+        "Pro dokončení operace Reflow zadejte heslo:"
+    );
+
+    if (heslo === null) {
+        return;
+    }
+
+    if (heslo.trim() !== "JUKI") {
+
+        alert(
+            "Nesprávné heslo! Požádejte technologa o pomoc."
+        );
+
+        return;
+    }
+
+    // Uložení dokončené operace
+
     if (!saveState()) {
         return;
     }
 
-    window.location.href =
-        "tp.html";
+    // Návrat do technologického postupu
+
+    window.location.href = "tp.html";
 }
+
 
 
 // ==========================================

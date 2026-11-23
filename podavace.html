@@ -3083,6 +3083,24 @@ function finishOperation() {
         return;
     }
 
+
+    // HESLO PRO DOKONČENÍ OPERACE
+
+    const heslo = prompt(
+        "Pro dokončení přípravy stroje zadejte heslo:"
+    );
+
+    if (heslo === null) {
+        return;
+    }
+
+    if (heslo.trim() !== "dráha") {
+        alert(
+            "Nesprávné heslo! Požádejte technologa o pomoc."
+        );
+        return;
+    }
+
     // Nejprve uložíme výrobní kartu
     // a stav dokončené operace.
 

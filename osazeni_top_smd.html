@@ -2269,6 +2269,25 @@ function finishOperation() {
 
     if (!savePlacement(true)) return;
 
+
+    // HESLO PRO DOKONČENÍ OSAZOVÁNÍ TOP
+
+    const heslo = prompt(
+        "Pro dokončení osazování SMT TOP zadejte heslo:"
+    );
+
+    if (heslo === null) {
+        return;
+    }
+
+    if (heslo.trim() !== "PickAndPlace") {
+        alert(
+            "Nesprávné heslo! Požádejte technologa o pomoc."
+        );
+        return;
+    }
+
+
     const control = checkPlacement();
 
     try {

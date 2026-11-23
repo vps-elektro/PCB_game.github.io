@@ -991,6 +991,23 @@ document.getElementById(
         return;
     }
 
+        // HESLO PRO DOKONČENÍ OPERACE
+
+    const heslo = prompt(
+        "Pro dokončení nanášení pájecí pasty zadejte heslo:"
+    );
+
+    if (heslo === null) {
+        return;
+    }
+
+    if (heslo.trim() !== "SAC305") {
+        alert(
+            "Nesprávné heslo! Požádejte technologa o pomoc."
+        );
+        return;
+    }
+
     // Uložení dokončené operace.
 
     if (!persist(true)) {

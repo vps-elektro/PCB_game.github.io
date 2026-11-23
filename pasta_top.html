@@ -1466,6 +1466,25 @@ document.getElementById(
             return;
         }
 
+
+        // HESLO PRO DOKONČENÍ OPERACE TOP
+
+        const heslo = prompt(
+            "Pro dokončení nanášení pájecí pasty TOP zadejte heslo:"
+        );
+
+        if (heslo === null) {
+            return;
+        }
+
+        if (heslo.trim() !== "JET") {
+            alert(
+                "Nesprávné heslo! Požádejte technologa o pomoc."
+            );
+            return;
+        }
+
+
         // Další krok technologického postupu
         // se odemkne přes dokončovací klíč.
 

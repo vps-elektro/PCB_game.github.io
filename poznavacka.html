@@ -1,0 +1,2783 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V.P.S. ELEKTRO | Sklad součástek</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    background: linear-gradient(135deg, #101d18, #244633);
+    color: white;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* HLAVIČKA */
+
+.header {
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.label {
+    color: #8bdba5;
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: clamp(26px, 4vw, 36px);
+    margin-bottom: 12px;
+}
+
+.description {
+    color: #d0e1d4;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+/* ROZLOŽENÍ HRY */
+
+.game-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 22px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 10px 22px 40px;
+    align-items: start;
+}
+
+/* SKLADOVÝ REGÁL */
+
+.warehouse {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border: 2px solid #50765b;
+    border-radius: 14px;
+    background: #18291e;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.warehouse img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* SKLADOVÉ POZICE */
+
+.storage-button {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    min-width: 58px;
+    padding: 9px 13px;
+    background: rgba(17,57,32,0.94);
+    border: 2px solid #8bdba5;
+    border-radius: 7px;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.storage-button:hover,
+.storage-button:focus-visible {
+    background: #8bdba5;
+    color: #10291b;
+    transform: translate(-50%, -50%) scale(1.12);
+}
+
+.a1 { left: 19%; top: 31%; }
+.a2 { left: 50%; top: 31%; }
+.a3 { left: 81%; top: 31%; }
+
+.b1 { left: 19%; top: 58%; }
+.b2 { left: 50%; top: 58%; }
+.b3 { left: 81%; top: 58%; }
+
+.c1 { left: 19%; top: 85%; }
+.c2 { left: 50%; top: 85%; }
+.c3 { left: 81%; top: 85%; }
+
+/* VYCHYSTANÝ MATERIÁL */
+
+.cart-panel {
+    position: sticky;
+    top: 20px;
+    background: #1b3425;
+    border: 1px solid #668b6d;
+    border-radius: 14px;
+    padding: 23px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+}
+
+.cart-panel h2 {
+    color: #8bdba5;
+    font-size: 23px;
+    margin-bottom: 12px;
+}
+
+.cart-description {
+    color: #bed1c2;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 22px;
+}
+
+.cart-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    max-height: 45vh;
+    overflow-y: auto;
+}
+
+.cart-empty {
+    color: #b0c4b5;
+    text-align: center;
+    padding: 25px 10px;
+    border: 1px dashed #54735b;
+    border-radius: 8px;
+    line-height: 1.6;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 13px;
+    background: #294833;
+    border-radius: 8px;
+}
+
+.cart-code {
+    color: white;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+.remove-button {
+    width: 31px;
+    height: 31px;
+    background: #674040;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 20px;
+}
+
+.remove-button:hover {
+    background: #b44242;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-top: 18px;
+    border-top: 1px solid #63856a;
+    color: #d4e7d8;
+}
+
+.cart-total strong {
+    color: #8bdba5;
+    font-size: 23px;
+}
+
+/* TLAČÍTKA */
+
+.action-button {
+    display: block;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    transition: 0.2s;
+    margin-top: 12px;
+}
+
+.primary-button {
+    background: #8bdba5;
+    color: #10291b;
+    border: 2px solid #8bdba5;
+}
+
+.primary-button:hover {
+    background: #b5f3c7;
+}
+
+.secondary-button {
+    background: transparent;
+    color: #8bdba5;
+    border: 2px solid #8bdba5;
+}
+
+.secondary-button:hover {
+    background: rgba(139,219,165,0.12);
+}
+
+.clear-button {
+    background: transparent;
+    border: none;
+    color: #bdcfc1;
+    font-size: 13px;
+    margin-top: 15px;
+    text-decoration: underline;
+}
+
+.clear-button:hover {
+    color: #ffb5b5;
+}
+
+/* SKLADOVÉ OKNO */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0,0,0,0.80);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 650px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: #1c3325;
+    border: 2px solid #8bdba5;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 20px 70px rgba(0,0,0,0.6);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+.modal-title {
+    color: #8bdba5;
+    font-size: 27px;
+    margin-bottom: 7px;
+}
+
+.modal-subtitle {
+    color: #c3d6c7;
+    font-size: 16px;
+}
+
+.close-button {
+    border: none;
+    border-radius: 6px;
+    background: #3d5844;
+    color: white;
+    font-size: 25px;
+    width: 38px;
+    height: 38px;
+}
+
+.close-button:hover {
+    background: #a33b3b;
+}
+
+/* KARTY SOUČÁSTEK */
+
+.components {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+}
+
+.component {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 14px;
+    background: #294a34;
+    border: 1px solid #587b61;
+    border-radius: 9px;
+    min-height: 76px;
+}
+
+.component-description {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.component-code {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.component-value {
+    color: #c9dfcf;
+    font-size: 12px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.select-button {
+    background: #8bdba5;
+    color: #10291b;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.select-button:hover {
+    background: #c1f6cf;
+}
+
+.component.selected {
+    background: #315b3d;
+    border-color: #8bdba5;
+}
+
+.select-button.selected-button {
+    background: #24452e;
+    color: #a5edb7;
+    border: 1px solid #8bdba5;
+}
+
+.select-button.selected-button:hover {
+    background: #426549;
+}
+
+.box-footer {
+    color: #b5cdbb;
+    text-align: center;
+    font-size: 13px;
+    margin-top: 24px;
+    line-height: 1.6;
+}
+
+.footer {
+    text-align: center;
+    padding: 0 20px 25px;
+    color: #90ab98;
+    font-size: 12px;
+}
+
+/* MOBILY A TABLETY */
+
+@media (max-width: 1050px) {
+    .game-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-panel {
+        position: static;
+    }
+}
+
+@media (max-width: 650px) {
+    .game-layout {
+        padding: 10px 10px 25px;
+    }
+
+    .storage-button {
+        min-width: 35px;
+        padding: 5px 7px;
+        font-size: 12px;
+        border-width: 1px;
+    }
+
+    .modal-content {
+        padding: 20px 15px;
+    }
+
+    .components {
+        grid-template-columns: 1fr;
+    }
+
+    .component {
+        padding: 10px;
+    }
+
+    .component-code {
+        font-size: 15px;
+    }
+
+    .select-button {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .header p {
+        font-size: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HLAVIČKA -->
+
+<header class="header">
+    <p class="label">
+        V.P.S. ELEKTRO | VÝROBNÍ OPERACE 01
+    </p>
+
+    <h1>Sklad elektronických součástek</h1>
+
+    <p class="description">
+        Podle kusovníku vyhledejte všechny
+        potřebné materiálové položky.
+        <br>
+        Každou položku stačí vychystat pouze jednou.
+    </p>
+</header>
+
+<!-- SKLAD A VYCHYSTANÝ MATERIÁL -->
+
+<main class="game-layout">
+
+    <section class="warehouse"
+             aria-label="Skladový regál">
+
+        <img src="images/sklad.png"
+             alt="Skladový regál elektronických součástek">
+
+        <!-- HORNÍ POLICE -->
+
+        <button class="storage-button a1"
+                data-zone="A1">A1</button>
+
+        <button class="storage-button a2"
+                data-zone="A2">A2</button>
+
+        <button class="storage-button a3"
+                data-zone="A3">A3</button>
+
+        <!-- PROSTŘEDNÍ POLICE -->
+
+        <button class="storage-button b1"
+                data-zone="B1">B1</button>
+
+        <button class="storage-button b2"
+                data-zone="B2">B2</button>
+
+        <button class="storage-button b3"
+                data-zone="B3">B3</button>
+
+        <!-- SPODNÍ POLICE -->
+
+        <button class="storage-button c1"
+                data-zone="C1">C1</button>
+
+        <button class="storage-button c2"
+                data-zone="C2">C2</button>
+
+        <button class="storage-button c3"
+                data-zone="C3">C3</button>
+
+    </section>
+
+    <!-- PRAVÝ PANEL -->
+
+    <aside class="cart-panel">
+
+        <h2>Vychystaný materiál</h2>
+
+        <p class="cart-description">
+            Zde se zobrazují materiálové položky,
+            které jste vybrali ze skladu.
+            Každé materiálové číslo může být vybráno
+            pouze jednou.
+        </p>
+
+        <div class="cart-list" id="cartList"></div>
+
+        <div class="cart-total">
+            <span>Počet položek:</span>
+            <strong id="totalQuantity">0</strong>
+        </div>
+
+        <button
+            class="action-button secondary-button"
+            onclick="openBOM()">
+            📋 Otevřít kusovník
+        </button>
+
+        <button
+            class="action-button primary-button"
+            onclick="finishPicking()">
+            Dokončit vychystávání →
+        </button>
+
+        <button
+            class="clear-button"
+            onclick="clearCart()">
+            Vyprázdnit vychystaný materiál
+        </button>
+
+    </aside>
+</main>
+
+<!-- OKNO SKLADOVÉ POZICE -->
+
+<div
+    class="modal"
+    id="storageModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+                <h2 class="modal-title" id="modalTitle">
+                    Skladová pozice
+                </h2>
+
+                <p
+                    class="modal-subtitle"
+                    id="modalSubtitle">
+                </p>
+            </div>
+
+            <button
+                class="close-button"
+                onclick="closeStorage()"
+                aria-label="Zavřít">
+                &times;
+            </button>
+
+        </div>
+
+        <div class="components" id="componentList"></div>
+
+        <p class="box-footer">
+            Kliknutím na Vybrat přidáte materiálovou
+            položku do vychystaného seznamu.
+            <br>
+            Opětovným kliknutím ji můžete odebrat.
+        </p>
+
+    </div>
+</div>
+
+<footer class="footer">
+    V.P.S. ELEKTRO s.r.o. | Interaktivní výuková hra
+</footer>
+
+<!-- CENTRÁLNÍ PAMĚŤ HRY -->
+
+<script src="choices.js"></script>
+
+<script>
+"use strict";
+
+// =========================================
+// 1. GENEROVÁNÍ MATERIÁLOVÝCH ČÍSEL
+// =========================================
+
+function createCodes(prefix, first, last) {
+
+    const codes = [];
+
+    for (let i = first; i <= last; i++) {
+
+        codes.push(
+            prefix + String(i).padStart(2, "0")
+        );
+    }
+
+    return codes;
+}
+
+
+// =========================================
+// 2. SKLADOVÉ POZICE
+// =========================================
+
+const warehouseData = {
+
+    A1: {
+        name: "SMT odpory",
+        components: createCodes("MR", 1, 10)
+    },
+
+    A2: {
+        name: "SMT kondenzátory",
+        components: createCodes("MC", 1, 10)
+    },
+
+    A3: {
+        name: "Tlumivky",
+        components: createCodes("MT", 1, 10)
+    },
+
+    B1: {
+        name: "Diody a polovodiče",
+        components: createCodes("MP", 1, 10)
+    },
+
+    B2: {
+        name: "Tranzistory a polovodiče",
+        components: createCodes("MP", 11, 20)
+    },
+
+    B3: {
+        name: "Integrované obvody",
+        components: createCodes("MP", 21, 30)
+    },
+
+    C1: {
+        name: "LED",
+        components: createCodes("MP", 31, 40)
+    },
+
+    C2: {
+        name: "THT odpory a kondenzátory",
+        components: [
+            ...createCodes("MR", 11, 15),
+            ...createCodes("MC", 11, 15)
+        ]
+    },
+
+    C3: {
+        name: "Ostatní součástky",
+        components: createCodes("MS", 1, 10)
+    }
+};
+
+
+// =========================================
+// 3. HODNOTY SKLADOVÝCH POLOŽEK
+// =========================================
+
+// SMT hodnoty jsou sjednocené s podavači FOX.
+
+const MATERIAL_VALUES = {
+
+    // A1 – SMT REZISTORY
+
+    MR01: "Rezistor SMT 100 Ω, 1206",
+    MR02: "Rezistor SMT 1 kΩ, 1206",
+    MR03: "Rezistor SMT 100 kΩ, 1206",
+    MR04: "Rezistor SMT 220 Ω, 1206",
+    MR05: "Rezistor SMT 470 Ω, 1206",
+    MR06: "Rezistor SMT 2,2 kΩ, 1206",
+    MR07: "Rezistor SMT 4,7 kΩ, 1206",
+    MR08: "Rezistor SMT 22 kΩ, 1206",
+    MR09: "Rezistor SMT 10 kΩ, 1206",
+    MR10: "Rezistor SMT 47 kΩ, 1206",
+
+    // A2 – SMT KONDENZÁTORY
+
+    MC01: "Kondenzátor SMT 100 nF",
+    MC02: "Kondenzátor SMT 10 nF",
+    MC03: "Kondenzátor SMT 1 nF",
+    MC04: "Kondenzátor SMT 220 nF",
+    MC05: "Kondenzátor SMT 470 nF",
+    MC06: "Kondenzátor SMT 1 µF",
+    MC07: "Kondenzátor SMT 2,2 µF",
+    MC08: "Kondenzátor SMT 4,7 µF",
+    MC09: "Kondenzátor SMT 22 pF",
+    MC10: "Kondenzátor SMT 10 µF",
+
+    // A3 – TLUMIVKY
+
+    MT01: "Tlumivka SMT 1 µH",
+    MT02: "Tlumivka SMT 2,2 µH",
+    MT03: "Tlumivka SMT 4,7 µH",
+    MT04: "Tlumivka SMT 10 µH",
+    MT05: "Tlumivka SMT 22 µH",
+    MT06: "Tlumivka SMT 47 µH",
+    MT07: "Tlumivka SMT 100 µH",
+    MT08: "Tlumivka SMT 220 µH",
+    MT09: "Tlumivka SMT 470 µH",
+    MT10: "Tlumivka SMT 1 mH",
+
+    // B1 – DIODY A POLOVODIČE
+
+    MP01: "Dioda SMT 1N4148",
+    MP02: "Dioda SMT 1N4007",
+    MP03: "Dioda SMT BAV99",
+    MP04: "Dioda SMT BAT54",
+    MP05: "Dioda SMT SS14",
+    MP06: "Dioda SMT SS34",
+    MP07: "Dioda SMT M7",
+    MP08: "Dioda SMT BAS16",
+    MP09: "Dioda SMT BZX84-C5V1",
+    MP10: "Dioda SMT BZX84-C12",
+
+    // B2 – TRANZISTORY
+
+    MP11: "Tranzistor SMT BC817",
+    MP12: "Tranzistor SMT BC807",
+    MP13: "Tranzistor SMT MMBT3904",
+    MP14: "Tranzistor SMT MMBT3906",
+    MP15: "Tranzistor SMT 2N7002",
+    MP16: "Tranzistor SMT BSS138",
+    MP17: "Tranzistor SMT AO3400A",
+    MP18: "Tranzistor SMT AO3401A",
+    MP19: "Tranzistor SMT IRLML2502",
+    MP20: "Tranzistor SMT IRLML6402",
+
+    // B3 – INTEGROVANÉ OBVODY
+
+    MP21: "Operační zesilovač LM358, THT",
+    MP22: "Integrovaný obvod SMT LM393",
+    MP23: "Komparátor LM393, THT",
+    MP24: "Integrovaný obvod SMT 74HC14",
+    MP25: "Integrovaný obvod NE555, THT",
+    MP26: "Integrovaný obvod SMT CD4017",
+    MP27: "Čítač CD4017, THT",
+    MP28: "Integrovaný obvod SMT ATtiny85",
+    MP29: "Operační zesilovač LM324, THT",
+    MP30: "Integrovaný obvod SMT ULN2003A",
+
+    // C1 – LED
+
+    MP31: "LED zelená 5 mm",
+    MP32: "LED modrá 5 mm",
+    MP33: "LED bílá 5 mm",
+    MP34: "LED červená 5 mm",
+    MP35: "LED žlutá 5 mm",
+    MP36: "LED oranžová 5 mm",
+    MP37: "LED červená 3 mm",
+    MP38: "LED zelená 3 mm",
+    MP39: "LED RGB 5 mm",
+    MP40: "LED infračervená 940 nm",
+
+    // C2 – THT REZISTORY
+
+    MR11: "Rezistor THT 1 kΩ",
+    MR12: "Rezistor THT 10 kΩ",
+    MR13: "Rezistor THT 470 Ω",
+    MR14: "Rezistor THT 100 kΩ",
+    MR15: "Rezistor THT 220 Ω",
+
+    // C2 – THT KONDENZÁTORY
+
+    MC11: "Elektrolytický kondenzátor 22 µF",
+    MC12: "Elektrolytický kondenzátor 10 µF",
+    MC13: "Elektrolytický kondenzátor 100 µF",
+    MC14: "Elektrolytický kondenzátor 47 µF",
+    MC15: "Elektrolytický kondenzátor 220 µF",
+
+    // C3 – OSTATNÍ SOUČÁSTKY
+
+    MS01: "Přepínač / jumper",
+    MS02: "Tlačítko THT, momentové",
+    MS03: "Svorkovnice 2pólová, 5,08 mm",
+    MS04: "Svorkovnice 3pólová, 5,08 mm",
+    MS05: "Kolíková lišta 1×2, 2,54 mm",
+    MS06: "Kolíková lišta 1×3, 2,54 mm",
+    MS07: "DIP přepínač 2polohový",
+    MS08: "DIP přepínač 4polohový",
+    MS09: "Pojistkové pouzdro THT",
+    MS10: "Trimr 10 kΩ, THT"
+};
+
+
+// =========================================
+// 4. KLÍČE SPOLEČNÉ PAMĚTI
+// =========================================
+
+const STORAGE_KEY = "vps_semafor_material";
+
+const COMPLETE_KEY =
+    "vps_semafor_sklad_dokonceno";
+
+const STEP_COMPLETE_KEY =
+    "vps_semafor_krok_1_dokonceno";
+
+// Materiál uložíme jako unikátní kódy.
+
+let selectedMaterials = new Set();
+
+const allowedCodes = new Set(
+    Object.values(warehouseData)
+        .flatMap(zone => zone.components)
+);
+
+
+// =========================================
+// 5. NAČTENÍ MATERIÁLU
+// =========================================
+
+function loadMaterials() {
+
+    try {
+
+        // Přednost má společná výrobní karta.
+
+        let codesFromCentral = null;
+
+        if (
+            typeof VPSChoices !== "undefined" &&
+            typeof VPSChoices.getStep === "function"
+        ) {
+
+            const sklad =
+                VPSChoices.getStep("sklad");
+
+            if (
+                sklad &&
+                Array.isArray(sklad.materialy)
+            ) {
+
+                codesFromCentral =
+                    sklad.materialy;
+            }
+        }
+
+        if (codesFromCentral !== null) {
+
+            selectedMaterials = new Set(
+                codesFromCentral.filter(code =>
+                    allowedCodes.has(code)
+                )
+            );
+
+            return;
+        }
+
+        // Záložní čtení staršího úložiště.
+
+        const saved =
+            localStorage.getItem(STORAGE_KEY);
+
+        if (!saved) return;
+
+        const parsed = JSON.parse(saved);
+
+        let codes = [];
+
+        if (Array.isArray(parsed)) {
+
+            codes = parsed;
+
+        } else if (
+            parsed &&
+            typeof parsed === "object"
+        ) {
+
+            codes = Object.entries(parsed)
+                .filter(([code, quantity]) =>
+                    Number(quantity) > 0
+                )
+                .map(([code]) => code);
+        }
+
+        selectedMaterials = new Set(
+            codes.filter(code =>
+                allowedCodes.has(code)
+            )
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Uložený materiál nelze načíst.",
+            error
+        );
+    }
+}
+
+
+// =========================================
+// 6. ULOŽENÍ MATERIÁLU DO OBOU PAMĚTÍ
+// =========================================
+
+function saveMaterials(completed = false) {
+
+    const codes = Array.from(selectedMaterials);
+
+    try {
+
+        // Podavače očekávají tuto strukturu:
+        //
+        // VPSChoices.getStep("sklad").materialy
+
+        if (
+            typeof VPSChoices === "undefined" ||
+            typeof VPSChoices.saveStep !== "function"
+        ) {
+
+            throw new Error(
+                "Soubor choices.js není dostupný."
+            );
+        }
+
+        const result = VPSChoices.saveStep(
+            "sklad",
+            {
+                materialy: codes,
+                dokonceno: completed
+            }
+        );
+
+        if (result === false) {
+
+            throw new Error(
+                "Nepodařilo se uložit výrobní kartu."
+            );
+        }
+
+        // Záložní úložiště pro starší skripty.
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(codes)
+        );
+
+        // Stav dokončení pro technologický postup.
+
+        if (completed) {
+
+            localStorage.setItem(
+                COMPLETE_KEY,
+                "true"
+            );
+
+            localStorage.setItem(
+                STEP_COMPLETE_KEY,
+                "true"
+            );
+
+        } else {
+
+            localStorage.removeItem(
+                COMPLETE_KEY
+            );
+
+            localStorage.removeItem(
+                STEP_COMPLETE_KEY
+            );
+        }
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Chyba při ukládání skladu:",
+            error
+        );
+
+        alert(
+            "Materiál se nepodařilo uložit " +
+            "do výrobní karty.\n" +
+            "Ověř, že je choices.js vedle sklad.html."
+        );
+
+        return false;
+    }
+}
+
+
+// =========================================
+// 7. VÝBĚR / ODEBRÁNÍ SOUČÁSTKY
+// =========================================
+
+function toggleMaterial(code) {
+
+    if (!allowedCodes.has(code)) return;
+
+    if (selectedMaterials.has(code)) {
+
+        selectedMaterials.delete(code);
+
+    } else {
+
+        selectedMaterials.add(code);
+    }
+
+    // Změna materiálu zruší dokončení skladu.
+
+    try {
+
+        localStorage.removeItem(
+            COMPLETE_KEY
+        );
+
+        localStorage.removeItem(
+            STEP_COMPLETE_KEY
+        );
+
+    } catch (error) {
+        console.warn(error);
+    }
+
+    // Ihned aktualizujeme společný zásobník.
+
+    saveMaterials(false);
+
+    renderCart();
+    updateComponentButtons();
+}
+
+
+// =========================================
+// 8. VYCHYSTANÉ POLOŽKY
+// =========================================
+
+function renderCart() {
+
+    const cart =
+        document.getElementById("cartList");
+
+    const totalElement =
+        document.getElementById("totalQuantity");
+
+    cart.innerHTML = "";
+
+    const materials =
+        Array.from(selectedMaterials).sort(
+            (a, b) => a.localeCompare(
+                b, "cs", { numeric: true }
+            )
+        );
+
+    if (materials.length === 0) {
+
+        const empty =
+            document.createElement("p");
+
+        empty.className = "cart-empty";
+
+        empty.textContent =
+            "Zatím nemáte vybraný žádný materiál.";
+
+        cart.appendChild(empty);
+    }
+
+    materials.forEach(code => {
+
+        const row =
+            document.createElement("div");
+
+        row.className = "cart-item";
+
+        const name =
+            document.createElement("span");
+
+        name.className = "cart-code";
+        name.textContent = code;
+
+        const remove =
+            document.createElement("button");
+
+        remove.className = "remove-button";
+        remove.textContent = "×";
+        remove.title = "Odebrat " + code;
+
+        remove.setAttribute(
+            "aria-label",
+            "Odebrat " + code
+        );
+
+        remove.addEventListener(
+            "click",
+            () => toggleMaterial(code)
+        );
+
+        row.appendChild(name);
+        row.appendChild(remove);
+
+        cart.appendChild(row);
+    });
+
+    totalElement.textContent =
+        materials.length;
+}
+
+
+// =========================================
+// 9. SKLADOVÉ OKNO
+// =========================================
+
+const modal =
+    document.getElementById("storageModal");
+
+const modalTitle =
+    document.getElementById("modalTitle");
+
+const modalSubtitle =
+    document.getElementById("modalSubtitle");
+
+const componentList =
+    document.getElementById("componentList");
+
+let lastOpenedButton = null;
+
+
+function openStorage(position, button) {
+
+    const data = warehouseData[position];
+
+    if (!data) return;
+
+    lastOpenedButton = button;
+
+    modalTitle.textContent =
+        "Skladová pozice " + position;
+
+    modalSubtitle.textContent =
+        data.name;
+
+    componentList.innerHTML = "";
+
+    data.components.forEach(code => {
+
+        const component =
+            document.createElement("div");
+
+        component.className = "component";
+        component.dataset.code = code;
+
+        // Materiálové číslo.
+
+        const label =
+            document.createElement("span");
+
+        label.className = "component-code";
+        label.textContent = code;
+
+        // Hodnota součástky.
+
+        const value =
+            document.createElement("span");
+
+        value.className = "component-value";
+
+        value.textContent =
+            MATERIAL_VALUES[code] ||
+            "Hodnota neuvedena";
+
+        // Společný blok kódu a hodnoty.
+
+        const description =
+            document.createElement("div");
+
+        description.className =
+            "component-description";
+
+        description.appendChild(label);
+        description.appendChild(value);
+
+        // Tlačítko výběru.
+
+        const selectButton =
+            document.createElement("button");
+
+        selectButton.className =
+            "select-button";
+
+        selectButton.dataset.code = code;
+
+        selectButton.addEventListener(
+            "click",
+            () => toggleMaterial(code)
+        );
+
+        component.appendChild(description);
+        component.appendChild(selectButton);
+
+        componentList.appendChild(component);
+    });
+
+    updateComponentButtons();
+
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+
+    modal.querySelector(
+        ".close-button"
+    ).focus();
+}
+
+
+// =========================================
+// 10. AKTUALIZACE TLAČÍTEK
+// =========================================
+
+function updateComponentButtons() {
+
+    componentList.querySelectorAll(
+        ".component"
+    ).forEach(component => {
+
+        const code =
+            component.dataset.code;
+
+        const button =
+            component.querySelector(
+                ".select-button"
+            );
+
+        const isSelected =
+            selectedMaterials.has(code);
+
+        component.classList.toggle(
+            "selected",
+            isSelected
+        );
+
+        button.classList.toggle(
+            "selected-button",
+            isSelected
+        );
+
+        button.textContent =
+            isSelected
+                ? "✓ Vybráno"
+                : "Vybrat";
+
+        button.setAttribute(
+            "aria-pressed",
+            String(isSelected)
+        );
+    });
+}
+
+
+// =========================================
+// 11. ZAVŘENÍ SKLADOVÉ POZICE
+// =========================================
+
+function closeStorage() {
+
+    modal.classList.remove("active");
+
+    document.body.style.overflow = "";
+
+    if (lastOpenedButton) {
+        lastOpenedButton.focus();
+    }
+}
+
+
+// =========================================
+// 12. KLIKÁNÍ NA SKLADOVÉ POZICE
+// =========================================
+
+document.querySelectorAll(
+    ".storage-button"
+).forEach(button => {
+
+    button.addEventListener(
+        "click",
+        () => openStorage(
+            button.dataset.zone,
+            button
+        )
+    );
+});
+
+// Zavření kliknutím mimo okno.
+
+modal.addEventListener(
+    "click",
+    event => {
+
+        if (event.target === modal) {
+            closeStorage();
+        }
+    }
+);
+
+// Zavření klávesou Escape.
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            modal.classList.contains("active")
+        ) {
+
+            closeStorage();
+        }
+    }
+);
+
+
+// =========================================
+// 13. VYPRÁZDNĚNÍ VÝBĚRU
+// =========================================
+
+function clearCart() {
+
+    const confirmed = confirm(
+        "Opravdu chcete odebrat všechny " +
+        "vychystané materiálové položky?"
+    );
+
+    if (!confirmed) return;
+
+    selectedMaterials.clear();
+
+    saveMaterials(false);
+
+    renderCart();
+    updateComponentButtons();
+}
+
+
+// =========================================
+// 14. OTEVŘENÍ KUSOVNÍKU
+// =========================================
+
+function openBOM() {
+
+    window.open(
+        "ks.html",
+        "_blank",
+        "noopener"
+    );
+}
+
+
+// =========================================
+// 15. DOKONČENÍ VYCHYSTÁVÁNÍ
+// =========================================
+
+function finishPicking() {
+
+    const count = selectedMaterials.size;
+
+    if (count === 0) {
+
+        alert(
+            "Nejprve vyberte alespoň " +
+            "jednu materiálovou položku."
+        );
+
+        return;
+    }
+
+    const confirmed = confirm(
+        "Chcete dokončit vychystávání?\n\n" +
+        "Vybrané materiálové položky: " +
+        count
+    );
+
+    if (!confirmed) return;
+
+    // Uložení do společného zásobníku.
+
+    if (!saveMaterials(true)) {
+        return;
+    }
+
+    alert(
+        "Vychystávání materiálu bylo dokončeno.\n\n" +
+        "Vybrali jste " + count +
+        " materiálových položek.\n\n" +
+        "Výběr byl uložen do společného zásobníku."
+    );
+
+    // Návrat na technologický postup.
+
+    window.location.href = "tp.html";
+}
+
+
+// =========================================
+// 16. SPUŠTĚNÍ SKLADU
+// =========================================
+
+loadMaterials();
+renderCart();
+
+</script>
+
+
+<script>
+/* KONTROLA VYCHYSTANÉHO MATERIÁLU */
+
+// Správné materiálové položky
+const REQUIRED_MATERIALS = new Set([
+    "MR03", "MR09", "MC01", "MC11",
+    "MR12", "MC14", "MP25", "MP31",
+    "MP34", "MP35", "MR13", "MS01"
+]);
+
+let materialCheckVisible = false;
+
+// Vytvoření tlačítka
+const checkButton = document.createElement("button");
+
+checkButton.className =
+    "action-button secondary-button";
+
+checkButton.textContent =
+    "✓ Zkontrolovat materiál";
+
+checkButton.onclick = function() {
+    materialCheckVisible = true;
+    renderCart();
+};
+
+// Vložení tlačítka před dokončení operace
+const finishButton = document.querySelector(
+    'button[onclick="finishPicking()"]'
+);
+
+finishButton.parentNode.insertBefore(
+    checkButton,
+    finishButton
+);
+
+// Rozšíření vykreslování seznamu
+const originalRenderCart = renderCart;
+
+renderCart = function() {
+
+    originalRenderCart();
+
+    if (!materialCheckVisible) return;
+
+    document.querySelectorAll(
+        ".cart-item"
+    ).forEach(row => {
+
+        const code = row.querySelector(
+            ".cart-code"
+        ).textContent.trim();
+
+        const correct = REQUIRED_MATERIALS.has(code);
+
+        const symbol = document.createElement("span");
+
+        symbol.textContent = correct ? "✓" : "✗";
+
+        symbol.style.color = correct
+            ? "#8bdba5"
+            : "#ff5555";
+
+        symbol.style.fontSize = "25px";
+        symbol.style.fontWeight = "bold";
+        symbol.style.marginLeft = "auto";
+
+        symbol.title = correct
+            ? "Správný materiál"
+            : "Nesprávný materiál";
+
+        const removeButton = row.querySelector(
+            ".remove-button"
+        );
+
+        row.insertBefore(symbol, removeButton);
+    });
+};
+
+// Při změně materiálu kontrolu skryjeme
+const originalToggleMaterial = toggleMaterial;
+
+toggleMaterial = function(code) {
+    materialCheckVisible = false;
+    originalToggleMaterial(code);
+};
+
+// Při vyprázdnění seznamu kontrolu skryjeme
+const originalClearCart = clearCart;
+
+clearCart = function() {
+    materialCheckVisible = false;
+    originalClearCart();
+};
+
+</script>
+
+
+<!-- VLOŽIT JEDNOU TĚSNĚ PŘED </body> V SOUBORU sklad.html -->
+
+<style>
+body.vps-uceni > header.header,
+body.vps-uceni > main.game-layout,
+body.vps-uceni > footer.footer {
+    display: none !important;
+}
+
+#vps-minihra {
+    display: none;
+    max-width: 1350px;
+    margin: auto;
+    padding: 24px 15px 45px;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    color: white;
+}
+
+body.vps-uceni #vps-minihra {
+    display: block;
+}
+
+#vps-minihra * {
+    box-sizing: border-box;
+}
+
+#vps-minihra h1 {
+    text-align: center;
+    font-size: clamp(25px, 4vw, 36px);
+    margin: 10px 0;
+}
+
+#vps-minihra .uvod {
+    text-align: center;
+    color: #cde4d2;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+    max-width: 800px;
+}
+
+#vps-minihra .panel {
+    background: #1b3425;
+    border: 1px solid #668b6d;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 15px 40px #0004;
+}
+
+#vps-minihra .rozvrzeni {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) minmax(245px, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+
+#vps-minihra .hlavicky,
+#vps-minihra .radek {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+#vps-minihra .hlavicky {
+    text-align: center;
+    color: #8bdba5;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#vps-minihra .radky {
+    display: grid;
+    gap: 10px;
+}
+
+#vps-minihra .obrazek,
+#vps-minihra .cil {
+    min-height: 114px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px;
+}
+
+#vps-minihra .obrazek {
+    background: #294833;
+    border: 1px solid #587b61;
+    overflow: hidden;
+}
+
+/* FOTOGRAFIE SOUČÁSTEK – PŘIŘAZOVÁNÍ */
+
+#vps-minihra .obrazek .fotka-soucastky {
+    display: block;
+    width: 150px;
+    height: 90px;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+#vps-minihra .cil {
+    border: 2px dashed #789a80;
+    background: #172c1e;
+    color: #b9d0bf;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#vps-minihra .cil.obsazeno {
+    border-style: solid;
+    color: white;
+    background: #32513b;
+}
+
+#vps-minihra .cil.spravne {
+    background: #235c35;
+    border-color: #8bea9c;
+    color: white;
+    cursor: default;
+}
+
+#vps-minihra .cil.chybne {
+    background: #642d31;
+    border-color: #ff7777;
+    color: white;
+}
+
+#vps-minihra .vyber {
+    background: #203d2c;
+    border: 1px solid #60866b;
+    border-radius: 12px;
+    padding: 16px;
+    position: sticky;
+    top: 12px;
+}
+
+#vps-minihra h2 {
+    color: #8bdba5;
+    margin-bottom: 12px;
+}
+
+#vps-minihra .napoveda {
+    color: #c5d8ca;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+
+#vps-minihra .nazvy {
+    display: grid;
+    gap: 9px;
+}
+
+#vps-minihra button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+#vps-minihra .nazev {
+    width: 100%;
+    background: #8bdba5;
+    color: #10291b;
+    font-weight: bold;
+    border: 2px solid #8bdba5;
+    border-radius: 8px;
+    padding: 13px 8px;
+    min-height: 53px;
+    touch-action: manipulation;
+}
+
+#vps-minihra .nazev.vybrany {
+    outline: 3px solid white;
+}
+
+#vps-minihra .nazev:disabled {
+    opacity: .3;
+    cursor: default;
+}
+
+#vps-minihra .akce {
+    margin: 20px 0 4px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#vps-minihra .tlacitko {
+    padding: 14px 20px;
+    background: #8bdba5;
+    border: 2px solid #8bdba5;
+    border-radius: 8px;
+    color: #10291b;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#vps-minihra .tlacitko:disabled {
+    opacity: .35;
+    cursor: default;
+}
+
+#vps-minihra .zprava {
+    text-align: center;
+    min-height: 26px;
+    margin-top: 14px;
+    color: #d3e6d6;
+    line-height: 1.6;
+}
+
+#vps-minihra .zprava.chyba {
+    color: #ff9c9c;
+}
+
+#vps-minihra .zprava.ok {
+    color: #93f1aa;
+}
+
+#vps-minihra .test {
+    text-align: center;
+    max-width: 780px;
+    margin: auto;
+}
+
+#vps-minihra .test-obrazek {
+    background: #294833;
+    border: 1px solid #587b61;
+    border-radius: 12px;
+    max-width: 470px;
+    margin: 18px auto;
+    padding: 18px;
+}
+
+/* FOTOGRAFIE SOUČÁSTEK – ZÁVĚREČNÝ TEST */
+
+#vps-minihra .test-obrazek .fotka-soucastky {
+    display: block;
+    width: 260px;
+    height: 180px;
+    max-width: 100%;
+    object-fit: contain;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+#vps-minihra .moznosti {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+#vps-minihra .moznost {
+    background: #294833;
+    border: 2px solid #6a9675;
+    border-radius: 8px;
+    color: white;
+    min-height: 62px;
+    padding: 12px;
+    font-weight: bold;
+}
+
+#vps-minihra .moznost:hover {
+    background: #386347;
+}
+
+#vps-minihra .moznost.spatna {
+    background: #642d31;
+    border-color: #ff7777;
+}
+
+#vps-minihra .moznost.dobra {
+    background: #235c35;
+    border-color: #8bea9c;
+}
+
+@media (max-width: 900px) {
+    #vps-minihra .rozvrzeni {
+        grid-template-columns: 1fr;
+    }
+
+    #vps-minihra .vyber {
+        position: static;
+        order: -1;
+    }
+
+    #vps-minihra .nazvy {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    #vps-minihra .panel {
+        padding: 10px;
+    }
+
+    #vps-minihra .radek {
+        gap: 6px;
+    }
+
+    #vps-minihra .obrazek,
+    #vps-minihra .cil {
+        min-height: 92px;
+        font-size: 13px;
+    }
+
+    #vps-minihra .obrazek .fotka-soucastky {
+        width: 115px;
+        height: 72px;
+    }
+
+    #vps-minihra .moznosti {
+        grid-template-columns: 1fr;
+    }
+
+    #vps-minihra .nazev {
+        font-size: 12px;
+        padding: 8px 3px;
+    }
+}
+</style>
+
+<div id="vps-minihra">
+
+    <h1>Poznej elektronické součástky</h1>
+
+    <p class="uvod">
+        Než vstoupíš do skladu, přiřaď šest názvů
+        k obrázkům. Správné odpovědi po kontrole
+        zezelenají a uzamknou se. Potom projdi testem.
+    </p>
+
+    <!-- PŘIŘAZOVÁNÍ -->
+
+    <section class="panel" id="vps-prirazeni">
+
+        <div class="rozvrzeni">
+
+            <div>
+
+                <div class="hlavicky">
+                    <span>Obrázek součástky</span>
+                    <span>Sem přetáhni název</span>
+                </div>
+
+                <div class="radky" id="vps-radky"></div>
+
+            </div>
+
+            <aside class="vyber">
+
+                <h2>Názvy součástek</h2>
+
+                <p class="napoveda">
+                    Přetáhni názvy doprostřed.
+                    Na tabletu klepni na název
+                    a potom na políčko.
+                    Chybný název můžeš vyměnit
+                    nebo odebrat klepnutím na políčko.
+                </p>
+
+                <div class="nazvy" id="vps-nazvy"></div>
+
+            </aside>
+
+        </div>
+
+        <div class="akce">
+
+            <button
+                class="tlacitko"
+                id="vps-kontrola"
+                type="button">
+                ✓ Zkontrolovat přiřazení
+            </button>
+
+            <button
+                class="tlacitko"
+                id="vps-spustit-test"
+                type="button"
+                disabled>
+                Spustit test →
+            </button>
+
+        </div>
+
+        <p class="zprava" id="vps-zprava">
+            Přiřaď všech šest názvů
+            a klikni na Zkontrolovat.
+        </p>
+
+    </section>
+
+    <!-- ZÁVĚREČNÝ TEST -->
+
+    <section class="panel test" id="vps-test" hidden>
+
+        <p class="uvod" id="vps-cislo"></p>
+
+        <h2 id="vps-test-nadpis">
+            Co je na obrázku?
+        </h2>
+
+        <div
+            class="test-obrazek"
+            id="vps-test-obrazek">
+        </div>
+
+        <div class="moznosti" id="vps-moznosti"></div>
+
+        <p class="zprava" id="vps-test-zprava"></p>
+
+        <div class="akce" id="vps-dalsi"></div>
+
+    </section>
+
+</div>
+
+<script>
+(function () {
+
+    "use strict";
+
+    const $ = id => document.getElementById(id);
+
+    // ==========================================
+    // 1. SOUČÁSTKY A FOTOGRAFIE
+    // ==========================================
+
+    const SOUCASTKY = [
+
+        {
+            id: "r-smt",
+            nazev: "SMT rezistor",
+            typ: "smtR"
+        },
+
+        {
+            id: "c-smt",
+            nazev: "SMT kondenzátor",
+            typ: "smtC"
+        },
+
+        {
+            id: "r-tht",
+            nazev: "THT rezistor",
+            typ: "thtR"
+        },
+
+        {
+            id: "c-el",
+            nazev: "Elektrolytický kondenzátor",
+            typ: "el"
+        },
+
+        {
+            id: "ic",
+            nazev: "Integrovaný obvod NE555",
+            typ: "ic"
+        },
+
+        {
+            id: "led",
+            nazev: "LED dioda",
+            typ: "led"
+        }
+
+    ];
+
+    // ==========================================
+    // 2. NÁHODNÉ POŘADÍ
+    // ==========================================
+
+    const NAHODNE = arr => {
+
+        const a = [...arr];
+
+        for (let i = a.length - 1; i > 0; i--) {
+
+            const j = Math.floor(
+                Math.random() * (i + 1)
+            );
+
+            [a[i], a[j]] = [a[j], a[i]];
+
+        }
+
+        return a;
+    };
+
+    // ==========================================
+    // 3. NAČÍTÁNÍ VLASTNÍCH OBRÁZKŮ
+    // ==========================================
+
+    // Obrázky musí být ve složce images
+    // vedle souboru sklad.html.
+
+    function obrazek(typ) {
+
+        const obrazky = {
+
+            smtR: "images/ress.png",
+
+            smtC: "images/caps.png",
+
+            thtR: "images/rest.png",
+
+            el: "images/elyt.png",
+
+            ic: "images/io.png",
+
+            led: "images/led.png"
+
+        };
+
+        const cesta = obrazky[typ];
+
+        if (!cesta) {
+            return "";
+        }
+
+        return `
+            <img
+                src="${cesta}"
+                alt="Elektronická součástka"
+                class="fotka-soucastky"
+                draggable="false"
+            >
+        `;
+    }
+
+    // ==========================================
+    // 4. STAV MINIHRY
+    // ==========================================
+
+    const ulozene = {};
+
+    const zamcene = new Set();
+
+    let aktivniNazev = null;
+
+    let objednavka = NAHODNE(SOUCASTKY);
+
+    let otazky = [];
+
+    let pozice = 0;
+
+    let potvrzenaOdpoved = false;
+
+    // ==========================================
+    // 5. ULOŽENÍ PŘÍSTUPU DO SKLADU
+    // ==========================================
+
+    const PRISTUP_KEY =
+        "vps_sklad_pristup_po_minihre";
+
+    // V téže kartě prohlížeče se již
+    // dokončená minihra neopakuje.
+
+    if (
+        sessionStorage.getItem(PRISTUP_KEY) === "ano"
+    ) {
+
+        document.body.classList.remove("vps-uceni");
+
+    } else {
+
+        document.body.classList.add("vps-uceni");
+
+    }
+
+    // ==========================================
+    // 6. VYKRESLENÍ PŘIŘAZENÍ
+    // ==========================================
+
+    function vykresli() {
+
+        document.querySelectorAll(
+            "#vps-minihra .cil"
+        ).forEach(cil => {
+
+            const id = cil.dataset.id;
+
+            const s = SOUCASTKY.find(
+                x => x.id === ulozene[id]
+            );
+
+            cil.textContent =
+                (zamcene.has(id) ? "✓ " : "") +
+                (s ? s.nazev : "Sem vlož název");
+
+            cil.className =
+                "cil" +
+                (s ? " obsazeno" : "") +
+                (zamcene.has(id) ? " spravne" : "");
+
+        });
+
+        document.querySelectorAll(
+            "#vps-minihra .nazev"
+        ).forEach(t => {
+
+            const id = t.dataset.id;
+
+            t.disabled =
+                Object.values(ulozene).includes(id);
+
+            t.draggable = !t.disabled;
+
+            t.classList.toggle(
+                "vybrany",
+                aktivniNazev === id
+            );
+
+        });
+
+    }
+
+    // ==========================================
+    // 7. PŘIŘAZENÍ NÁZVU
+    // ==========================================
+
+    function prirad(cil, id) {
+
+        if (
+            zamcene.has(cil) ||
+            !SOUCASTKY.some(x => x.id === id)
+        ) {
+            return;
+        }
+
+        const predchozi =
+            Object.keys(ulozene).find(
+                x => ulozene[x] === id
+            );
+
+        if (
+            predchozi &&
+            zamcene.has(predchozi)
+        ) {
+            return;
+        }
+
+        if (predchozi) {
+            delete ulozene[predchozi];
+        }
+
+        ulozene[cil] = id;
+
+        aktivniNazev = null;
+
+        vykresli();
+    }
+
+    // ==========================================
+    // 8. SPUŠTĚNÍ PŘIŘAZOVÁNÍ
+    // ==========================================
+
+    function init() {
+
+        objednavka.forEach(s => {
+
+            const radek =
+                document.createElement("div");
+
+            radek.className = "radek";
+
+            const obr =
+                document.createElement("div");
+
+            obr.className = "obrazek";
+
+            // Zobrazení skutečné fotografie.
+
+            obr.innerHTML = obrazek(s.typ);
+
+            const cil =
+                document.createElement("div");
+
+            cil.className = "cil";
+
+            cil.dataset.id = s.id;
+
+            // Přetažení názvu.
+
+            cil.addEventListener(
+                "dragover",
+                e => e.preventDefault()
+            );
+
+            cil.addEventListener(
+                "drop",
+                e => {
+
+                    e.preventDefault();
+
+                    prirad(
+                        s.id,
+                        e.dataTransfer.getData("text/plain")
+                    );
+
+                }
+            );
+
+            // Dotykové ovládání.
+
+            cil.addEventListener(
+                "click",
+                () => {
+
+                    if (aktivniNazev) {
+
+                        prirad(
+                            s.id,
+                            aktivniNazev
+                        );
+
+                    } else if (
+                        ulozene[s.id] &&
+                        !zamcene.has(s.id)
+                    ) {
+
+                        delete ulozene[s.id];
+
+                        vykresli();
+
+                    }
+
+                }
+            );
+
+            radek.append(obr, cil);
+
+            $("vps-radky").append(radek);
+
+        });
+
+        // Názvy v náhodném pořadí.
+
+        NAHODNE(SOUCASTKY).forEach(s => {
+
+            const btn =
+                document.createElement("button");
+
+            btn.type = "button";
+
+            btn.className = "nazev";
+
+            btn.textContent = s.nazev;
+
+            btn.dataset.id = s.id;
+
+            btn.addEventListener(
+                "click",
+                () => {
+
+                    if (btn.disabled) {
+                        return;
+                    }
+
+                    aktivniNazev =
+                        aktivniNazev === s.id
+                            ? null
+                            : s.id;
+
+                    vykresli();
+
+                }
+            );
+
+            btn.addEventListener(
+                "dragstart",
+                e => {
+
+                    if (btn.disabled) {
+
+                        e.preventDefault();
+                        return;
+
+                    }
+
+                    e.dataTransfer.setData(
+                        "text/plain",
+                        s.id
+                    );
+
+                }
+            );
+
+            $("vps-nazvy").append(btn);
+
+        });
+
+        vykresli();
+    }
+
+    // ==========================================
+    // 9. KONTROLA PŘIŘAZENÍ
+    // ==========================================
+
+    $("vps-kontrola").addEventListener(
+        "click",
+        () => {
+
+            let spatne = 0;
+
+            objednavka.forEach(s => {
+
+                if (zamcene.has(s.id)) {
+                    return;
+                }
+
+                if (ulozene[s.id] === s.id) {
+
+                    zamcene.add(s.id);
+
+                } else if (ulozene[s.id]) {
+
+                    spatne++;
+
+                }
+
+            });
+
+            vykresli();
+
+            objednavka.forEach(s => {
+
+                if (
+                    ulozene[s.id] &&
+                    !zamcene.has(s.id)
+                ) {
+
+                    const cil =
+                        document.querySelector(
+                            '#vps-minihra .cil[data-id="' +
+                            s.id +
+                            '"]'
+                        );
+
+                    if (cil) {
+                        cil.classList.add("chybne");
+                    }
+
+                }
+
+            });
+
+            if (zamcene.size === 6) {
+
+                $("vps-zprava").textContent =
+                    "Výborně! Všech šest součástek " +
+                    "je správně. Můžeš pokračovat do testu.";
+
+                $("vps-zprava").className =
+                    "zprava ok";
+
+                $("vps-spustit-test").disabled = false;
+
+            } else {
+
+                $("vps-zprava").textContent =
+                    "Správně: " +
+                    zamcene.size +
+                    " ze 6. Chybné odpovědi: " +
+                    spatne +
+                    ". Červené oprav a zkontroluj znovu.";
+
+                $("vps-zprava").className =
+                    "zprava" +
+                    (spatne ? " chyba" : "");
+
+            }
+
+        }
+    );
+
+    // ==========================================
+    // 10. SPUŠTĚNÍ TESTU
+    // ==========================================
+
+    $("vps-spustit-test").addEventListener(
+        "click",
+        () => {
+
+            if (zamcene.size !== 6) {
+                return;
+            }
+
+            otazky = NAHODNE(SOUCASTKY);
+
+            pozice = 0;
+
+            $("vps-prirazeni").hidden = true;
+
+            $("vps-prirazeni").style.display = "none";
+
+            $("vps-test").hidden = false;
+
+            novaOtazka();
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+    );
+
+    // ==========================================
+    // 11. JEDNOTLIVÉ OTÁZKY
+    // ==========================================
+
+    function novaOtazka() {
+
+        potvrzenaOdpoved = false;
+
+        const s = otazky[pozice];
+
+        $("vps-cislo").textContent =
+            "TEST | Otázka " +
+            (pozice + 1) +
+            " ze 6";
+
+        $("vps-test-nadpis").textContent =
+            "Jak se jmenuje tato součástka?";
+
+        // Fotografie vybrané součástky.
+
+        $("vps-test-obrazek").innerHTML =
+            obrazek(s.typ);
+
+        $("vps-test-zprava").textContent =
+            "Klikni na správný název. " +
+            "Při chybě to zkus znovu.";
+
+        $("vps-test-zprava").className =
+            "zprava";
+
+        $("vps-moznosti").replaceChildren();
+
+        $("vps-dalsi").replaceChildren();
+
+        NAHODNE(SOUCASTKY).forEach(m => {
+
+            const btn =
+                document.createElement("button");
+
+            btn.type = "button";
+
+            btn.className = "moznost";
+
+            btn.textContent = m.nazev;
+
+            btn.onclick = () => {
+
+                if (potvrzenaOdpoved) {
+                    return;
+                }
+
+                // Nesprávná odpověď.
+
+                if (m.id !== s.id) {
+
+                    btn.classList.add("spatna");
+
+                    $("vps-test-zprava").textContent =
+                        "✗ Nesprávně. Zkus jinou možnost.";
+
+                    $("vps-test-zprava").className =
+                        "zprava chyba";
+
+                    return;
+                }
+
+                // Správná odpověď.
+
+                potvrzenaOdpoved = true;
+
+                btn.classList.add("dobra");
+
+                $("vps-test-zprava").textContent =
+                    "✓ Správně!";
+
+                $("vps-test-zprava").className =
+                    "zprava ok";
+
+                const dal =
+                    document.createElement("button");
+
+                dal.type = "button";
+
+                dal.className = "tlacitko";
+
+                dal.textContent =
+                    pozice === 5
+                        ? "Dokončit test →"
+                        : "Další obrázek →";
+
+                dal.onclick = () => {
+
+                    pozice++;
+
+                    if (pozice < 6) {
+
+                        novaOtazka();
+
+                    } else {
+
+                        konecTestu();
+
+                    }
+
+                };
+
+                $("vps-dalsi").append(dal);
+
+            };
+
+            $("vps-moznosti").append(btn);
+
+        });
+
+    }
+
+    // ==========================================
+    // 12. DOKONČENÍ TESTU
+    // ==========================================
+
+    function konecTestu() {
+
+        $("vps-cislo").textContent =
+            "POZNÁVAČKA DOKONČENA";
+
+        $("vps-test-nadpis").textContent =
+            "Výborně! Poznáváš všechny součástky.";
+
+        $("vps-test-obrazek").style.display =
+            "none";
+
+        $("vps-moznosti").replaceChildren();
+
+        $("vps-test-zprava").textContent =
+            "Teď můžeš přejít do skladu " +
+            "elektronických součástek.";
+
+        $("vps-dalsi").replaceChildren();
+
+        const vstup =
+            document.createElement("button");
+
+        vstup.type = "button";
+
+        vstup.className = "tlacitko";
+
+        vstup.textContent =
+            "Jít na sklad →";
+
+        vstup.onclick = () => {
+
+            const heslo = prompt(
+                "Pro vstup do skladu zadejte heslo:"
+            );
+
+            if (heslo === null) {
+                return;
+            }
+
+            if (
+                heslo.trim().toLowerCase() !==
+                "odpor"
+            ) {
+
+                alert("Nesprávné heslo.");
+
+                return;
+            }
+
+            sessionStorage.setItem(
+                PRISTUP_KEY,
+                "ano"
+            );
+
+            document.body.classList.remove(
+                "vps-uceni"
+            );
+
+            window.scrollTo(0, 0);
+
+        };
+
+        $("vps-dalsi").append(vstup);
+
+    }
+
+    // ==========================================
+    // 13. HESLO PRO DOKONČENÍ SKLADU
+    // ==========================================
+
+    // Nejprve se ověří, že je vychystaný
+    // přesně požadovaný materiál.
+    //
+    // Teprve potom se vyžádá heslo "material".
+    //
+    // Původní ukládání a potvrzení zůstává
+    // zachované v původní funkci finishPicking().
+
+    const puvodniDokonceni = finishPicking;
+
+    finishPicking = function () {
+
+        const chybi = [...REQUIRED_MATERIALS].filter(
+            kod => !selectedMaterials.has(kod)
+        );
+
+        const navic = [...selectedMaterials].filter(
+            kod => !REQUIRED_MATERIALS.has(kod)
+        );
+
+        if (chybi.length || navic.length) {
+
+            if (typeof materialCheckVisible !== "undefined") {
+                materialCheckVisible = true;
+            }
+
+            if (typeof renderCart === "function") {
+                renderCart();
+            }
+
+            let zprava =
+                "Materiál není správně vychystaný.";
+
+            if (chybi.length) {
+
+                zprava +=
+                    "\n\nChybějící položky: " +
+                    chybi.join(", ");
+
+            }
+
+            if (navic.length) {
+
+                zprava +=
+                    "\n\nNesprávné položky navíc: " +
+                    navic.join(", ");
+
+            }
+
+            zprava +=
+                "\n\nOprav výběr a potom to zkus znovu.";
+
+            alert(zprava);
+
+            return;
+        }
+
+        // HESLO AŽ PO SPRÁVNÉM VYCHYSTÁNÍ
+
+        const heslo = prompt(
+            "Pro dokončení vychystávání zadejte heslo:"
+        );
+
+        if (heslo === null) {
+            return;
+        }
+
+        if (
+            heslo.trim().toLowerCase() !==
+            "material"
+        ) {
+
+            alert(
+                "Nesprávné heslo! " +
+                "Požádejte technologa o pomoc."
+            );
+
+            return;
+        }
+
+        // Původní dokončení skladu.
+
+        puvodniDokonceni();
+
+    };
+
+    // ==========================================
+    // 14. SPUŠTĚNÍ MINIHRY
+    // ==========================================
+
+    init();
+
+})();
+</script>
+
+
+<script>
+// KONTROLA SPRÁVNÉHO VYCHYSTÁNÍ SKLADU
+
+(function () {
+    const puvodniDokonceni = finishPicking;
+
+    finishPicking = function () {
+
+        const chybejici = [...REQUIRED_MATERIALS].filter(
+            code => !selectedMaterials.has(code)
+        );
+
+        const nespravne = [...selectedMaterials].filter(
+            code => !REQUIRED_MATERIALS.has(code)
+        );
+
+        if (chybejici.length > 0 || nespravne.length > 0) {
+
+            materialCheckVisible = true;
+            renderCart();
+
+            // Zruší případný starší stav dokončení
+            saveMaterials(false);
+
+            let zprava =
+                "Vychystávání není správně dokončeno!\n\n";
+
+            if (chybejici.length > 0) {
+                zprava +=
+                    "Chybí vám " + chybejici.length +
+                    " požadovaných položek.\n";
+            }
+
+            if (nespravne.length > 0) {
+                zprava +=
+                    "Máte navíc " + nespravne.length +
+                    " nesprávných položek.\n";
+            }
+
+            zprava +=
+                "\nZkontrolujte označení materiálu " +
+                "a opravte svůj výběr.";
+
+            alert(zprava);
+            return;
+        }
+
+        // Výběr je správný:
+        // pokračuje původní funkce včetně hesla.
+        puvodniDokonceni();
+    };
+})();
+</script>
+
+
+</body>
+</html>

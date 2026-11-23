@@ -2746,6 +2746,7 @@ function showFinishedBoard() {
 // 28. DOKONČENÍ KROKU
 // ==========================================
 
+
 function finishOperation() {
 
     if (!completed) {
@@ -2758,13 +2759,36 @@ function finishOperation() {
         return;
     }
 
+    // HESLO PRO DOKONČENÍ REFLOW TOP
+
+    const heslo = prompt(
+        "Pro dokončení reflow TOP zadejte heslo:"
+    );
+
+    if (heslo === null) {
+        return;
+    }
+
+    if (heslo.trim() !== "220") {
+
+        alert(
+            "Nesprávné heslo! Požádejte technologa o pomoc."
+        );
+
+        return;
+    }
+
+    // Uložení stavu
+
     if (!saveState()) {
         return;
     }
 
-    window.location.href =
-        "tp.html";
+    // Návrat do technologického postupu
+
+    window.location.href = "tp.html";
 }
+
 
 
 // ==========================================
