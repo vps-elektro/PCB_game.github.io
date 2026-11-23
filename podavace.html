@@ -469,6 +469,100 @@ h1 {
 }
 
 /* ==========================================
+   VELKÝ DOTYKOVÝ POSUVNÍK SMT MATERIÁLU
+   Funguje nezávisle na přetahování kartiček.
+========================================== */
+
+.material-scroll-layout {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    min-width: 0;
+}
+
+.material-scroll-layout .material-grid {
+    flex: 1;
+    min-width: 0;
+    max-height: 330px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* vlastní širší ovládání */
+}
+
+.material-scroll-layout .material-grid::-webkit-scrollbar {
+    display: none;
+}
+
+.material-scroll-controls {
+    width: 42px;
+    flex: 0 0 42px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.material-scroll-arrow {
+    width: 42px;
+    height: 43px;
+    flex: 0 0 43px;
+    border-radius: 9px;
+    border: 2px solid #8bdba5;
+    background: #365a40;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    touch-action: manipulation;
+}
+
+.material-scroll-track {
+    position: relative;
+    flex: 1;
+    min-height: 100px;
+    border: 2px solid #628c6d;
+    border-radius: 14px;
+    background: #0c2115;
+    touch-action: none;
+    cursor: pointer;
+}
+
+.material-scroll-thumb {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    top: 0;
+    min-height: 58px;
+    border-radius: 10px;
+    background: #a5efb9;
+    border: 2px solid #e2ffe9;
+    box-shadow: 0 2px 7px #0008;
+    pointer-events: none;
+}
+
+.material-scroll-track:focus-visible,
+.material-scroll-arrow:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+    .material-scroll-controls {
+        width: 52px;
+        flex-basis: 52px;
+    }
+    .material-scroll-arrow {
+        width: 52px;
+        height: 50px;
+        flex-basis: 50px;
+    }
+    .material-scroll-thumb {
+        min-height: 65px;
+    }
+}
+
+/* ==========================================
    PLOCHA PRO UCHYCENÍ DPS
 ========================================== */
 
@@ -1048,9 +1142,19 @@ h1 {
                 Ostatní součástky zůstávají dostupné.
             </p>
 
-            <div
-                class="material-grid"
-                id="softwareMaterials">
+            <!-- SEZNAM MATERIÁLU S VELKÝM POSUVNÍKEM PRO TABLET -->
+            <div class="material-scroll-layout">
+                <div
+                    class="material-grid"
+                    id="softwareMaterials">
+                </div>
+                <div class="material-scroll-controls" aria-label="Posouvání seznamu součástek">
+                    <button type="button" class="material-scroll-arrow" id="materialScrollUp" aria-label="Posunout seznam nahoru">▲</button>
+                    <div class="material-scroll-track" id="materialScrollTrack" role="scrollbar" aria-label="Posuvník SMT materiálu" aria-controls="softwareMaterials" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                        <div class="material-scroll-thumb" id="materialScrollThumb"></div>
+                    </div>
+                    <button type="button" class="material-scroll-arrow" id="materialScrollDown" aria-label="Posunout seznam dolů">▼</button>
+                </div>
             </div>
 
         </div>
@@ -2777,6 +2881,94 @@ document.addEventListener(
     cancelDrag
 );
 
+
+// ==========================================
+// 26A. POSUVNÍK MATERIÁLU PRO TABLET
+// ==========================================
+// Velká zelená lišta napravo; přetahování názvů zůstává zachováno.
+
+(function initMaterialScrollbar() {
+    const list = document.getElementById("softwareMaterials");
+    const track = document.getElementById("materialScrollTrack");
+    const thumb = document.getElementById("materialScrollThumb");
+    const up = document.getElementById("materialScrollUp");
+    const down = document.getElementById("materialScrollDown");
+    if (!list || !track || !thumb) return;
+
+    let activePointerId = null;
+
+    function maxScroll() {
+        return Math.max(0, list.scrollHeight - list.clientHeight);
+    }
+
+    function sync() {
+        const range = maxScroll();
+        const height = track.clientHeight;
+        const handle = range === 0
+            ? height
+            : Math.max(65, Math.round(height * list.clientHeight / list.scrollHeight));
+        const actual = Math.min(handle, height);
+        const travel = Math.max(0, height - actual);
+        thumb.style.height = actual + "px";
+        thumb.style.top = (range ? list.scrollTop / range * travel : 0) + "px";
+        track.setAttribute("aria-valuenow", String(range ? Math.round(list.scrollTop / range * 100) : 0));
+        up.disabled = range === 0 || list.scrollTop <= 0;
+        down.disabled = range === 0 || list.scrollTop >= range - 1;
+    }
+
+    function moveToY(clientY) {
+        const rect = track.getBoundingClientRect();
+        const range = maxScroll();
+        const handle = thumb.offsetHeight;
+        const travel = rect.height - handle;
+        if (range <= 0 || travel <= 0) return;
+        const pos = Math.min(travel, Math.max(0, clientY - rect.top - handle / 2));
+        list.scrollTop = pos / travel * range;
+        sync();
+    }
+
+    track.addEventListener("pointerdown", event => {
+        if (!event.isPrimary || event.button > 0) return;
+        event.preventDefault();
+        activePointerId = event.pointerId;
+        track.setPointerCapture(event.pointerId);
+        moveToY(event.clientY);
+    });
+    track.addEventListener("pointermove", event => {
+        if (activePointerId !== event.pointerId) return;
+        event.preventDefault();
+        moveToY(event.clientY);
+    });
+    function finishScroll(event) {
+        if (activePointerId !== event.pointerId) return;
+        activePointerId = null;
+        if (track.hasPointerCapture(event.pointerId)) {
+            track.releasePointerCapture(event.pointerId);
+        }
+    }
+    track.addEventListener("pointerup", finishScroll);
+    track.addEventListener("pointercancel", finishScroll);
+
+    track.addEventListener("keydown", event => {
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+            list.scrollBy({top: event.key === "ArrowDown" ? 80 : -80, behavior: "smooth"});
+        }
+    });
+    up.addEventListener("click", () => list.scrollBy({top: -180, behavior: "smooth"}));
+    down.addEventListener("click", () => list.scrollBy({top: 180, behavior: "smooth"}));
+    list.addEventListener("scroll", sync, {passive: true});
+    window.addEventListener("resize", sync);
+    if (typeof ResizeObserver !== "undefined") {
+        const observer = new ResizeObserver(sync);
+        observer.observe(list);
+        observer.observe(track);
+    }
+    // Materiál se do seznamu vykresluje dynamicky.
+    const mutationObserver = new MutationObserver(sync);
+    mutationObserver.observe(list, {childList: true});
+    sync();
+})();
 
 // ==========================================
 // 27. AKTUALIZACE STAVOVÉHO PANELU
