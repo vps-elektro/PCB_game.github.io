@@ -532,11 +532,8 @@ h1 {
             <strong id="totalQuantity">0</strong>
         </div>
 
-        <button
-            class="action-button secondary-button"
-            onclick="openBOM()">
-            📋 Otevřít kusovník
-        </button>
+        <p id="pickingProgress" class="picking-progress" aria-live="polite"></p>
+        <p class="cart-description">Hledejte označené položky v regálu. Prázdný čtvereček označuje potřebný materiál, fajfka již vychystaný materiál.</p>
 
         <button
             class="action-button primary-button"
@@ -589,8 +586,8 @@ h1 {
         <div class="components" id="componentList"></div>
 
         <p class="box-footer">
-            Kliknutím na Vybrat přidáte materiálovou
-            položku do vychystaného seznamu.
+            Potřebné položky jsou zvýrazněné žlutým rámečkem a čtverečkem.
+            Kliknutím na Vybrat je přidáte do seznamu.
             <br>
             Opětovným kliknutím ji můžete odebrat.
         </p>
@@ -1216,6 +1213,13 @@ function openStorage(position, button) {
             () => toggleMaterial(code)
         );
 
+        if (REQUIRED_MATERIALS.has(code)) {
+            component.classList.add("required-material");
+            const marker = document.createElement("span");
+            marker.className = "material-marker";
+            marker.setAttribute("aria-label", "Požadovaná položka");
+            component.appendChild(marker);
+        }
         component.appendChild(description);
         component.appendChild(selectButton);
 
@@ -1264,6 +1268,11 @@ function updateComponentButtons() {
             isSelected
         );
 
+        const marker = component.querySelector(".material-marker");
+        if (marker) {
+            marker.textContent = isSelected ? "✓" : "";
+            marker.setAttribute("aria-label", isSelected ? "Vychystáno" : "Požadovaná položka");
+        }
         button.textContent =
             isSelected
                 ? "✓ Vybráno"
@@ -1366,12 +1375,61 @@ function clearCart() {
 // =========================================
 
 function openBOM() {
+    document.body.classList.remove("vps-uceni");
+    document.body.classList.add("vps-bom");
 
-    window.open(
-        "ks.html",
-        "_blank",
-        "noopener"
-    );
+    const tbody = document.getElementById("bomRows");
+    tbody.replaceChildren();
+
+    const refs = {
+        MR03: "R2, R4",
+        MR09: "R1, R3",
+        MC01: "C3, C4",
+        MC11: "C2",
+        MR12: "R6",
+        MC14: "C1",
+        MP25: "U1, U2",
+        MP31: "D3",
+        MP34: "D1",
+        MP35: "D2",
+        MR13: "R5, R7, R8",
+        MS01: "—"
+    };
+
+    for (const code of REQUIRED_MATERIALS) {
+
+        const skladovaPozice = Object.keys(warehouseData)
+            .find(position =>
+                warehouseData[position].components.includes(code)
+            ) || "—";
+
+        const tr = document.createElement("tr");
+
+        for (const value of [
+            code,
+            MATERIAL_VALUES[code],
+            refs[code],
+            skladovaPozice
+        ]) {
+            const td = document.createElement("td");
+            td.textContent = value;
+            tr.append(td);
+        }
+
+        tbody.append(tr);
+    }
+
+    window.scrollTo(0, 0);
+}
+function enterWarehouse() {
+    const heslo = prompt("Pro vstup do skladu zadejte heslo:");
+    if (heslo === null) return;
+    if (heslo.trim().toLowerCase() !== "odpor") {
+        alert("Nesprávné heslo."); return;
+    }
+    document.body.classList.remove("vps-bom");
+    renderCart();
+    window.scrollTo(0, 0);
 }
 
 
@@ -1472,7 +1530,8 @@ const originalRenderCart = renderCart;
 renderCart = function() {
 
     originalRenderCart();
-
+    const done = [...REQUIRED_MATERIALS].filter(code => selectedMaterials.has(code)).length;
+    document.getElementById("pickingProgress").textContent = `Vychystáno správně: ${done} / ${REQUIRED_MATERIALS.size}`;
     if (!materialCheckVisible) return;
 
     document.querySelectorAll(
@@ -1524,6 +1583,7 @@ clearCart = function() {
     materialCheckVisible = false;
     originalClearCart();
 };
+renderCart();
 
 </script>
 
@@ -1873,6 +1933,43 @@ body.vps-uceni #vps-minihra {
 }
 </style>
 
+<style>
+body.vps-bom > header.header, body.vps-bom > main.game-layout,
+body.vps-bom > footer.footer { display:none !important; }
+#bomStage { display:none; max-width:1050px; margin:24px auto; padding:24px; }
+body.vps-bom #bomStage { display:block; }
+.bom-panel { background:#1b3425; border:1px solid #668b6d; border-radius:14px; padding:20px; }
+.bom-scroll { overflow-x:auto; margin:20px 0; }
+.bom-table { width:100%; border-collapse:collapse; text-align:left; }
+.bom-table th,.bom-table td { padding:12px; border-bottom:1px solid #587b61; }
+.bom-table th { color:#8bdba5; }
+.component.required-material { border:2px solid #ffe18a; }
+.component.required-material.selected { border-color:#8bdba5; }
+.material-marker { flex-shrink:0; width:24px; height:24px; border:2px solid #ffe18a; border-radius:5px; color:#ffe18a; display:flex; align-items:center; justify-content:center; font-weight:bold; }
+.component.selected .material-marker { color:#10291b; background:#8bdba5; border-color:#8bdba5; }
+.picking-progress { margin:12px 0; font-weight:bold; color:#8bdba5; }
+</style>
+<section id="bomStage">
+    <h1>Kusovník – semafor</h1>
+    <div class="bom-panel">
+        <p class="description">Kusovník je seznam materiálu potřebného pro výrobu výrobku. Obsahuje materiálové číslo, popis součástky a její označení na desce.</p>
+        <div class="bom-scroll">
+    <table class="bom-table">
+        <thead>
+            <tr>
+                <th>Materiálové číslo</th>
+                <th>Popis součástky</th>
+                <th>Pozice na DPS</th>
+                <th>Skladová pozice</th>
+            </tr>
+        </thead>
+        <tbody id="bomRows"></tbody>
+    </table>
+</div>
+        <p class="description">Ve skladu vychystejte každé požadované materiálové číslo jednou. Potřebné položky budou označené přímo v regálu.</p>
+        <button class="action-button primary-button" onclick="enterWarehouse()">Pokračovat do skladu →</button>
+    </div>
+</section>
 <div id="vps-minihra">
 
     <h1>Poznej elektronické součástky</h1>
@@ -2104,23 +2201,8 @@ body.vps-uceni #vps-minihra {
     // 5. ULOŽENÍ PŘÍSTUPU DO SKLADU
     // ==========================================
 
-    const PRISTUP_KEY =
-        "vps_sklad_pristup_po_minihre";
-
-    // V téže kartě prohlížeče se již
-    // dokončená minihra neopakuje.
-
-    if (
-        sessionStorage.getItem(PRISTUP_KEY) === "ano"
-    ) {
-
-        document.body.classList.remove("vps-uceni");
-
-    } else {
-
-        document.body.classList.add("vps-uceni");
-
-    }
+    // Při každém otevření začínáme poznávačkou.
+    document.body.classList.add("vps-uceni");
 
     // ==========================================
     // 6. VYKRESLENÍ PŘIŘAZENÍ
@@ -2672,8 +2754,7 @@ body.vps-uceni #vps-minihra {
         $("vps-moznosti").replaceChildren();
 
         $("vps-test-zprava").textContent =
-            "Teď můžeš přejít do skladu " +
-            "elektronických součástek.";
+            "Teď se seznámíme s kusovníkem a potom přejdeme do skladu.";
 
         $("vps-dalsi").replaceChildren();
 
@@ -2684,41 +2765,8 @@ body.vps-uceni #vps-minihra {
 
         vstup.className = "tlacitko";
 
-        vstup.textContent =
-            "Jít na sklad →";
-
-        vstup.onclick = () => {
-
-            const heslo = prompt(
-                "Pro vstup do skladu zadejte heslo:"
-            );
-
-            if (heslo === null) {
-                return;
-            }
-
-            if (
-                heslo.trim().toLowerCase() !==
-                "odpor"
-            ) {
-
-                alert("Nesprávné heslo.");
-
-                return;
-            }
-
-            sessionStorage.setItem(
-                PRISTUP_KEY,
-                "ano"
-            );
-
-            document.body.classList.remove(
-                "vps-uceni"
-            );
-
-            window.scrollTo(0, 0);
-
-        };
+        vstup.textContent = "Zobrazit kusovník →";
+        vstup.onclick = openBOM;
 
         $("vps-dalsi").append(vstup);
 
@@ -2824,59 +2872,7 @@ body.vps-uceni #vps-minihra {
 </script>
 
 
-<script>
-// KONTROLA SPRÁVNÉHO VYCHYSTÁNÍ SKLADU
 
-(function () {
-    const puvodniDokonceni = finishPicking;
-
-    finishPicking = function () {
-
-        const chybejici = [...REQUIRED_MATERIALS].filter(
-            code => !selectedMaterials.has(code)
-        );
-
-        const nespravne = [...selectedMaterials].filter(
-            code => !REQUIRED_MATERIALS.has(code)
-        );
-
-        if (chybejici.length > 0 || nespravne.length > 0) {
-
-            materialCheckVisible = true;
-            renderCart();
-
-            // Zruší případný starší stav dokončení
-            saveMaterials(false);
-
-            let zprava =
-                "Vychystávání není správně dokončeno!\n\n";
-
-            if (chybejici.length > 0) {
-                zprava +=
-                    "Chybí vám " + chybejici.length +
-                    " požadovaných položek.\n";
-            }
-
-            if (nespravne.length > 0) {
-                zprava +=
-                    "Máte navíc " + nespravne.length +
-                    " nesprávných položek.\n";
-            }
-
-            zprava +=
-                "\nZkontrolujte označení materiálu " +
-                "a opravte svůj výběr.";
-
-            alert(zprava);
-            return;
-        }
-
-        // Výběr je správný:
-        // pokračuje původní funkce včetně hesla.
-        puvodniDokonceni();
-    };
-})();
-</script>
 
 
 </body>
